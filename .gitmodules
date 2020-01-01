@@ -1,0 +1,3 @@
+[submodule "c++/utilsCpp"]
+	path = c++/utilsCpp
+	url = git@tomhp.fritz.box:submodule/utilsCpp.git

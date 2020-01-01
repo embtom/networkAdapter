@@ -1,0 +1,2 @@
+add_subdirectory(networkingAdapter)
+add_subdirectory(utilsCpp)
