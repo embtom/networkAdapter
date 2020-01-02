@@ -1,5 +1,6 @@
 project(networkingAdapter)
 
+include(GNUInstallDirs)
 #######################################################################################
 # settings 
 #######################################################################################
@@ -46,8 +47,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 #Install
 ######################################################
 
-include(GNUInstallDirs)
-
 install(TARGETS ${PROJECT_NAME} EXPORT networkingAdapter-config
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
@@ -58,5 +57,5 @@ install(DIRECTORY include
 install(EXPORT networkingAdapter-config
     NAMESPACE
         EMBTOM::
-    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )

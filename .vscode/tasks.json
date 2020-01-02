@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build Deb",
+            "type": "shell",
+            "command": "${workspaceFolder}/debBuild.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+        // {
+        //     "label": "osbaseTest_g",
+        //     "type": "shell",
+        //     "command": "${workspaceFolder}/build/Debug/test/osbaseTest_g",
+        //     "problemMatcher": [
+        //         "$gcc"
+        //     ]
+        // }
+    ]
+}

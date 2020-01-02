@@ -6,7 +6,7 @@
 	dh $@ --buildsystem=cmake
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DNETWORKINGADAPTER_BUILD_TEST=ON
 
 override_dh_strip:
 	dh_strip --dbg-package=networkingadapter-dbg

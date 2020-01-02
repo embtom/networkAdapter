@@ -1,0 +1,13 @@
+{  
+    "window.zoomLevel": 0.1,
+    "editor.fontSize": 12,   
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "cmake.buildDirectory": "${workspaceRoot}/build/${buildType}",
+    //"cmake.generator": "Unix Makefiles",
+    "cmake.generator": "Ninja",
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
+    "cmake.configureArgs": [
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DNETWORKINGADAPTER_BUILD_TEST=ON"
+    ]
+}

@@ -33,6 +33,8 @@
 #include <arpa/inet.h>
 #include <error_msg.hpp>
 #include <string.h>
+#include <netinet/in.h>
+
 #include <make_unordered_map.h>
 #include <HostName.h>
 
@@ -74,7 +76,7 @@ CDataSocket CStreamClient::connect(const std::string& rHost, int port)
     {
         sockaddr_in serverAddr{};
         serverAddr.sin_family       = AF_INET;
-        serverAddr.sin_port         = ::htons(port);
+        serverAddr.sin_port         = htons(port);
         std::memcpy(&serverAddr.sin_addr, (*it).to_v4(), sizeof(in_addr));
 
         if (::connect(m_baseSocket.getFd(), (sockaddr*)&serverAddr, sizeof(serverAddr)) != 0) {
@@ -85,7 +87,7 @@ CDataSocket CStreamClient::connect(const std::string& rHost, int port)
     {
         sockaddr_in6 serverAddr{};
         serverAddr.sin6_family       = AF_INET6;
-        serverAddr.sin6_port         = ::htons(port);
+        serverAddr.sin6_port         = htons(port);
         std::memcpy(&serverAddr.sin6_addr, (*it).to_v6(), sizeof(in6_addr));
 
         if (::connect(m_baseSocket.getFd(), (sockaddr*)&serverAddr, sizeof(serverAddr)) != 0) {
