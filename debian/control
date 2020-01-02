@@ -1,0 +1,30 @@
+Source: networkingadapter
+Section: comm
+Priority: optional
+Maintainer: Thomas Willetal <t.willetal@gmail.com>
+Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4)
+Standards-Version: 4.3.0
+
+Package: networkingadapter
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, 
+         ${misc:Depends}, 
+Description: emtom networkingadapter
+
+Package: networkingadapter-dev
+Architecture: any
+Section: libdevel
+Depends: networkingadapter,
+         ${misc:Depends}
+Description: emtom logger [development]
+
+Package: networkingadapter-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:
+    networkingadapter (= ${binary:Version}),
+    ${misc:Depends}
+Description: debugging symbols for networkingadapter
+

@@ -1,0 +1,6 @@
+networkingAdapter (0.1.0) bionic; urgency=medium
+
+  * Initial creation of the networkingAdapter
+
+ -- Thomas Willetal <t.willetal@gmail.com>  Tue, 02 Jan 2020 09:25:10 +0200
+
