@@ -26,14 +26,26 @@
 #ifndef _DGRAMCLIENT_H_
 #define _DGRAMCLIENT_H_
 
+#include <string>
+#include <BaseSocket.hpp>
+
 namespace EtNet
 {
+
+class CBaseSocket;
 
 class CDgramClient
 {
 public:
-    CDgramClient();
+    CDgramClient(CBaseSocket &&rBaseSocket);
+
+    CDgramClient(const CDgramClient&)             = delete;
+    CDgramClient& operator= (const CDgramClient&) = delete;
+    CDgramClient(CDgramClient&&)                  = default;
+    CDgramClient& operator= (CDgramClient&&)      = default;
+    CDgramClient()                                = default;
 private:
+    CBaseSocket m_baseSocket;
 };
 
 } // EtNet

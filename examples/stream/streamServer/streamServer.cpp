@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET6_STREAM);
+    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
     EtNet::CStreamServer CStreamServer(std::move(baseSocket), 5001);
     while(true)
     {   

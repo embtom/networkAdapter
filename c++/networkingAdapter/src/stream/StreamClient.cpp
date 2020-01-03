@@ -31,12 +31,12 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <error_msg.hpp>
 #include <string.h>
 #include <netinet/in.h>
 
-#include <make_unordered_map.h>
+#include <error_msg.hpp>
 #include <HostName.h>
+#include <IpAddress.hpp>
 
 using namespace EtNet;
 

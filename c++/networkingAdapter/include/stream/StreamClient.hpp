@@ -26,13 +26,13 @@
 #ifndef _CStreamClient_H_
 #define _CStreamClient_H_
 
-#include <stream/DataSocket.hpp>
 #include <string>
-#include <unordered_map>
-#include <IpAddress.hpp>
+#include <BaseSocket.hpp>
+#include <stream/DataSocket.hpp>
 
 namespace EtNet
 {
+class CBaseSocket;
 
 class CStreamClient
 {

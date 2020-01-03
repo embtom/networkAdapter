@@ -24,10 +24,16 @@
  */
 
 #include <dgram/DgramClient.hpp>
+#include <error_msg.hpp>
+#include <HostName.h>
+#include <IpAddress.hpp>
+
+
 
 using namespace EtNet;
 
-CDgramClient::CDgramClient()
+CDgramClient::CDgramClient(CBaseSocket &&rBaseSocket) :
+     m_baseSocket(std::move(rBaseSocket))
 {
 
 }
