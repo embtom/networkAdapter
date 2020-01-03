@@ -3,10 +3,10 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --buildsystem=cmake
+	dh $@ --parallel --buildsystem=cmake
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DNETWORKINGADAPTER_BUILD_TEST=ON
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE=RelWithDebInfo -DNETWORKINGADAPTER_BUILD_TEST=OFF -DNETWORKINGADAPTER_BUILD_EXAMPLES=OFF
 
 override_dh_strip:
-	dh_strip --dbg-package=networkingadapter-dbg
+	dh_strip -p networkingadapter --dbg-package=networkingadapter-dbg

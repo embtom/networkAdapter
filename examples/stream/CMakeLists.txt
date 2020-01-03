@@ -1,0 +1,2 @@
+add_subdirectory(streamClient)
+add_subdirectory(streamServer)
