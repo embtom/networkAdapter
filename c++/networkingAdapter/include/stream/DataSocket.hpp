@@ -28,11 +28,14 @@
 #define _DATASOCKET_H_
 
 #include <cstddef>
+#include <functional>
 #include <BaseSocket.hpp>
 #include <stdint.h>
 
 namespace EtNet
 {
+    using Callback = std::function<bool (std::size_t len)>;
+
     auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
     class CDataSocket : public  CBaseSocket
@@ -48,14 +51,10 @@ namespace EtNet
         CDataSocket(ESocketMode opMode);
         CDataSocket(int socketFd);
 
-        template<typename F>
-        std::size_t recive(uint8_t* buffer, std::size_t len, F scanForEnd = defaultNoScanForEnd);
+        std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
         void        send(const char* buffer, std::size_t len);
     };
 
 }
-
-#include <stream/DataSocket.inl>
-
 
 #endif /* _DATASOCKET_H_ */
