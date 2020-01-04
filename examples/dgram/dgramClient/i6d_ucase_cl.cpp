@@ -16,7 +16,7 @@
    the server, and then display the contents of the server's response datagram.
 */
 #include <BaseSocket.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 #include "i6d_ucase.h"
 #undef min
 #undef max
@@ -24,7 +24,7 @@
 int
 main(int argc, char *argv[])
 {
-    EtNet::CDataSocket baseSocket(EtNet::ESocketMode::INET_DGRAM);
+    EtNet::CStreamDataLink baseSocket(EtNet::ESocketMode::INET_DGRAM);
 
     struct sockaddr_in svaddr;
     int  j;

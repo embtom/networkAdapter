@@ -63,7 +63,7 @@ int main()
 //     char buf[BUF_SIZE];
 //     char claddrStr[INET6_ADDRSTRLEN];
 
-//     EtNet::CDataSocket dataSocket(EtNet::ESocketMode::INET_DGRAM);
+//     EtNet::CStreamDataLink dataSocket(EtNet::ESocketMode::INET_DGRAM);
 
 //     memset(&svaddr, 0, sizeof(struct sockaddr_in));
 //     svaddr.sin_family = AF_INET;

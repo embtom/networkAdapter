@@ -50,6 +50,7 @@ class CBaseSocket
     CBaseSocket(ESocketMode opMode);
 
     static CBaseSocket& SoReuseSocket(CBaseSocket &rBaseSocket);
+    static CBaseSocket& SoBroadcast(CBaseSocket &rBaseSocket);
 
     virtual ~CBaseSocket();
     int getFd() const;

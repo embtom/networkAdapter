@@ -2,7 +2,7 @@
 #include <iostream>
 #include <BaseSocket.hpp>
 #include <stream/StreamServer.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 #undef min
 #undef max
 

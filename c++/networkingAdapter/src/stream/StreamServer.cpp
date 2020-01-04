@@ -85,7 +85,7 @@ CStreamServer::CStreamServer(CBaseSocket&& rhs, int port) :
     }
 }
 
-std::tuple<CDataSocket, CIpAddress> CStreamServer::waitForConnection()
+std::tuple<CStreamDataLink, CIpAddress> CStreamServer::waitForConnection()
 {
     union
     {   
@@ -124,6 +124,6 @@ std::tuple<CDataSocket, CIpAddress> CStreamServer::waitForConnection()
         throw std::runtime_error(utils::buildErrorMessage("ServerSocket:", __func__, ": accept: ", strerror(errno)));
     }
     std::cout << "Server is connected from: "<< peerAddress.toString() << std::endl;
-    return std::tuple(CDataSocket(newSocket),peerAddress);
+    return std::tuple(CStreamDataLink(newSocket),peerAddress);
 }
 

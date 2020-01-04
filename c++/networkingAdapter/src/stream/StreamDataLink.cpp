@@ -29,19 +29,19 @@
 #include <errno.h>
 #include <string.h>
 #include <error_msg.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 
 using namespace EtNet;
 
-CDataSocket::CDataSocket(ESocketMode opMode) : 
+CStreamDataLink::CStreamDataLink(ESocketMode opMode) : 
     CBaseSocket(opMode)
 { }
 
-CDataSocket::CDataSocket(int socketFd) :
+CStreamDataLink::CStreamDataLink(int socketFd) :
     CBaseSocket(socketFd)
 { }
 
-void CDataSocket::send(const char* buffer, std::size_t len)
+void CStreamDataLink::send(const char* buffer, std::size_t len)
 {
     std::size_t dataWritten = 0;
 
@@ -91,7 +91,7 @@ void CDataSocket::send(const char* buffer, std::size_t len)
     return;
 }
 
-std::size_t CDataSocket::recive(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+std::size_t CStreamDataLink::recive(uint8_t* buffer, std::size_t len, Callback scanForEnd)
 {
     if (getFd() == 0)
     {

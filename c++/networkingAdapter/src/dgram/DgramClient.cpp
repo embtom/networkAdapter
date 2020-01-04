@@ -34,7 +34,5 @@ using namespace EtNet;
 
 CDgramClient::CDgramClient(CBaseSocket &&rBaseSocket) :
      m_baseSocket(std::move(rBaseSocket))
-{
-
-}
+{ }
 

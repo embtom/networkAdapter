@@ -44,7 +44,7 @@ CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
     m_baseSocket(std::move(rBaseSocket))
 { }
 
-CDataSocket CStreamClient::connect(const std::string& rHost, int port)
+CStreamDataLink CStreamClient::connect(const std::string& rHost, int port)
 {
     CHostLookup::IpAddresses ipList; 
     try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
@@ -98,5 +98,5 @@ CDataSocket CStreamClient::connect(const std::string& rHost, int port)
         throw std::logic_error(utils::buildErrorMessage("ConnectSocket::", __func__, " : No valid Ip to connect"));
     }
 
-    return CDataSocket(m_baseSocket.getFd());
+    return CStreamDataLink(m_baseSocket.getFd());
 }

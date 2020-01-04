@@ -29,7 +29,7 @@
 #include <tuple>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
@@ -49,7 +49,7 @@ public:
     CStreamServer& operator= (CStreamServer&&)      = default;
     CStreamServer()                                 = default;
     
-    std::tuple<CDataSocket, CIpAddress> waitForConnection();
+    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
     CBaseSocket m_baseSocket;
 };

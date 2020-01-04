@@ -28,7 +28,7 @@
 
 #include <string>
 #include <BaseSocket.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
@@ -45,7 +45,7 @@ public:
     CStreamClient& operator= (CStreamClient&&)      = default;
     CStreamClient()                                 = default;
 
-    CDataSocket connect(const std::string& rHost, int port);
+    CStreamDataLink connect(const std::string& rHost, int port);
 private:
     CBaseSocket m_baseSocket;
 };
