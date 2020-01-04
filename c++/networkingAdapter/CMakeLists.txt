@@ -10,6 +10,7 @@ set(SOURCES_NA  src/IpAddress.cpp
                 src/stream/StreamDataLink.cpp
                 src/stream/StreamServer.cpp
                 src/stream/StreamClient.cpp
+                src/dgram/DgramDataLink.cpp
                 src/dgram/DgramServer.cpp
                 src/dgram/DgramClient.cpp)
 
@@ -19,6 +20,7 @@ set (HEADERS_NA include/IpAddress.hpp
                 include/stream/StreamDataLink.hpp
                 include/stream/StreamServer.hpp
                 include/stream/StreamClient.hpp
+                include/dgram/DgramDataLink.hpp
                 include/dgram/DgramServer.hpp
                 include/dgram/DgramClient.hpp)
                 
@@ -31,7 +33,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   17
     CXX_EXTENSIONS yes
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE utilsCpp)
+target_link_libraries(${PROJECT_NAME} PUBLIC utilsCpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

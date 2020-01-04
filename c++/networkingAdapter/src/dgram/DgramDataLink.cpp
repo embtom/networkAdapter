@@ -23,74 +23,24 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <dgram/DgramServer.hpp>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <stdexcept>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 #include <error_msg.hpp>
-
-class CDgramServerPrivate
-
-
-
+#include <dgram/DgramDataLink.hpp>
 
 using namespace EtNet;
 
-CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
-    m_baseSocket(std::move(rhs))
-{
-    int fd = m_baseSocket.getFd();
-    auto setupServer = [fd](const sockaddr* addr, socklen_t len)
-    {
-        if (::bind(fd, addr, len) != 0)
-        {
-            throw std::runtime_error(utils::buildErrorMessage("ServerSocket::", __func__, ": bind: ", strerror(errno)));
-        }
-    };
+CDgramDataLink::CDgramDataLink(ESocketMode opMode) : 
+    CBaseSocket(opMode)
+{ }
 
-    int domain;
-    int length = sizeof(int);
-    getsockopt(fd, SOL_SOCKET, SO_DOMAIN, &domain, (socklen_t*)&length);
+CDgramDataLink::CDgramDataLink(int socketFd) :
+    CBaseSocket(socketFd)
+{ }
 
-    switch (domain)
-    {
-        case AF_INET:
-        {
-            sockaddr_in serverAddr {0};
-            serverAddr.sin_family       = AF_INET;
-            serverAddr.sin_port         = htons(port);
-            serverAddr.sin_addr.s_addr  = INADDR_ANY;
-            setupServer(reinterpret_cast<sockaddr*>(&serverAddr), sizeof(sockaddr_in));
-            break;
-        }
-        case AF_INET6:
-        {
-            sockaddr_in6 serverAddr {0};
-            serverAddr.sin6_family       = AF_INET6;
-            serverAddr.sin6_port         = htons(port);
-            serverAddr.sin6_addr         = in6addr_any;
-            setupServer(reinterpret_cast<sockaddr*>(&serverAddr), sizeof(sockaddr_in6));
-            break;
-        }
-        default:
-        {
-            throw std::logic_error(utils::buildErrorMessage("ServerSocket::", __func__));
-            break;
-        } 
-    }
-    
-}
-
-CDgramDataLink CDgramServer::waitForConnection()
-{
-
-}
-
-
-void CDgramServer::sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len)
+void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len)
 {
     sockaddr_in clAddr{};
     sockaddr_in6 clAddr6{};
@@ -120,7 +70,7 @@ void CDgramServer::sendTo(const SClientAddr& rClientAddr, const char* buffer, st
     std::size_t dataWritten = 0;
     while(dataWritten < len)
     {
-        std::size_t put = ::sendto(m_baseSocket.getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -164,7 +114,7 @@ void CDgramServer::sendTo(const SClientAddr& rClientAddr, const char* buffer, st
     return;
 }
 
-std::size_t CDgramServer::reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd)
 {
     union e
     {   
@@ -206,7 +156,7 @@ std::size_t CDgramServer::reciveFrom(uint8_t* buffer, std::size_t len, Callback 
     while(dataRead < len)
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(m_baseSocket.getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -266,6 +216,4 @@ std::size_t CDgramServer::reciveFrom(uint8_t* buffer, std::size_t len, Callback 
     }
     return dataRead;
 }
-
-
 

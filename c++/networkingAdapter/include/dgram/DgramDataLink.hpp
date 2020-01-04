@@ -23,36 +23,43 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _STREAMDATALINK_H_
-#define _STREAMDATALINK_H_
+#ifndef _DGRAMDATALINK_H_
+#define _DGRAMDATALINK_H_
 
+#include <stdint.h>
 #include <cstddef>
 #include <functional>
 #include <BaseSocket.hpp>
-#include <stdint.h>
+#include <IpAddress.hpp>
 
 namespace EtNet
-{
+{   
 constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
-class CStreamDataLink : public  CBaseSocket
+struct SClientAddr
 {
-public:
-    using Callback = std::function<bool (std::size_t len)>;
-    
-    CStreamDataLink(CStreamDataLink &&rhs)              = default;
-    CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
-    CStreamDataLink(CStreamDataLink const&)             = delete;
-    CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
-    CStreamDataLink()                               = default;
-
-    CStreamDataLink(ESocketMode opMode);
-    CStreamDataLink(int socketFd);
-
-    std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
-    void        send(const char* buffer, std::size_t len);
+    CIpAddress Ip;
+    unsigned int Port;
 };
 
-}
+class CDgramDataLink : public CBaseSocket
+{
+public:
+    using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
+ 
+    CDgramDataLink(CDgramDataLink &&rhs)              = default;
+    CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;
+    CDgramDataLink(CDgramDataLink const&)             = delete;
+    CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
+    CDgramDataLink()                               = default;
 
-#endif /* _STREAMDATALINK_H_ */
+    CDgramDataLink(ESocketMode opMode);
+    CDgramDataLink(int socketFd);
+
+    void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
+    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
+};
+
+} // EtNet
+
+#endif // _DGRAMDATALINK_H_
