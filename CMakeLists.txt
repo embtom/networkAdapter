@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+find_package(Threads REQUIRED)
+
 option (NETWORKINGADAPTER_BUILD_TEST "build tests of the networkingAdapter" ON)
 option (NETWORKINGADAPTER_BUILD_EXAMPLES "build examples of the networkingAdapter" ON)
 
@@ -8,7 +10,7 @@ set(UTILSCPP_BUILD_TEST ${NETWORKINGADAPTER_BUILD_TEST})
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
-#use of standard install paths
+
 
 ######################################################
 #Subdirectoris 

@@ -33,7 +33,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   17
     CXX_EXTENSIONS yes
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE utilsCpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE utilsCpp Threads::Threads)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

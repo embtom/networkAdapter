@@ -29,11 +29,15 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#include <iostream>
 #include <stdexcept>
+#include <future>
+
 #include <error_msg.hpp>
 #include <fdSet.h>
 #include <BaseSocket.hpp>
-#include <iostream>
+
 
 
 namespace EtNet
@@ -49,8 +53,9 @@ public:
     CDgramDataLink waitForConnection();
 
 private:
-    utils::CFdSet m_FdSet;
-    CBaseSocket   m_baseSocket;
+    utils::CFdSet       m_FdSet;
+    CBaseSocket         m_baseSocket;
+    std::promise<int>   m_connectionPromise;
 };
 
 }
@@ -113,11 +118,22 @@ int CDgramServerPrivate::getFd()
 void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
 {
     std::cout << "Hallo fd" << fd << std::endl;
+    m_connectionPromise.set_value(fd);
 }
     
 CDgramDataLink CDgramServerPrivate::waitForConnection()
 {
-    m_FdSet.Select();
+    m_connectionPromise = std::promise<int>{};
+    if (utils::CFdSetRetval::UNBLOCK == m_FdSet.Select()) {
+        return CDgramDataLink(-1);
+    }
+    
+    int fd =  m_connectionPromise.get_future().get();
+
+    std::cout << "waitForConnection: " << fd << std::endl; 
+
+    return CDgramDataLink(fd);
+
 }
 
 void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
