@@ -35,6 +35,8 @@ int main()
         int rcvLen;
         EtNet::SClientAddr addr;
 
+        DgramServer.waitForConnection();
+
         rcvLen = DgramServer.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SClientAddr ClientAddr, std::size_t len) 
         {
             std::cout << "Message form: " << addr.Ip.toString() << " with length: " << len << std::endl;

@@ -95,7 +95,7 @@ CBaseSocket::~CBaseSocket()
     }
 }
 
-int CBaseSocket::getFd() const
+int CBaseSocket::getFd() const noexcept
 {
     return m_socketFd;
 }

@@ -53,7 +53,7 @@ class CBaseSocket
     static CBaseSocket& SoBroadcast(CBaseSocket &rBaseSocket);
 
     virtual ~CBaseSocket();
-    int getFd() const;
+    int getFd() const noexcept;
     int getDomain() const noexcept;
 
     protected:

@@ -31,16 +31,34 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include <error_msg.hpp>
+#include <fdSet.h>
+#include <BaseSocket.hpp>
+#include <iostream>
+
+
+namespace EtNet
+{
 
 class CDgramServerPrivate
+{
+public:
+    CDgramServerPrivate(CBaseSocket&& rBaseSocket, int port);
+    ~CDgramServerPrivate();
+    int getFd();
+    void incomingConnectionCb(int fd) noexcept;
+    CDgramDataLink waitForConnection();
 
+private:
+    utils::CFdSet m_FdSet;
+    CBaseSocket   m_baseSocket;
+};
 
-
+}
 
 using namespace EtNet;
 
-CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
-    m_baseSocket(std::move(rhs))
+CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, int port) :
+    m_baseSocket(std::move(rBaseSocket))
 {
     int fd = m_baseSocket.getFd();
     auto setupServer = [fd](const sockaddr* addr, socklen_t len)
@@ -51,11 +69,7 @@ CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
         }
     };
 
-    int domain;
-    int length = sizeof(int);
-    getsockopt(fd, SOL_SOCKET, SO_DOMAIN, &domain, (socklen_t*)&length);
-
-    switch (domain)
+    switch (m_baseSocket.getDomain())
     {
         case AF_INET:
         {
@@ -81,12 +95,46 @@ CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
             break;
         } 
     }
-    
+
+    m_FdSet.AddFd(m_baseSocket.getFd(), [this] (int fd) {incomingConnectionCb(fd);});
 }
+
+CDgramServerPrivate::~CDgramServerPrivate()
+{
+    m_FdSet.RemoveFd(m_baseSocket.getFd());
+    m_FdSet.UnBlock();
+}
+
+int CDgramServerPrivate::getFd()
+{
+    return m_baseSocket.getFd();
+}
+
+void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
+{
+    std::cout << "Hallo fd" << fd << std::endl;
+}
+    
+CDgramDataLink CDgramServerPrivate::waitForConnection()
+{
+    m_FdSet.Select();
+}
+
+void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
+{
+    delete it;
+}
+
+CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, int port) :
+    m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))
+{ }
+
+CDgramServer::~CDgramServer() = default;
+
 
 CDgramDataLink CDgramServer::waitForConnection()
 {
-
+    return m_pPrivate->waitForConnection();
 }
 
 
@@ -120,7 +168,7 @@ void CDgramServer::sendTo(const SClientAddr& rClientAddr, const char* buffer, st
     std::size_t dataWritten = 0;
     while(dataWritten < len)
     {
-        std::size_t put = ::sendto(m_baseSocket.getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(m_pPrivate->getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -206,7 +254,7 @@ std::size_t CDgramServer::reciveFrom(uint8_t* buffer, std::size_t len, Callback 
     while(dataRead < len)
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(m_baseSocket.getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(m_pPrivate->getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

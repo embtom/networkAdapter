@@ -30,16 +30,22 @@
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
 #include <dgram/DgramDataLink.hpp>
-//#include <unique_opaque.h>
+#include <memory>
 
 namespace EtNet
 {
+
+
+
 
 // struct SClientAddr
 // {
 //     CIpAddress Ip;
 //     unsigned int Port;
 // };
+class CDgramServerPrivate;
+
+
 
 
 class CDgramServer
@@ -55,13 +61,23 @@ public:
     CDgramServer& operator= (CDgramServer&&)      = default;
     CDgramServer()                                = default;
 
+    ~CDgramServer();
     CDgramDataLink waitForConnection();
 
     void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
     std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
 
 private:
-    CBaseSocket m_baseSocket;
+    static void privateDeleterHook(CDgramServerPrivate *it);
+   
+    struct privateDeleter
+    {
+        void operator()(CDgramServerPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+
+    std::unique_ptr<CDgramServerPrivate,privateDeleter> m_pPrivate;
 };
 
 } // EtNet
