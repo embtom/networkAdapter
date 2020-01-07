@@ -36,18 +36,8 @@
 namespace EtNet
 {
 
-
-
-
-// struct SClientAddr
-// {
-//     CIpAddress Ip;
-//     unsigned int Port;
-// };
+class CBaseSocket;
 class CDgramServerPrivate;
-
-
-
 
 class CDgramServer
 {

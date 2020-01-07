@@ -26,13 +26,16 @@
 #ifndef _DGRAMCLIENT_H_
 #define _DGRAMCLIENT_H_
 
+#include <tuple>
 #include <string>
-#include <BaseSocket.hpp>
+#include <memory>
+#include <stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
 
 class CBaseSocket;
+class CDgramClientPrivate;
 
 class CDgramClient
 {
@@ -44,8 +47,20 @@ public:
     CDgramClient(CDgramClient&&)                  = default;
     CDgramClient& operator= (CDgramClient&&)      = default;
     CDgramClient()                                = default;
+
+    std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+
 private:
-    CBaseSocket m_baseSocket;
+    static void privateDeleterHook(CDgramClientPrivate *it);
+
+    struct privateDeleter
+    {
+        void operator()(CDgramClientPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+
+    std::unique_ptr<CDgramClientPrivate,privateDeleter> m_pPrivate;
 };
 
 } // EtNet

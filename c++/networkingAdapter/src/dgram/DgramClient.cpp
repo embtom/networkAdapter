@@ -24,15 +24,112 @@
  */
 
 #include <dgram/DgramClient.hpp>
+
+#include <iostream>
+#include <stdexcept>
+#include <algorithm>
+
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <netinet/in.h>
+
 #include <error_msg.hpp>
 #include <HostName.h>
 #include <IpAddress.hpp>
+#include <BaseSocket.hpp>
 
+namespace EtNet
+{
+
+class CDgramClientPrivate
+{
+public:
+     CDgramClientPrivate(CBaseSocket&& rBaseSocket); 
+     std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+private:
+     CBaseSocket m_baseSocket;
+};
+
+}
 
 
 using namespace EtNet;
 
-CDgramClient::CDgramClient(CBaseSocket &&rBaseSocket) :
-     m_baseSocket(std::move(rBaseSocket))
+CDgramClientPrivate::CDgramClientPrivate(CBaseSocket&& rBaseSocket) :
+    m_baseSocket(std::move(rBaseSocket))     
 { }
 
+std::tuple<CStreamDataLink> CDgramClientPrivate::connect(const std::string& rHost, int port)
+{
+     CHostLookup::IpAddresses ipList; 
+     try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
+    
+     if (ipList.empty()) 
+     {
+          ipList = CHostLookup(rHost).addresses(); 
+     }
+
+     int domain = m_baseSocket.getDomain();
+     auto it = std::find_if(ipList.begin(), ipList.end(),[&domain] (const auto &elm) 
+     { 
+        if (elm.is_v4() && (domain == AF_INET)) {
+            return true;
+        }
+        else if (elm.is_v6() && (domain == AF_INET6)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+     });
+
+     if (it == ipList.end()) {
+        throw std::runtime_error(utils::buildErrorMessage("CDgramClient::", __func__, " : No valid Ip available"));
+     }
+
+     if ((*it).is_v4())
+     {
+          sockaddr_in serverAddr{};
+          serverAddr.sin_family       = AF_INET;
+          serverAddr.sin_port         = htons(port);
+          std::memcpy(&serverAddr.sin_addr, (*it).to_v4(), sizeof(in_addr));
+
+          if (::connect(m_baseSocket.getFd(), (sockaddr*)&serverAddr, sizeof(serverAddr)) != 0) {
+               throw std::runtime_error(utils::buildErrorMessage("CDgramClient::", __func__, ": connect: ", strerror(errno)));
+          }
+     }
+     else if((*it).is_v6())
+     {
+          sockaddr_in6 serverAddr{};
+          serverAddr.sin6_family       = AF_INET6;
+          serverAddr.sin6_port         = htons(port);
+          std::memcpy(&serverAddr.sin6_addr, (*it).to_v6(), sizeof(in6_addr));
+
+          if (::connect(m_baseSocket.getFd(), (sockaddr*)&serverAddr, sizeof(serverAddr)) != 0) {
+               throw std::runtime_error(utils::buildErrorMessage("CDgramClient::", __func__, ": connect: ", strerror(errno)));
+          }
+     }
+     else {
+          throw std::logic_error(utils::buildErrorMessage("CDgramClient::", __func__, " : No valid Ip to connect"));
+     }
+
+     return std::tuple(CStreamDataLink(m_baseSocket.getFd()));
+}
+
+
+
+
+void CDgramClient::privateDeleterHook(CDgramClientPrivate *it)
+{
+     delete it;
+}
+
+CDgramClient::CDgramClient(CBaseSocket &&rBaseSocket) :
+     m_pPrivate(new CDgramClientPrivate(std::move(rBaseSocket)))
+{ }
+
+std::tuple<CStreamDataLink> CDgramClient::connect(const std::string& rHost, int port)
+{
+     return m_pPrivate->connect(rHost,port);
+}

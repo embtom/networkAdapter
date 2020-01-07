@@ -69,7 +69,7 @@ CStreamDataLink CStreamClient::connect(const std::string& rHost, int port)
     });
 
     if (it == ipList.end()) {
-        throw std::runtime_error(utils::buildErrorMessage("CStreamClient:", __func__, " : No valid Ip available"));
+        throw std::runtime_error(utils::buildErrorMessage("CStreamClient: ", __func__, " : No valid Ip available"));
     }
 
     if ((*it).is_v4())
