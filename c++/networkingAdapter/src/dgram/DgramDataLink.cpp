@@ -32,12 +32,8 @@
 
 using namespace EtNet;
 
-CDgramDataLink::CDgramDataLink(ESocketMode opMode) : 
-    CBaseSocket(opMode)
-{ }
-
 CDgramDataLink::CDgramDataLink(int socketFd) :
-    CBaseSocket(socketFd)
+    m_linkFd(socketFd)
 { }
 
 void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len)
@@ -70,7 +66,7 @@ void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, 
     std::size_t dataWritten = 0;
     while(dataWritten < len)
     {
-        std::size_t put = ::sendto(getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(m_linkFd, buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -156,7 +152,7 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
     while(dataRead < len)
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(m_linkFd, readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

@@ -27,6 +27,7 @@
 #define _DGRAMSERVER_H_
 
 #include <functional>
+#include <tuple>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
 #include <dgram/DgramDataLink.hpp>
@@ -53,7 +54,7 @@ class CDgramServer
 public:
     using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
     
-    CDgramServer(CBaseSocket&& rhs, int port);
+    CDgramServer(CBaseSocket&& rBaseSocket, int port);
 
     CDgramServer(const CDgramServer&)             = delete;
     CDgramServer& operator= (const CDgramServer&) = delete;
@@ -62,10 +63,7 @@ public:
     CDgramServer()                                = default;
 
     ~CDgramServer();
-    CDgramDataLink waitForConnection();
-
-    void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
-    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
+    std::tuple<CDgramDataLink> waitForConnection();
 
 private:
     static void privateDeleterHook(CDgramServerPrivate *it);

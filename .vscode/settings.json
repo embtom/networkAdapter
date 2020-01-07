@@ -8,7 +8,8 @@
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.configureArgs": [
         "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
-        "-DNETWORKINGADAPTER_BUILD_TEST=ON"
+        "-DNETWORKINGADAPTER_BUILD_TEST=ON",
+        "-DNETWORKINGADAPTER_BUILD_EXAMPLES=ON"
     ],
     "files.associations": {
         "cctype": "cpp",

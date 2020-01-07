@@ -42,22 +42,25 @@ struct SClientAddr
     unsigned int Port;
 };
 
-class CDgramDataLink : public CBaseSocket
+class CDgramDataLink
 {
 public:
     using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
  
+    CDgramDataLink()                                  = default;
     CDgramDataLink(CDgramDataLink &&rhs)              = default;
     CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;
     CDgramDataLink(CDgramDataLink const&)             = delete;
     CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
-    CDgramDataLink()                               = default;
 
-    CDgramDataLink(ESocketMode opMode);
     CDgramDataLink(int socketFd);
 
     void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
     std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
+
+private:
+    int m_linkFd;
+
 };
 
 } // EtNet

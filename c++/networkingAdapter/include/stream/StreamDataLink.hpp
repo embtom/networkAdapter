@@ -44,8 +44,9 @@ public:
     CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
     CStreamDataLink(CStreamDataLink const&)             = delete;
     CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
-    CStreamDataLink()                               = default;
+    CStreamDataLink()                                   = default;
 
+    ~CStreamDataLink() { }
     CStreamDataLink(ESocketMode opMode);
     CStreamDataLink(int socketFd);
 

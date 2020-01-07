@@ -41,12 +41,13 @@ enum class ESocketMode
 
 class CBaseSocket
 {
-    public:
+public:
+    CBaseSocket()                              = default;
+    
     CBaseSocket(CBaseSocket &&rhs)             noexcept;
     CBaseSocket& operator=(CBaseSocket&& rhs)  noexcept;
     CBaseSocket(CBaseSocket const&)            = delete;
     CBaseSocket& operator=(CBaseSocket const&) = delete;
-    CBaseSocket()                              = default;
     CBaseSocket(ESocketMode opMode);
 
     static CBaseSocket& SoReuseSocket(CBaseSocket &rBaseSocket);
@@ -56,7 +57,7 @@ class CBaseSocket
     int getFd() const noexcept;
     int getDomain() const noexcept;
 
-    protected:
+protected:
     CBaseSocket(int socketFd);
     
     private:
