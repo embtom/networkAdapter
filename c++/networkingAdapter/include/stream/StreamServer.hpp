@@ -26,9 +26,12 @@
 #ifndef _CSTREAMSERVER_H_
 #define _CSTREAMSERVER_H_
 
+//******************************************************************************
+// Header
+
 #include <tuple>
+#include <memory>
 #include <IpAddress.hpp>
-#include <BaseSocket.hpp>
 #include <stream/StreamDataLink.hpp>
 
 namespace EtNet
@@ -36,12 +39,16 @@ namespace EtNet
 
 constexpr int maxConnectionBacklog = 5;
 
+class CBaseSocket;
+class CStreamServerPrivate;
 
-
+//*****************************************************************************
+//! \brief CStreamServer
+//!
 class CStreamServer
 {
 public:
-    CStreamServer(CBaseSocket&& rhs, int port);
+    CStreamServer(CBaseSocket&& rBaseSocket, int port);
     
     CStreamServer(const CStreamServer&)             = delete;
     CStreamServer& operator= (const CStreamServer&) = delete;
@@ -51,7 +58,15 @@ public:
     
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
-    CBaseSocket m_baseSocket;
+    static void privateDeleterHook(CStreamServerPrivate *it);
+    struct privateDeleter
+    {
+        void operator()(CStreamServerPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+
+    std::unique_ptr<CStreamServerPrivate,privateDeleter> m_pPrivate;
 };
 
 } //EtNet

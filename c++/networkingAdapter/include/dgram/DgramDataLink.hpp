@@ -26,6 +26,9 @@
 #ifndef _DGRAMDATALINK_H_
 #define _DGRAMDATALINK_H_
 
+//******************************************************************************
+// Header
+
 #include <stdint.h>
 #include <cstddef>
 #include <functional>
@@ -42,6 +45,9 @@ struct SClientAddr
     unsigned int Port;
 };
 
+//*****************************************************************************
+//! \brief CDgramDataLink
+//!
 class CDgramDataLink
 {
 public:
@@ -60,7 +66,6 @@ public:
 
 private:
     int m_linkFd;
-
 };
 
 } // EtNet

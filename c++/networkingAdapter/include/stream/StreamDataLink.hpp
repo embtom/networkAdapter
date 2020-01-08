@@ -26,6 +26,9 @@
 #ifndef _STREAMDATALINK_H_
 #define _STREAMDATALINK_H_
 
+//******************************************************************************
+// Header
+
 #include <cstddef>
 #include <functional>
 #include <BaseSocket.hpp>
@@ -35,6 +38,9 @@ namespace EtNet
 {
 constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
+//*****************************************************************************
+//! \brief CStreamDataLink
+//!
 class CStreamDataLink : public  CBaseSocket
 {
 public:
@@ -46,7 +52,6 @@ public:
     CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
     CStreamDataLink()                                   = default;
 
-    ~CStreamDataLink() { }
     CStreamDataLink(ESocketMode opMode);
     CStreamDataLink(int socketFd);
 

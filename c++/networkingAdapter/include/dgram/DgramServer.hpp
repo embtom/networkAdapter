@@ -26,12 +26,14 @@
 #ifndef _DGRAMSERVER_H_
 #define _DGRAMSERVER_H_
 
-#include <functional>
+//******************************************************************************
+// Header
+
+
 #include <tuple>
-#include <IpAddress.hpp>
-#include <BaseSocket.hpp>
-#include <dgram/DgramDataLink.hpp>
 #include <memory>
+#include <IpAddress.hpp>
+#include <dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {
@@ -39,11 +41,12 @@ namespace EtNet
 class CBaseSocket;
 class CDgramServerPrivate;
 
+//*****************************************************************************
+//! \brief CDgramServer
+//!
 class CDgramServer
 {
 public:
-    using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
-    
     CDgramServer(CBaseSocket&& rBaseSocket, int port);
 
     CDgramServer(const CDgramServer&)             = delete;
@@ -51,8 +54,8 @@ public:
     CDgramServer(CDgramServer&&)                  = default;
     CDgramServer& operator= (CDgramServer&&)      = default;
     CDgramServer()                                = default;
-
     ~CDgramServer();
+
     std::tuple<CDgramDataLink> waitForConnection();
 
 private:

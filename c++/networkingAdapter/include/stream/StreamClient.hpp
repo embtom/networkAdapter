@@ -26,14 +26,23 @@
 #ifndef _CStreamClient_H_
 #define _CStreamClient_H_
 
+//******************************************************************************
+// Header
+
+#include <tuple>
+#include <memory>
 #include <string>
-#include <BaseSocket.hpp>
 #include <stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
-class CBaseSocket;
 
+class CBaseSocket;
+class CStreamClientPrivate;
+
+//*****************************************************************************
+//! \brief CStreamClient
+//!
 class CStreamClient
 {
 public:
@@ -45,9 +54,17 @@ public:
     CStreamClient& operator= (CStreamClient&&)      = default;
     CStreamClient()                                 = default;
 
-    CStreamDataLink connect(const std::string& rHost, int port);
+    std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
 private:
-    CBaseSocket m_baseSocket;
+    static void privateDeleterHook(CStreamClientPrivate *it);
+
+    struct privateDeleter
+    {
+        void operator()(CStreamClientPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+    std::unique_ptr<CStreamClientPrivate,privateDeleter> m_pPrivate;
 };
 
 }

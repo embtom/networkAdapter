@@ -26,6 +26,9 @@
 #ifndef _DGRAMCLIENT_H_
 #define _DGRAMCLIENT_H_
 
+//******************************************************************************
+// Header
+
 #include <tuple>
 #include <string>
 #include <memory>
@@ -37,6 +40,9 @@ namespace EtNet
 class CBaseSocket;
 class CDgramClientPrivate;
 
+//*****************************************************************************
+//! \brief CDgramClient
+//!
 class CDgramClient
 {
 public:

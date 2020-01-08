@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <dgram/DgramServer.hpp>
 #include <string.h>
 #include <sys/socket.h>
@@ -39,10 +42,12 @@
 #include <BaseSocket.hpp>
 
 
-
 namespace EtNet
 {
 
+//*****************************************************************************
+//! \brief CDgramClientPrivate
+//!
 class CDgramServerPrivate
 {
 public:
@@ -60,6 +65,9 @@ private:
 }
 
 using namespace EtNet;
+
+//*****************************************************************************
+// Method definitions "CDgramServerPrivate"
 
 CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, int port) :
     m_baseSocket(std::move(rBaseSocket))
@@ -125,10 +133,13 @@ std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
     return std::tuple(CDgramDataLink(fd));
 }
 
+//*****************************************************************************
+// Method definitions "CDgramServer"
+
 void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
 {
     delete it;
-}
+}   
 
 CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, int port) :
     m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))

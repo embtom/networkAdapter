@@ -22,21 +22,49 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+//******************************************************************************
+// Header
+
 #include <iostream>
 #include <stream/StreamServer.hpp>
 #include <BaseSocket.hpp>
+#include <stdexcept>
+
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <stdexcept>
-#include <error_msg.hpp>
 #include <string.h>
+
+#include <error_msg.hpp>
 #include <make_unordered_map.h>
+#include <BaseSocket.hpp>
+
+namespace EtNet
+{
+//*****************************************************************************
+//! \brief CStreamServerPrivate
+//!
+class CStreamServerPrivate
+{
+public:
+    CStreamServerPrivate(CBaseSocket&& rBaseSocket, int port);
+    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
+private:
+    CBaseSocket m_baseSocket;
+
+};
+
+
+}
 
 using namespace EtNet;
 
-CStreamServer::CStreamServer(CBaseSocket&& rhs, int port) :
-    m_baseSocket(std::move(rhs))
+//*****************************************************************************
+// Method definitions "CStreamServerPrivate"
+
+CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, int port) :
+    m_baseSocket(std::move(rBaseSocket))
 {
     int fd = m_baseSocket.getFd();
     auto setupServer = [fd](const sockaddr* addr, socklen_t len)
@@ -85,7 +113,7 @@ CStreamServer::CStreamServer(CBaseSocket&& rhs, int port) :
     }
 }
 
-std::tuple<CStreamDataLink, CIpAddress> CStreamServer::waitForConnection()
+std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection()
 {
     union
     {   
@@ -127,3 +155,19 @@ std::tuple<CStreamDataLink, CIpAddress> CStreamServer::waitForConnection()
     return std::tuple(CStreamDataLink(newSocket),peerAddress);
 }
 
+//*****************************************************************************
+// Method definitions "CStreamServer"
+
+void CStreamServer::privateDeleterHook(CStreamServerPrivate *it)
+{
+    delete it;
+}   
+
+CStreamServer::CStreamServer(CBaseSocket&& rBaseSocket, int port) :
+    m_pPrivate(new CStreamServerPrivate(std::move(rBaseSocket), port))
+{ }
+
+std::tuple<CStreamDataLink, CIpAddress> CStreamServer::waitForConnection()
+{
+    return m_pPrivate->waitForConnection();
+}

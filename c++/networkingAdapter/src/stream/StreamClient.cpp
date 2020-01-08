@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <stream/StreamClient.hpp>
 
 #include <iostream>
@@ -37,14 +40,34 @@
 #include <error_msg.hpp>
 #include <HostName.h>
 #include <IpAddress.hpp>
+#include <BaseSocket.hpp>
+
+namespace EtNet
+{
+
+//*****************************************************************************
+//! \brief CStreamClientPrivate
+//!
+class CStreamClientPrivate
+{
+public:
+     CStreamClientPrivate(CBaseSocket&& rBaseSocket); 
+     std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+private:
+     CBaseSocket m_baseSocket;
+};
+
+}
 
 using namespace EtNet;
 
-CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
-    m_baseSocket(std::move(rBaseSocket))
+//*****************************************************************************
+// Method definitions "CStreamClientPrivate"
+CStreamClientPrivate::CStreamClientPrivate(CBaseSocket&& rBaseSocket) :
+    m_baseSocket(std::move(rBaseSocket))   
 { }
 
-CStreamDataLink CStreamClient::connect(const std::string& rHost, int port)
+std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHost, int port)
 {
     CHostLookup::IpAddresses ipList; 
     try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
@@ -98,5 +121,22 @@ CStreamDataLink CStreamClient::connect(const std::string& rHost, int port)
         throw std::logic_error(utils::buildErrorMessage("ConnectSocket::", __func__, " : No valid Ip to connect"));
     }
 
-    return CStreamDataLink(m_baseSocket.getFd());
+    return std::tuple(CStreamDataLink(m_baseSocket.getFd()));
+}
+
+//*****************************************************************************
+// Method definitions "CStreamClient"
+
+void CStreamClient::privateDeleterHook(CStreamClientPrivate *it)
+{
+     delete it;
+}
+
+CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
+    m_pPrivate(new CStreamClientPrivate(std::move(rBaseSocket)))
+{ }
+
+std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, int port)
+{
+     return m_pPrivate->connect(rHost,port);
 }

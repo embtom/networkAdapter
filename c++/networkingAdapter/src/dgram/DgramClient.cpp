@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <dgram/DgramClient.hpp>
 
 #include <iostream>
@@ -42,6 +45,9 @@
 namespace EtNet
 {
 
+//*****************************************************************************
+//! \brief CDgramClientPrivate
+//!
 class CDgramClientPrivate
 {
 public:
@@ -53,8 +59,10 @@ private:
 
 }
 
-
 using namespace EtNet;
+
+//*****************************************************************************
+// Method definitions "CDgramClientPrivate"
 
 CDgramClientPrivate::CDgramClientPrivate(CBaseSocket&& rBaseSocket) :
     m_baseSocket(std::move(rBaseSocket))     
@@ -117,8 +125,8 @@ std::tuple<CStreamDataLink> CDgramClientPrivate::connect(const std::string& rHos
      return std::tuple(CStreamDataLink(m_baseSocket.getFd()));
 }
 
-
-
+//*****************************************************************************
+// Method definitions "CDgramClient"
 
 void CDgramClient::privateDeleterHook(CDgramClientPrivate *it)
 {

@@ -23,14 +23,22 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <stdexcept>
+
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
 #include <error_msg.hpp>
 #include <stream/StreamDataLink.hpp>
 
 using namespace EtNet;
+
+//*****************************************************************************
+// Method definitions "CStreamDataLink"
 
 CStreamDataLink::CStreamDataLink(ESocketMode opMode) : 
     CBaseSocket(opMode)

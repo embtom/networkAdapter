@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <stdexcept>
 #include <unistd.h>
 #include <errno.h>
@@ -31,6 +34,9 @@
 #include <dgram/DgramDataLink.hpp>
 
 using namespace EtNet;
+
+//*****************************************************************************
+// Method definitions "CDgramDataLink"
 
 CDgramDataLink::CDgramDataLink(int socketFd) :
     m_linkFd(socketFd)
