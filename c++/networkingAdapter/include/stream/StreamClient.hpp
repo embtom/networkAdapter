@@ -54,7 +54,7 @@ public:
     CStreamClient& operator= (CStreamClient&&)      = default;
     CStreamClient()                                 = default;
 
-    std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+    std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
 private:
     static void privateDeleterHook(CStreamClientPrivate *it);
 

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_DGRAM);
     EtNet::CDgramClient dgramClient(std::move(baseSocket));
 
-    auto[a] = dgramClient.connect("localhost",PORT_NUM);
+    auto[a, b] = dgramClient.getLink("localhost",PORT_NUM);
 
     for (int i = 0 ; i < 2; i++) 
     {

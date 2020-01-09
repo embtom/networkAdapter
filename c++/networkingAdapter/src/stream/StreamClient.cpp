@@ -52,7 +52,7 @@ class CStreamClientPrivate
 {
 public:
      CStreamClientPrivate(CBaseSocket&& rBaseSocket); 
-     std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+     std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
 private:
      CBaseSocket m_baseSocket;
 };
@@ -67,7 +67,7 @@ CStreamClientPrivate::CStreamClientPrivate(CBaseSocket&& rBaseSocket) :
     m_baseSocket(std::move(rBaseSocket))   
 { }
 
-std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHost, int port)
+std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHost, unsigned int port)
 {
     CHostLookup::IpAddresses ipList; 
     try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
@@ -136,7 +136,7 @@ CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
     m_pPrivate(new CStreamClientPrivate(std::move(rBaseSocket)))
 { }
 
-std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, int port)
+std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, unsigned int port)
 {
      return m_pPrivate->connect(rHost,port);
 }

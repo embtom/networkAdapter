@@ -48,7 +48,7 @@ namespace EtNet
 class CStreamServerPrivate
 {
 public:
-    CStreamServerPrivate(CBaseSocket&& rBaseSocket, int port);
+    CStreamServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port);
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
     CBaseSocket m_baseSocket;
@@ -63,7 +63,7 @@ using namespace EtNet;
 //*****************************************************************************
 // Method definitions "CStreamServerPrivate"
 
-CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, int port) :
+CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_baseSocket(std::move(rBaseSocket))
 {
     int fd = m_baseSocket.getFd();
@@ -163,7 +163,7 @@ void CStreamServer::privateDeleterHook(CStreamServerPrivate *it)
     delete it;
 }   
 
-CStreamServer::CStreamServer(CBaseSocket&& rBaseSocket, int port) :
+CStreamServer::CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_pPrivate(new CStreamServerPrivate(std::move(rBaseSocket), port))
 { }
 

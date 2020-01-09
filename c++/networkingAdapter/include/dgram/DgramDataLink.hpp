@@ -14,7 +14,7 @@
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITdgramClientHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -34,24 +34,26 @@
 #include <functional>
 #include <BaseSocket.hpp>
 #include <IpAddress.hpp>
+#include <BaseDataLink.hpp>
 
 namespace EtNet
 {   
-constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
-struct SClientAddr
+struct SPeerAddr
 {
     CIpAddress Ip;
-    unsigned int Port;
+    unsigned int Port {0};
 };
+
+constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount){ return false; };
 
 //*****************************************************************************
 //! \brief CDgramDataLink
 //!
-class CDgramDataLink
+class CDgramDataLink final : public CBaseDataLink
 {
 public:
-    using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
+    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, std::size_t len)>;
  
     CDgramDataLink()                                  = default;
     CDgramDataLink(CDgramDataLink &&rhs)              = default;
@@ -60,12 +62,10 @@ public:
     CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
 
     CDgramDataLink(int socketFd);
+    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr);
 
-    void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
-    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
-
-private:
-    int m_linkFd;
+    void sendTo(const SPeerAddr& rClientAddr, const char* buffer, std::size_t len);
+    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd);
 };
 
 } // EtNet

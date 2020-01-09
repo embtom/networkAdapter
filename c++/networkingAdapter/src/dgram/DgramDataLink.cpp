@@ -28,7 +28,7 @@
 
 #include <stdexcept>
 #include <unistd.h>
-#include <errno.h>
+#include <errno.h>  
 #include <string.h>
 #include <error_msg.hpp>
 #include <dgram/DgramDataLink.hpp>
@@ -39,10 +39,10 @@ using namespace EtNet;
 // Method definitions "CDgramDataLink"
 
 CDgramDataLink::CDgramDataLink(int socketFd) :
-    m_linkFd(socketFd)
+    CBaseDataLink(socketFd)
 { }
 
-void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len)
+void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, std::size_t len)
 {
     sockaddr_in clAddr{};
     sockaddr_in6 clAddr6{};
@@ -72,7 +72,7 @@ void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, 
     std::size_t dataWritten = 0;
     while(dataWritten < len)
     {
-        std::size_t put = ::sendto(m_linkFd, buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -116,7 +116,7 @@ void CDgramDataLink::sendTo(const SClientAddr& rClientAddr, const char* buffer, 
     return;
 }
 
-std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd)
 {
     union e
     {   
@@ -126,7 +126,7 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
     } peerAdr;
     socklen_t addr_size = sizeof(peerAdr);
 
-    SClientAddr peerAddress;
+    SPeerAddr peerAddress;
     auto toCIpAddress = [&peerAddress] (e& peerAdr) 
     {
         switch (peerAdr.common.ss_family)
@@ -158,7 +158,7 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
     while(dataRead < len)
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(m_linkFd, readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

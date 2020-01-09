@@ -119,7 +119,7 @@ void CBaseDataLink::send(const char* buffer, std::size_t len)
     return;
 }
 
-std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd)
 {
     if (getFd() == 0)
     {

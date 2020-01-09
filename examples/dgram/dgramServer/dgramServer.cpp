@@ -15,10 +15,10 @@ int main()
     {
         uint8_t buffer [128];
         int rcvLen;
-        EtNet::SClientAddr addr;
+        EtNet::SPeerAddr addr;
 
         auto [a] = DgramServer.waitForConnection();
-        rcvLen = a.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SClientAddr ClientAddr, std::size_t len) 
+        rcvLen = a.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SPeerAddr ClientAddr, std::size_t len) 
         {
             addr = std::move(ClientAddr);
             std::cout << "Message form: " << addr.Ip.toString() << " with length: " << len << std::endl;

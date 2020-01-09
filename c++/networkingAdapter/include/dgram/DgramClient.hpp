@@ -32,7 +32,7 @@
 #include <tuple>
 #include <string>
 #include <memory>
-#include <stream/StreamDataLink.hpp>
+#include <dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {
@@ -54,7 +54,7 @@ public:
     CDgramClient& operator= (CDgramClient&&)      = default;
     CDgramClient()                                = default;
 
-    std::tuple<CStreamDataLink> connect(const std::string& rHost, int port);
+    std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
 
 private:
     static void privateDeleterHook(CDgramClientPrivate *it);

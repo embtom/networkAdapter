@@ -78,20 +78,11 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
     m_socketFd = ret;
 }
 
-CBaseSocket::CBaseSocket(int socketFd) :
-    m_socketFd(socketFd)
-{
-    if (socketFd <= 0)
-    {
-        throw std::runtime_error(utils::buildErrorMessage("CBaseSocket::", __func__, ": bad socket: ", strerror(errno)));
-    }
-}
-
 CBaseSocket::~CBaseSocket()
 {
     if (m_socketFd > 0) {
         ::close(m_socketFd);
-        m_socketFd=0;
+        m_socketFd=-1;
     }
 }
 
@@ -110,7 +101,7 @@ int CBaseSocket::getDomain() const noexcept
     return domain;
 }
 
-CBaseSocket& CBaseSocket::SoReuseSocket(CBaseSocket &rBaseSocket)
+CBaseSocket& CBaseSocket::SoReuseSocket(CBaseSocket &&rBaseSocket)
 {
     int reuseaddr = 1;
     if(setsockopt(rBaseSocket.getFd(), SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)) == -1) {
@@ -119,7 +110,7 @@ CBaseSocket& CBaseSocket::SoReuseSocket(CBaseSocket &rBaseSocket)
     return rBaseSocket;
 }
 
-CBaseSocket& CBaseSocket::SoBroadcast(CBaseSocket &rBaseSocket)
+CBaseSocket& CBaseSocket::SoBroadcast(CBaseSocket &&rBaseSocket)
 {
     int broadcast = 1;
     if(setsockopt(rBaseSocket.getFd(),SOL_SOCKET,SO_BROADCAST,&broadcast,sizeof(broadcast)) == -1) {

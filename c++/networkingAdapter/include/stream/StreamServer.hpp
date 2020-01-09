@@ -48,7 +48,7 @@ class CStreamServerPrivate;
 class CStreamServer
 {
 public:
-    CStreamServer(CBaseSocket&& rBaseSocket, int port);
+    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
     
     CStreamServer(const CStreamServer&)             = delete;
     CStreamServer& operator= (const CStreamServer&) = delete;

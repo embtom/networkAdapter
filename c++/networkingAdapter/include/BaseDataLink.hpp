@@ -35,7 +35,7 @@
 
 namespace EtNet
 {
-constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
+constexpr auto defaultOneRead = [](std::size_t rcvCount){ return true; };
 
 //*****************************************************************************
 //! \brief CBaseDataLink
@@ -43,7 +43,7 @@ constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 class CBaseDataLink
 {
 public:
-    using Callback = std::function<bool (std::size_t len)>;
+    using CallbackReceive = std::function<bool (std::size_t len)>;
     
     CBaseDataLink(CBaseDataLink &&rhs) noexcept;
     CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
@@ -53,7 +53,7 @@ public:
 
     virtual ~CBaseDataLink()                        = default;
 
-    std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
+    std::size_t recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd = defaultOneRead);
     void        send(const char* buffer, std::size_t len);
 
 protected:

@@ -51,7 +51,7 @@ namespace EtNet
 class CDgramServerPrivate
 {
 public:
-    CDgramServerPrivate(CBaseSocket&& rBaseSocket, int port);
+    CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port);
     ~CDgramServerPrivate();
     void incomingConnectionCb(int fd) noexcept;
     std::tuple<CDgramDataLink> waitForConnection();
@@ -69,7 +69,7 @@ using namespace EtNet;
 //*****************************************************************************
 // Method definitions "CDgramServerPrivate"
 
-CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, int port) :
+CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_baseSocket(std::move(rBaseSocket))
 {
     int fd = m_baseSocket.getFd();
@@ -141,7 +141,7 @@ void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
     delete it;
 }   
 
-CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, int port) :
+CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))
 { }
 

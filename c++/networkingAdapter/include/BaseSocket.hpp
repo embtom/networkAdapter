@@ -50,18 +50,15 @@ public:
     CBaseSocket& operator=(CBaseSocket const&) = delete;
     CBaseSocket(ESocketMode opMode);
 
-    static CBaseSocket& SoReuseSocket(CBaseSocket &rBaseSocket);
-    static CBaseSocket& SoBroadcast(CBaseSocket &rBaseSocket);
+    static CBaseSocket& SoReuseSocket(CBaseSocket &&rBaseSocket);
+    static CBaseSocket& SoBroadcast(CBaseSocket &&rBaseSocket);
 
     virtual ~CBaseSocket();
     int getFd() const noexcept;
     int getDomain() const noexcept;
 
-protected:
-    CBaseSocket(int socketFd);
-    
-    private:
-    int         m_socketFd{0};
+private:
+    int         m_socketFd{-1};
 };
 
 }

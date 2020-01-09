@@ -47,7 +47,7 @@ class CDgramServerPrivate;
 class CDgramServer
 {
 public:
-    CDgramServer(CBaseSocket&& rBaseSocket, int port);
+    CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
     CDgramServer(const CDgramServer&)             = delete;
     CDgramServer& operator= (const CDgramServer&) = delete;
