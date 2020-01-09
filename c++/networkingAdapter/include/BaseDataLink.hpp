@@ -23,29 +23,51 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef _BASEDATALINK_H_
+#define _BASEDATALINK_H_
+
 //******************************************************************************
 // Header
+#include <cstddef>
+#include <functional>
+#include <BaseSocket.hpp>
+#include <stdint.h>
 
-#include <iostream>
-#include <stdexcept>
-
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-
-#include <error_msg.hpp>
-#include <stream/StreamDataLink.hpp>
-
-using namespace EtNet;
+namespace EtNet
+{
+constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
 //*****************************************************************************
-// Method definitions "CStreamDataLink"
-
-CStreamDataLink::CStreamDataLink(int socketFd) :
-    CBaseDataLink(socketFd)
-{ }
-
-CStreamDataLink::~CStreamDataLink()
+//! \brief CBaseDataLink
+//!
+class CBaseDataLink
 {
-    closeFd();
+public:
+    using Callback = std::function<bool (std::size_t len)>;
+    
+    CBaseDataLink(CBaseDataLink &&rhs) noexcept;
+    CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
+    CBaseDataLink(CBaseDataLink const&)             = delete;
+    CBaseDataLink& operator=(CBaseDataLink const&)  = delete;
+    CBaseDataLink()                                 = default;
+
+    virtual ~CBaseDataLink()                        = default;
+
+    std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
+    void        send(const char* buffer, std::size_t len);
+
+protected:
+
+    CBaseDataLink(int socketFd) noexcept;
+    int getFd() const noexcept;
+    void closeFd() noexcept;
+
+private:
+    int m_socketFd {-1};
+};
+
+
 }
+
+
+#endif // _BASEDATALINK_H_

@@ -7,6 +7,7 @@ include(GNUInstallDirs)
 set(SOURCES_NA  src/IpAddress.cpp
                 src/BaseSocket.cpp
                 src/HostName.cpp
+                src/BaseDataLink.cpp
                 src/stream/StreamDataLink.cpp
                 src/stream/StreamServer.cpp
                 src/stream/StreamClient.cpp
@@ -17,6 +18,7 @@ set(SOURCES_NA  src/IpAddress.cpp
 set (HEADERS_NA include/IpAddress.hpp
                 include/BaseSocket.hpp
                 include/HostName.h
+                include/BaseDataLink.hpp
                 include/stream/StreamDataLink.hpp
                 include/stream/StreamServer.hpp
                 include/stream/StreamClient.hpp

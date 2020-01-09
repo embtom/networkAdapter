@@ -31,32 +31,26 @@
 
 #include <cstddef>
 #include <functional>
-#include <BaseSocket.hpp>
+#include <BaseDataLink.hpp>
 #include <stdint.h>
 
 namespace EtNet
 {
-constexpr auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
 
 //*****************************************************************************
 //! \brief CStreamDataLink
 //!
-class CStreamDataLink : public  CBaseSocket
+class CStreamDataLink final : public CBaseDataLink
 {
-public:
-    using Callback = std::function<bool (std::size_t len)>;
-    
+public:    
     CStreamDataLink(CStreamDataLink &&rhs)              = default;
     CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
     CStreamDataLink(CStreamDataLink const&)             = delete;
     CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
     CStreamDataLink()                                   = default;
 
-    CStreamDataLink(ESocketMode opMode);
     CStreamDataLink(int socketFd);
-
-    std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
-    void        send(const char* buffer, std::size_t len);
+    virtual ~CStreamDataLink();
 };
 
 }
