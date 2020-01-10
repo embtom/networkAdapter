@@ -151,7 +151,6 @@ std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection(
     {
         throw std::runtime_error(utils::buildErrorMessage("ServerSocket:", __func__, ": accept: ", strerror(errno)));
     }
-    std::cout << "Server is connected from: "<< peerAddress.toString() << std::endl;
     return std::tuple(CStreamDataLink(newSocket),peerAddress);
 }
 
