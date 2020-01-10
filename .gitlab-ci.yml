@@ -1,0 +1,47 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SSL_NO_VERIFY: "true"
+
+stages:
+  - build
+  - deploy
+  - enable_merge
+
+build_job:
+  stage: build
+  tags: 
+    - tomhp
+  script:
+    - ./debBuild.sh
+  artifacts:
+    paths:
+      - ./build_deb/  
+    expire_in: 4 week
+  only:
+    - master
+
+deploy_job:
+  stage: deploy
+  tags: 
+    - tomhp
+  script:
+    - cd ./build_deb
+    - cp * /media/volume1/ci_projects/snapshot/networkingAdapter
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-dev
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter
+    - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkingadapter
+    - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkingadapter*_amd64.changes
+  when: on_success
+  only:
+    - master
+
+enable_merge:
+  stage: enable_merge    
+  tags: 
+    - tomhp
+  script:
+    - mkdir -p build
+    - cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DNETWORKINGADAPTER_BUILD_TEST=ON -DNETWORKINGADAPTER_BUILD_EXAMPLES=ON -G"Ninja" -H. -Bbuild
+    - cmake --build ./build
+  only: 
+    - merge_requests
