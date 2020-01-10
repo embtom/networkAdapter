@@ -2,7 +2,7 @@
 #include <iostream>
 #include <BaseSocket.hpp>
 #include <stream/StreamServer.hpp>
-#include <stream/DataSocket.hpp>
+#include <stream/StreamDataLink.hpp>
 #undef min
 #undef max
 
@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET6_STREAM);
+    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
     EtNet::CStreamServer CStreamServer(std::move(baseSocket), 5001);
     while(true)
     {   

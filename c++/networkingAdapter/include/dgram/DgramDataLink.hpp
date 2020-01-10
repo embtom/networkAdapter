@@ -14,7 +14,7 @@
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITdgramClientHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -23,51 +23,51 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _DGRAMCLIENT_H_
-#define _DGRAMCLIENT_H_
+#ifndef _DGRAMDATALINK_H_
+#define _DGRAMDATALINK_H_
 
 //******************************************************************************
 // Header
 
-#include <tuple>
-#include <string>
-#include <memory>
-#include <dgram/DgramDataLink.hpp>
+#include <stdint.h>
+#include <cstddef>
+#include <functional>
+#include <BaseSocket.hpp>
+#include <IpAddress.hpp>
+#include <BaseDataLink.hpp>
 
 namespace EtNet
-{
+{   
 
-class CBaseSocket;
-class CDgramClientPrivate;
+struct SPeerAddr
+{
+    CIpAddress Ip;
+    unsigned int Port {0};
+};
+
+constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount){ return false; };
 
 //*****************************************************************************
-//! \brief CDgramClient
+//! \brief CDgramDataLink
 //!
-class CDgramClient
+class CDgramDataLink final : public CBaseDataLink
 {
 public:
-    CDgramClient(CBaseSocket &&rBaseSocket);
+    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, std::size_t len)>;
+ 
+    CDgramDataLink()                                  = default;
+    CDgramDataLink(CDgramDataLink &&rhs)              = default;
+    CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;
+    CDgramDataLink(CDgramDataLink const&)             = delete;
+    CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
 
-    CDgramClient(const CDgramClient&)             = delete;
-    CDgramClient& operator= (const CDgramClient&) = delete;
-    CDgramClient(CDgramClient&&)                  = default;
-    CDgramClient& operator= (CDgramClient&&)      = default;
-    CDgramClient()                                = default;
+    CDgramDataLink(int socketFd);
+    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr);
 
-    std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
-
-private:
-    static void privateDeleterHook(CDgramClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CDgramClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CDgramClientPrivate,privateDeleter> m_pPrivate;
+    void sendTo(const SPeerAddr& rClientAddr, const char* buffer, std::size_t len);
+    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd);
 };
 
 } // EtNet
-#endif // _DGRAMCLIENT_H_
+
+#endif // _DGRAMDATALINK_H_

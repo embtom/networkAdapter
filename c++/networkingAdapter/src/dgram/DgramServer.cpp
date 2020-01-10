@@ -23,20 +23,54 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <dgram/DgramServer.hpp>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <stdexcept>
-#include <error_msg.hpp>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <iostream>
+#include <stdexcept>
+#include <future>
+
+#include <error_msg.hpp>
+#include <fdSet.h>
+#include <BaseSocket.hpp>
+
+
+namespace EtNet
+{
+
+//*****************************************************************************
+//! \brief CDgramClientPrivate
+//!
+class CDgramServerPrivate
+{
+public:
+    CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port);
+    ~CDgramServerPrivate();
+    void incomingConnectionCb(int fd) noexcept;
+    std::tuple<CDgramDataLink> waitForConnection();
+
+private:
+    utils::CFdSet       m_FdSet;
+    CBaseSocket         m_baseSocket;
+    std::promise<int>   m_connectionPromise;
+};
+
+}
 
 using namespace EtNet;
 
-CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
-    m_baseSocket(std::move(rhs)),
-    m_port(port)
+//*****************************************************************************
+// Method definitions "CDgramServerPrivate"
+
+CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port) :
+    m_baseSocket(std::move(rBaseSocket))
 {
     int fd = m_baseSocket.getFd();
     auto setupServer = [fd](const sockaddr* addr, socklen_t len)
@@ -47,11 +81,7 @@ CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
         }
     };
 
-    int domain;
-    int length = sizeof(int);
-    getsockopt(fd, SOL_SOCKET, SO_DOMAIN, &domain, (socklen_t*)&length);
-
-    switch (domain)
+    switch (m_baseSocket.getDomain())
     {
         case AF_INET:
         {
@@ -77,185 +107,48 @@ CDgramServer::CDgramServer(CBaseSocket&& rhs, int port) :
             break;
         } 
     }
+
+    m_FdSet.AddFd(m_baseSocket.getFd(), [this] (int fd) {incomingConnectionCb(fd);});
+}
+
+CDgramServerPrivate::~CDgramServerPrivate()
+{
+    m_FdSet.RemoveFd(m_baseSocket.getFd());
+    m_FdSet.UnBlock();
+}
+
+void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
+{
+    m_connectionPromise.set_value(fd);
+}
     
-}
-
-void CDgramServer::sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len)
+std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
 {
-    sockaddr_in clAddr{};
-    sockaddr_in6 clAddr6{};
-    sockaddr* claddr;
-    socklen_t claddrLen;
-
-    if (rClientAddr.Ip.is_v4())
-    {
-        clAddr.sin_family       = AF_INET;
-        clAddr.sin_port         = rClientAddr.Port;
-        std::memcpy(&clAddr.sin_addr, rClientAddr.Ip.to_v4(), sizeof(in_addr));
-        claddr = (sockaddr*)&clAddr;
-        claddrLen = sizeof(sockaddr_in);
+    m_connectionPromise = std::promise<int>{};
+    if (utils::CFdSetRetval::UNBLOCK == m_FdSet.Select()) {
+        return CDgramDataLink(-1);
     }
-    else if (rClientAddr.Ip.is_v6())
-    {   
-        clAddr6.sin6_family      = AF_INET6;
-        clAddr6.sin6_port        = rClientAddr.Port;
-        std::memcpy(&clAddr6.sin6_addr, rClientAddr.Ip.to_v6(), sizeof(in6_addr));
-        claddr = (sockaddr*)&clAddr6;
-        claddrLen = sizeof(sockaddr_in6);
-    }
-    else {
-        throw std::logic_error(utils::buildErrorMessage("CDgramServer::", __func__, " : No valid Ip to connect"));
-    }
-
-    std::size_t dataWritten = 0;
-    while(dataWritten < len)
-    {
-        std::size_t put = ::sendto(m_baseSocket.getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
-        if (put == static_cast<std::size_t>(-1))
-        {
-            switch(errno)
-            {
-                case EINVAL:     [[fallthrough]];
-                case EBADF:      [[fallthrough]];
-                case ECONNRESET: [[fallthrough]];
-                case ENXIO:      [[fallthrough]];
-                case EPIPE:
-                {
-                    // Fatal error
-                    throw std::domain_error(utils::buildErrorMessage("DataSocket::", __func__, ": write: critical error: ", strerror(errno)));
-                }
-                case EDQUOT:     [[fallthrough]];
-                case EFBIG:      [[fallthrough]];
-                case EIO:        [[fallthrough]];                    
-                case ENETDOWN:   [[fallthrough]];
-                case ENETUNREACH:[[fallthrough]];
-                case ENOSPC:
-                {
-                    // Resource acquisition failure or device error
-                    throw std::runtime_error(utils::buildErrorMessage("DataSocket::", __func__, ": write: resource failure: ", strerror(errno)));
-                }
-                case EINTR:      [[fallthrough]];
-                        // TODO: Check for user interrupt flags.
-                        //       Beyond the scope of this project
-                        //       so continue normal operations.
-                case EAGAIN:
-                { 
-                    // Temporary Error, retry the read.
-                    continue;
-                }
-                default:
-                {
-                    throw std::runtime_error(utils::buildErrorMessage("DataSocket::", __func__, ": write: returned -1: ", strerror(errno)));
-                }
-            }
-        }
-        dataWritten += put;
-    }
-    return;
+    
+    int fd =  m_connectionPromise.get_future().get();
+    return std::tuple(CDgramDataLink(fd));
 }
 
-std::size_t CDgramServer::reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+//*****************************************************************************
+// Method definitions "CDgramServer"
+
+void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
 {
-    union e
-    {   
-        sockaddr_storage  common;
-        sockaddr_in       sin;
-        sockaddr_in6      sin6;
-    } peerAdr;
-    socklen_t addr_size = sizeof(peerAdr);
+    delete it;
+}   
 
-    SClientAddr peerAddress;
-    auto toCIpAddress = [&peerAddress] (e& peerAdr) 
-    {
-        switch (peerAdr.common.ss_family)
-        {
-            case AF_INET:
-            {
-                peerAddress.Ip = std::move(CIpAddress(peerAdr.sin.sin_addr));
-                peerAddress.Port = peerAdr.sin.sin_port;
-                break;
-            }
-            case AF_INET6:
-            { 
-                if (IN6_IS_ADDR_V4MAPPED(&peerAdr.sin6.sin6_addr)) {
-                    in_addr ip4;
-                    std::memcpy(&ip4, &peerAdr.sin6.sin6_addr.__in6_u.__u6_addr8[12], sizeof(in_addr));
-                    peerAddress.Ip = std::move(CIpAddress(ip4));
-                }
-                else {
-                    peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));    
-                }
-                peerAddress.Port = peerAdr.sin6.sin6_port;
-                break;
-            }
-        }
-    };
-    uint8_t* readBuffer = buffer;
-    std::size_t dataRead  = 0;
+CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port) :
+    m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))
+{ }
 
-    while(dataRead < len)
-    {
-        // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(m_baseSocket.getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
-        if (get == static_cast<std::size_t>(-1))
-        {
-            switch(errno)
-            {
-                case EBADF:     [[fallthrough]];
-                case EFAULT:    [[fallthrough]];
-                case EINVAL:    [[fallthrough]];
-                case ENXIO:
-                {
-                    // Fatal error. Programming bug
-                    throw std::domain_error(utils::buildErrorMessage("DataSocket::", __func__, ": read: critical error: ", strerror(errno)));
-                }
+CDgramServer::~CDgramServer() = default;
 
-                case EIO:       [[fallthrough]];
-                case ENOBUFS:   [[fallthrough]];
-                case ENOMEM:
-                {
-                   // Resource acquisition failure or device error
-                    throw std::runtime_error(utils::buildErrorMessage("DataSocket::", __func__, ": read: resource failure: ", strerror(errno)));
-                }
-                case EINTR:     [[fallthrough]];
-                    // TODO: Check for user interrupt flags.
-                    //       Beyond the scope of this project
-                    //       so continue normal operations.
-                case ETIMEDOUT: [[fallthrough]];
-                case EAGAIN:
-                {
-                    // Temporary error, retry
-                    continue;
-                }
-                case ECONNRESET:[[fallthrough]];
-                case ENOTCONN:
-                {
-                    // Connection broken.
-                    // Return the data we have available and exit
-                    // as if the connection was closed correctly.
-                    get = 0;
-                    break;
-                }
-                default:
-                {
-                    throw std::runtime_error(utils::buildErrorMessage("DataSocket::", __func__, ": read: returned -1: ", strerror(errno)));
-                }
-            }
-        }
-        if (get == 0)
-        {
-            break;
-        }
-        dataRead += get;
-        
-        toCIpAddress(peerAdr);
-        if (scanForEnd(peerAddress, dataRead))
-        {
-            break;
-        }
-    }
-    return dataRead;
+
+std::tuple<CDgramDataLink> CDgramServer::waitForConnection()
+{
+    return m_pPrivate->waitForConnection();
 }
-
-
-

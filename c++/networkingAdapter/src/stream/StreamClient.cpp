@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <stream/StreamClient.hpp>
 
 #include <iostream>
@@ -31,20 +34,40 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <error_msg.hpp>
 #include <string.h>
 #include <netinet/in.h>
 
-#include <make_unordered_map.h>
+#include <error_msg.hpp>
 #include <HostName.h>
+#include <IpAddress.hpp>
+#include <BaseSocket.hpp>
+
+namespace EtNet
+{
+
+//*****************************************************************************
+//! \brief CStreamClientPrivate
+//!
+class CStreamClientPrivate
+{
+public:
+     CStreamClientPrivate(CBaseSocket&& rBaseSocket); 
+     std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
+private:
+     CBaseSocket m_baseSocket;
+};
+
+}
 
 using namespace EtNet;
 
-CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
-    m_baseSocket(std::move(rBaseSocket))
+//*****************************************************************************
+// Method definitions "CStreamClientPrivate"
+CStreamClientPrivate::CStreamClientPrivate(CBaseSocket&& rBaseSocket) :
+    m_baseSocket(std::move(rBaseSocket))   
 { }
 
-CDataSocket CStreamClient::connect(const std::string& rHost, int port)
+std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHost, unsigned int port)
 {
     CHostLookup::IpAddresses ipList; 
     try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
@@ -69,7 +92,7 @@ CDataSocket CStreamClient::connect(const std::string& rHost, int port)
     });
 
     if (it == ipList.end()) {
-        throw std::runtime_error(utils::buildErrorMessage("CStreamClient:", __func__, " : No valid Ip available"));
+        throw std::runtime_error(utils::buildErrorMessage("CStreamClient: ", __func__, " : No valid Ip available"));
     }
 
     if ((*it).is_v4())
@@ -98,5 +121,22 @@ CDataSocket CStreamClient::connect(const std::string& rHost, int port)
         throw std::logic_error(utils::buildErrorMessage("ConnectSocket::", __func__, " : No valid Ip to connect"));
     }
 
-    return CDataSocket(m_baseSocket.getFd());
+    return std::tuple(CStreamDataLink(m_baseSocket.getFd()));
+}
+
+//*****************************************************************************
+// Method definitions "CStreamClient"
+
+void CStreamClient::privateDeleterHook(CStreamClientPrivate *it)
+{
+     delete it;
+}
+
+CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
+    m_pPrivate(new CStreamClientPrivate(std::move(rBaseSocket)))
+{ }
+
+std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, unsigned int port)
+{
+     return m_pPrivate->connect(rHost,port);
 }

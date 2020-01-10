@@ -23,43 +23,36 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _BASESOCKET_H_
-#define _BASESOCKET_H_
+#ifndef _STREAMDATALINK_H_
+#define _STREAMDATALINK_H_
+
+//******************************************************************************
+// Header
+
+#include <cstddef>
+#include <functional>
+#include <BaseDataLink.hpp>
+#include <stdint.h>
 
 namespace EtNet
 {
 
-enum class ESocketMode
+//*****************************************************************************
+//! \brief CStreamDataLink
+//!
+class CStreamDataLink final : public CBaseDataLink
 {
-    INET_DGRAM,
-    INET_STREAM,
-    INET6_DGRAM,
-    INET6_STREAM,
-    NO_MODE
-};
+public:    
+    CStreamDataLink(CStreamDataLink &&rhs)              = default;
+    CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
+    CStreamDataLink(CStreamDataLink const&)             = delete;
+    CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
+    CStreamDataLink()                                   = default;
 
-
-class CBaseSocket
-{
-public:
-    CBaseSocket()                              = default;
-    
-    CBaseSocket(CBaseSocket &&rhs)             noexcept;
-    CBaseSocket& operator=(CBaseSocket&& rhs)  noexcept;
-    CBaseSocket(CBaseSocket const&)            = delete;
-    CBaseSocket& operator=(CBaseSocket const&) = delete;
-    CBaseSocket(ESocketMode opMode);
-
-    static CBaseSocket& SoReuseSocket(CBaseSocket &&rBaseSocket);
-    static CBaseSocket& SoBroadcast(CBaseSocket &&rBaseSocket);
-
-    virtual ~CBaseSocket();
-    int getFd() const noexcept;
-    int getDomain() const noexcept;
-
-private:
-    int         m_socketFd{-1};
+    CStreamDataLink(int socketFd);
+    virtual ~CStreamDataLink();
 };
 
 }
-#endif /*_SOCKET_H_*/
+
+#endif /* _STREAMDATALINK_H_ */

@@ -23,25 +23,53 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
 
 #include <stdexcept>
+
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
 #include <error_msg.hpp>
-#include <stream/DataSocket.hpp>
+#include <BaseDataLink.hpp>
+#include <iostream>
 
 using namespace EtNet;
 
-CDataSocket::CDataSocket(ESocketMode opMode) : 
-    CBaseSocket(opMode)
+//*****************************************************************************
+// Method definitions "CBaseDataLink"
+
+CBaseDataLink::CBaseDataLink(int socketFd) noexcept :
+    m_socketFd(socketFd)
 { }
 
-CDataSocket::CDataSocket(int socketFd) :
-    CBaseSocket(socketFd)
-{ }
+CBaseDataLink::CBaseDataLink(CBaseDataLink &&rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+}
+   
+CBaseDataLink& CBaseDataLink::operator=(CBaseDataLink&& rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+    return *this;
+}
 
-void CDataSocket::send(const char* buffer, std::size_t len)
+int CBaseDataLink::getFd() const noexcept
+{
+    return m_socketFd;
+}
+
+void CBaseDataLink::closeFd() noexcept
+{
+    if (m_socketFd > 0) {
+        close (m_socketFd);
+        m_socketFd=-1;
+    }
+}
+
+void CBaseDataLink::send(const char* buffer, std::size_t len)
 {
     std::size_t dataWritten = 0;
 
@@ -91,7 +119,7 @@ void CDataSocket::send(const char* buffer, std::size_t len)
     return;
 }
 
-std::size_t CDataSocket::recive(uint8_t* buffer, std::size_t len, Callback scanForEnd)
+std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd)
 {
     if (getFd() == 0)
     {

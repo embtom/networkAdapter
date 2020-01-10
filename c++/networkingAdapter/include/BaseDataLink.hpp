@@ -23,10 +23,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef _BASEDATALINK_H_
+#define _BASEDATALINK_H_
 
-#ifndef _DATASOCKET_H_
-#define _DATASOCKET_H_
-
+//******************************************************************************
+// Header
 #include <cstddef>
 #include <functional>
 #include <BaseSocket.hpp>
@@ -34,27 +35,39 @@
 
 namespace EtNet
 {
-    using Callback = std::function<bool (std::size_t len)>;
+constexpr auto defaultOneRead = [](std::size_t rcvCount){ return true; };
 
-    auto defaultNoScanForEnd = [](std::size_t rcvCount){ return false; };
+//*****************************************************************************
+//! \brief CBaseDataLink
+//!
+class CBaseDataLink
+{
+public:
+    using CallbackReceive = std::function<bool (std::size_t len)>;
+    
+    CBaseDataLink(CBaseDataLink &&rhs) noexcept;
+    CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
+    CBaseDataLink(CBaseDataLink const&)             = delete;
+    CBaseDataLink& operator=(CBaseDataLink const&)  = delete;
+    CBaseDataLink()                                 = default;
 
-    class CDataSocket : public  CBaseSocket
-    {
+    virtual ~CBaseDataLink()                        = default;
 
-        public:
-        CDataSocket(CDataSocket &&rhs)              = default;
-        CDataSocket& operator=(CDataSocket&& rhs)   = default;
-        CDataSocket(CDataSocket const&)             = delete;
-        CDataSocket& operator=(CDataSocket const&)  = delete;
-        CDataSocket()                               = default;
+    std::size_t recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd = defaultOneRead);
+    void        send(const char* buffer, std::size_t len);
 
-        CDataSocket(ESocketMode opMode);
-        CDataSocket(int socketFd);
+protected:
 
-        std::size_t recive(uint8_t* buffer, std::size_t len, Callback scanForEnd = defaultNoScanForEnd);
-        void        send(const char* buffer, std::size_t len);
-    };
+    CBaseDataLink(int socketFd) noexcept;
+    int getFd() const noexcept;
+    void closeFd() noexcept;
+
+private:
+    int m_socketFd {-1};
+};
+
 
 }
 
-#endif /* _DATASOCKET_H_ */
+
+#endif // _BASEDATALINK_H_

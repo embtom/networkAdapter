@@ -26,40 +26,49 @@
 #ifndef _DGRAMSERVER_H_
 #define _DGRAMSERVER_H_
 
-#include <functional>
-#include <IpAddress.hpp>
-#include <BaseSocket.hpp>
+//******************************************************************************
+// Header
 
+
+#include <tuple>
+#include <memory>
+#include <IpAddress.hpp>
+#include <dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {
 
-struct SClientAddr
-{
-    CIpAddress Ip;
-    unsigned int Port;
-};
+class CBaseSocket;
+class CDgramServerPrivate;
 
-
+//*****************************************************************************
+//! \brief CDgramServer
+//!
 class CDgramServer
 {
 public:
-    using Callback = std::function<bool (EtNet::SClientAddr ClientAddr, std::size_t len)>;
-    
-    CDgramServer(CBaseSocket&& rhs, int port);
+    CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
     CDgramServer(const CDgramServer&)             = delete;
     CDgramServer& operator= (const CDgramServer&) = delete;
     CDgramServer(CDgramServer&&)                  = default;
     CDgramServer& operator= (CDgramServer&&)      = default;
     CDgramServer()                                = default;
+    ~CDgramServer();
 
-    void sendTo(const SClientAddr& rClientAddr, const char* buffer, std::size_t len);
-    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, Callback scanForEnd);
+    std::tuple<CDgramDataLink> waitForConnection();
 
 private:
-    CBaseSocket m_baseSocket;
-    int         m_port;
+    static void privateDeleterHook(CDgramServerPrivate *it);
+   
+    struct privateDeleter
+    {
+        void operator()(CDgramServerPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+
+    std::unique_ptr<CDgramServerPrivate,privateDeleter> m_pPrivate;
 };
 
 } // EtNet

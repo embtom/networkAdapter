@@ -1,4 +1,4 @@
-project(EXA_dgramClient)
+project(TST_DataLink)
 set(CMAKE_CXX_STANDARD  17)
 set(CMAKE_DEBUG_POSTFIX _g)
 set(CMAKE_CXX_EXTENSIONS yes)
@@ -6,7 +6,9 @@ set(CMAKE_CXX_EXTENSIONS yes)
 #######################################################################################
 #Build Settings 
 #######################################################################################
-set (SOURCES dgramClient.cpp)
+find_package(GTest REQUIRED)
+
+set (SOURCES main.cpp)
 
 #######################################################################################
 #Build target settings
@@ -18,4 +20,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ./)
-target_link_libraries(${PROJECT_NAME} networkingAdapter)
+target_link_libraries(${PROJECT_NAME}  networkingAdapter
+                                       GTest::GTest 
+                                       GTest::Main)
