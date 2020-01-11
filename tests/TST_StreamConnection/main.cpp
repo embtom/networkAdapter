@@ -37,10 +37,10 @@ TEST_F(CStreamComTest, simple)
         char rcvData[40];
         auto [a, b] = m_Server.waitForConnection();
 
-        std::cout << COUT_GTEST_MGT << "Server connectd from: " << b.toString() << std::endl;
+        std::cout << GTEST_BOX << "Server connectd from: " << b.toString() << std::endl;
         a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](std::size_t len)
         {
-            std::cout << COUT_GTEST_MGT << "Rcv from: " << rcvData << std::endl;
+            std::cout << GTEST_BOX << "Rcv from: " << rcvData << std::endl;
             a.send(&rcvData[0], strlen(rcvData));
             return true;
         });
@@ -52,7 +52,7 @@ TEST_F(CStreamComTest, simple)
     a.send(dataToSend.c_str(),dataToSend.length());
     a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]),sizeof(rcvData));
     std::string dataRcv(rcvData); 
-    std::cout << COUT_GTEST_MGT << "Rcv: " << dataRcv << std::endl;
+    std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);
 
