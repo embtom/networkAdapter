@@ -39,7 +39,7 @@ TEST_F(CDgramComTest, simple)
 
         a.reciveFrom(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, std::size_t len) 
         {
-            std::cout << COUT_GTEST_MGT << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
+            std::cout << GTEST_BOX << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
             a.sendTo(ClientAddr, &rcvData[0], strlen(rcvData));
             return true;
         });
@@ -51,7 +51,7 @@ TEST_F(CDgramComTest, simple)
     a.send(dataToSend.c_str(),dataToSend.length());
     a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]),sizeof(rcvData));
     std::string dataRcv(rcvData); 
-    std::cout << COUT_GTEST_MGT << "Rcv: " << dataRcv << std::endl;
+    std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);
 

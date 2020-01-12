@@ -1,4 +1,4 @@
-project(TST_DataLink)
+project(TST_Common)
 set(CMAKE_CXX_STANDARD  17)
 set(CMAKE_DEBUG_POSTFIX _g)
 set(CMAKE_CXX_EXTENSIONS yes)
