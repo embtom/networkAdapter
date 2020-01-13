@@ -17,10 +17,12 @@ set(VERSION_PATCH 0)
 ######################################################
 add_subdirectory(c++)
 
-if (${NETWORKINGADAPTER_BUILD_TEST})
+include(CTest)
+if (${BUILD_TESTING} AND ${NETWORKINGADAPTER_BUILD_TEST})
     message(STATUS "Build with networkingAdapter Unit Tests")
+    enable_testing()
     add_subdirectory(tests)
-    endif()
+endif()
     
 if (${NETWORKINGADAPTER_BUILD_TEST})
     message(STATUS "Build with networkingAdapter Examples")

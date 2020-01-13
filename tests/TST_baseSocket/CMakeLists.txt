@@ -23,3 +23,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC ./)
 target_link_libraries(${PROJECT_NAME}  networkingAdapter
                                        GTest::GTest 
                                        GTest::Main)
+
+add_test(NAME TST_baseSocket COMMAND ${PROJECT_NAME})                                       
