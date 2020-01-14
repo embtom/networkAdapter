@@ -1,7 +1,4 @@
 project(TST_StreamConnection)
-set(CMAKE_CXX_STANDARD  17)
-set(CMAKE_DEBUG_POSTFIX _g)
-set(CMAKE_CXX_EXTENSIONS yes)
 
 #######################################################################################
 #Build Settings 

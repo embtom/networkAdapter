@@ -136,27 +136,27 @@ TEST(HostName, NameToIP)
     std::string ipAddr = list.at(0).toString();
     EXPECT_EQ(ipAddr, "127.0.0.1");
     
-    CHostLookup google(std::string("google.de"));
-    for(auto e : google.addresses())
-    {
-        if(e.is_v4()) {
-            std::cout << "Ip4 : " << e.toString() << std::endl;
-        } else {
-            std::cout << "Ip6 : " << e.toString() << std::endl;
-        }
+    // CHostLookup google(std::string("google.de"));
+    // for(auto e : google.addresses())
+    // {
+    //     if(e.is_v4()) {
+    //         std::cout << "Ip4 : " << e.toString() << std::endl;
+    //     } else {
+    //         std::cout << "Ip6 : " << e.toString() << std::endl;
+    //     }
 
-    }
+    // }
 
-    CHostLookup fritzBox(std::string("tom-fujitsu"));
-    for(auto e : fritzBox.addresses())
-    {
-        if(e.is_v4()) {
-            std::cout << "Ip4 : " << e.toString() << std::endl;
-        } else {
-            std::cout << "Ip6 : " << e.toString() << std::endl;
-        }
+    // CHostLookup fritzBox(std::string("tom-fujitsu"));
+    // for(auto e : fritzBox.addresses())
+    // {
+    //     if(e.is_v4()) {
+    //         std::cout << "Ip4 : " << e.toString() << std::endl;
+    //     } else {
+    //         std::cout << "Ip6 : " << e.toString() << std::endl;
+    //     }
 
-    }
+    // }
 }
 
 int main(int argc, char **argv)

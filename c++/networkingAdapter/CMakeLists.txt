@@ -1,39 +1,42 @@
 project(networkingAdapter)
 
 include(GNUInstallDirs)
-#######################################################################################
-# settings 
-#######################################################################################
-set(SOURCES_NA  src/IpAddress.cpp
-                src/BaseSocket.cpp
-                src/HostName.cpp
-                src/BaseDataLink.cpp
-                src/stream/StreamDataLink.cpp
-                src/stream/StreamServer.cpp
-                src/stream/StreamClient.cpp
-                src/dgram/DgramDataLink.cpp
-                src/dgram/DgramServer.cpp
-                src/dgram/DgramClient.cpp)
 
-set (HEADERS_NA include/IpAddress.hpp
-                include/BaseSocket.hpp
-                include/HostName.h
-                include/BaseDataLink.hpp
-                include/stream/StreamDataLink.hpp
-                include/stream/StreamServer.hpp
-                include/stream/StreamClient.hpp
-                include/dgram/DgramDataLink.hpp
-                include/dgram/DgramServer.hpp
-                include/dgram/DgramClient.hpp)
+######################################################
+#Sources and Headers to build
+set(SOURCES_NA  
+    "src/IpAddress.cpp"
+    "src/BaseSocket.cpp"
+    "src/HostName.cpp"
+    "src/BaseDataLink.cpp"
+    "src/stream/StreamDataLink.cpp"
+    "src/stream/StreamServer.cpp"
+    "src/stream/StreamClient.cpp"
+    "src/dgram/DgramDataLink.cpp"
+    "src/dgram/DgramServer.cpp"
+    "src/dgram/DgramClient.cpp"
+)
+
+set(HEADERS_NA  
+    "include/IpAddress.hpp"
+    "include/BaseSocket.hpp"
+    "include/HostName.h"
+    "include/BaseDataLink.hpp"
+    "include/stream/StreamDataLink.hpp"
+    "include/stream/StreamServer.hpp"
+    "include/stream/StreamClient.hpp"
+    "include/dgram/DgramDataLink.hpp"
+    "include/dgram/DgramServer.hpp"
+    "include/dgram/DgramClient.hpp"
+)
                 
-#######################################################################################
-#Build target settings
-#######################################################################################
+######################################################
+#Build target
 add_library(${PROJECT_NAME} SHARED ${SOURCES_NA} ${HEADERS_NA})
 set_target_properties(${PROJECT_NAME} PROPERTIES 
-    DEBUG_POSTFIX  "_g"
-    CXX_STANDARD   17
-    CXX_EXTENSIONS yes
+    DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
+    CXX_STANDARD   ${CMAKE_CXX_STANDARD}
+    CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE utilsCpp Threads::Threads)
 
@@ -48,9 +51,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 ######################################################
-#Install
-######################################################
-
+#Install rules
 install(TARGETS ${PROJECT_NAME} EXPORT networkingAdapter-config
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
