@@ -1,4 +1,4 @@
-project(TST_IpAddress)
+project(TST_EndianConversion)
 
 ######################################################
 #Build Sources
@@ -12,9 +12,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-
-target_link_libraries(${PROJECT_NAME}  networkingAdapter
+target_link_libraries(${PROJECT_NAME}  endianConversion
                                        GTest::GTest 
                                        GTest::Main)
 
-add_test(NAME TST_IpAddress COMMAND ${PROJECT_NAME}) 
+add_test(NAME TST_EndianConversion COMMAND ${PROJECT_NAME}) 

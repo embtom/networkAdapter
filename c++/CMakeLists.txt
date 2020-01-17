@@ -1,3 +1,4 @@
 
 add_subdirectory(networkingAdapter)
 add_subdirectory(utilsCpp)
+add_subdirectory(endianConversion)
