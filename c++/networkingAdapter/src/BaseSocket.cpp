@@ -70,6 +70,12 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
             ret = ::socket(AF_INET6, SOCK_STREAM, 0);
             break;
         }
+        
+        case ESocketMode::NO_MODE: [[fallthrough]];
+        default:
+        {
+            throw std::runtime_error(utils::buildErrorMessage("CBaseSocket::", __func__, ": No Valid socket mode"));
+        }
     }
 
     if (ret < 0) {

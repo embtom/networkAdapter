@@ -9,7 +9,7 @@ If the class is not registered, members is std::tuple<>
 
 #include <tuple>
 
-namespace meta
+namespace EtEndian
 {
 namespace detail
 {
@@ -29,4 +29,4 @@ TupleType MetaHolder<T, TupleType>::members = registerMembers<T>();
 
 
 } // end of namespace detail
-} // end of namespace meta
+} // end of namespace EtEndian

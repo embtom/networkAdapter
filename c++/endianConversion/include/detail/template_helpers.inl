@@ -1,4 +1,4 @@
-namespace meta {
+namespace EtEndian {
 namespace detail {
 
 template <typename F, typename... Args, std::size_t... Idx>

@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace meta {
+namespace EtEndian {
 namespace detail {
 
 // for_each_arg - call f for each element from tuple
