@@ -31,42 +31,55 @@
 #include <array>
 #include <EndianMeta.h>
 #include <EndianMembers.h>
+#include <template_helpers.h>
 
 namespace EtEndian
 {
 
-//type trait to check if is std::array
-template<class T>
-struct is_array :  std::false_type{};
-
-template<class T, std::size_t N>
-struct is_array<std::array<T, N>> : std::true_type {};
-
+enum class EConvertMode
+{
+    NET_ORDER,
+    HOST_ORDER
+};
 
 template<typename T>
 class ConverterFunc
 {
 
 public:
-    explicit ConverterFunc(const T& rObj) noexcept : 
-        m_initialObj(rObj) 
+    explicit ConverterFunc(EConvertMode mode, T&& rObj) noexcept :
+        m_ConvertMode(mode),
+        m_initialObj(std::forward<T>(rObj)) 
     { };
 
     template<typename Member,
              typename = std::enable_if_t<std::is_arithmetic<EtEndian::get_member_type<Member>>::value>
     >
-    void operator()(Member& member) noexcept
+    void operator()(const Member& member) noexcept
     {
         using element_t = EtEndian::get_member_type<Member>;
         const element_t& source = member.getConstRef(m_initialObj);  
-        member.set(m_convertedObj, host_to_network(source));
+
+        switch (m_ConvertMode)
+        {
+            case EConvertMode::NET_ORDER:
+            {
+                member.set(m_convertedObj, host_to_network(source));
+                break;
+            }
+            case EConvertMode::HOST_ORDER:
+            {
+                member.set(m_convertedObj, network_to_host(source));
+                break;
+            } 
+        }
     }
 
     template<typename Member,
-                typename = std::enable_if_t<is_array<EtEndian::get_member_type<Member> >::value>,
+                typename = std::enable_if_t<detail::is_array<EtEndian::get_member_type<Member>>::value>,
                 typename = void
     >   
-    void operator()(Member& member) noexcept
+    void operator()(const Member& member) noexcept
     {
         using array_t = EtEndian::get_member_type<Member>;
         using array_element_t = std::decay_t<decltype(std::declval<array_t>()[0])>;
@@ -78,11 +91,25 @@ public:
         const array_t& sourceArray= member.getConstRef(m_initialObj);
         array_t& destArray= member.getRef(m_convertedObj);
 
-        std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(), 
-            [](const auto& a) {return host_to_network(a);});
+        switch (m_ConvertMode)
+        {
+            case EConvertMode::NET_ORDER:
+            {
+                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(), 
+                    [](const auto& a) { return host_to_network(a); });
+                break;
+            }
+            case EConvertMode::HOST_ORDER:
+            {
+                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(), 
+                    [](const auto& a) { return network_to_host(a); });
+                break;
+            }    
+        }
+        
     }
 
-    const T& initial() const noexcept
+    const T& value() const noexcept
     {
         return m_initialObj;
     }
@@ -93,10 +120,10 @@ public:
     }
 
 private:
-    T    m_initialObj;
-    T    m_convertedObj;
+    const EConvertMode  m_ConvertMode;
+    const T             m_initialObj;
+    T                   m_convertedObj;
 };
-
 
 }
 

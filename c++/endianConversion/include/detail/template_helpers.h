@@ -14,6 +14,13 @@ void for_tuple(F&& f, const std::tuple<Args...>& tuple);
 template <typename F>
 void for_tuple(F&& f, const std::tuple<>& tuple);
 
+//type trait to check if is std::array
+template<class T>
+struct is_array :  std::false_type{};
+
+template<class T, std::size_t N>
+struct is_array<std::array<T, N>> : std::true_type {};
+
 } // end of namespace detail
 } // end of namespace meta
 

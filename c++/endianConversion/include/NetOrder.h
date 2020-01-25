@@ -43,8 +43,8 @@ class CNetOrder
 {
 public:
     template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>    
-    CNetOrder(U &&r) :
-        m_converterFunc(std::forward<U>(r))
+    CNetOrder(U &&obj) noexcept :
+        m_converterFunc(EConvertMode::NET_ORDER, std::forward<removeConstReference_t<U>>(obj))
     {
         doForAllMembers<T>(m_converterFunc);
     }
@@ -53,16 +53,15 @@ public:
     CNetOrder(CNetOrder const&)            = delete;
     CNetOrder& operator=(CNetOrder const&) = delete;
 
-    const T& NetworkOrder() const
+    const T& HostOrder() const noexcept
+    {
+        return m_converterFunc.value();
+    }
+
+    const T& NetworkOrder() const noexcept
     {
         return m_converterFunc.converted();
     }
-
-    const T& HostOrder() const
-    {
-        return m_converterFunc.initilal();
-    }
-
 private:
     ConverterFunc<T> m_converterFunc;
 };
