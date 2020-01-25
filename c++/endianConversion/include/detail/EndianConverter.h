@@ -29,9 +29,10 @@
 #include <string>
 #include <type_traits>
 #include <array>
-#include <EndianMeta.h>
-#include <EndianMembers.h>
-#include <template_helpers.h>
+#include "EndianMeta.h"
+#include "EndianMembers.h"
+#include "EndianConvert.h"
+#include "template_helpers.h"
 
 namespace EtEndian
 {
@@ -47,10 +48,13 @@ class ConverterFunc
 {
 
 public:
-    explicit ConverterFunc(EConvertMode mode, T&& rObj) noexcept :
+    template<typename U>
+    ConverterFunc(EConvertMode mode, U&& rObj) noexcept :
         m_ConvertMode(mode),
-        m_initialObj(std::forward<T>(rObj)) 
+        m_initialObj(std::forward<U>(rObj)) 
     { };
+
+    ConverterFunc(const ConverterFunc&) = default;
 
     template<typename Member,
              typename = std::enable_if_t<std::is_arithmetic<EtEndian::get_member_type<Member>>::value>

@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include <EndianConvert.h>
-#include <EndianMembers.h>
-#include <EndianMeta.h>
+#include <detail/EndianConvert.h>
+#include <detail/EndianMembers.h>
+#include <detail/EndianMeta.h>
 #include <NetOrder.h>
+#include <HostOrder.h>
 
 #include "SwapEndian.h"
 
@@ -184,6 +185,26 @@ TEST(NetOrder, ConvertToNet)
       EXPECT_NE(TestNetOrder,testDataVerify);
       EXPECT_EQ(TestNetOrder,testDataVerifyNetOrder);
    }
+   {
+      EtEndian::CNetOrder converterToNet (testDataVerify);
+      const STestStructure& TestHostOrder = converterToNet.HostOrder();
+      const STestStructure& TestNetOrder = converterToNet.NetworkOrder();
+      EXPECT_EQ(TestHostOrder,testDataVerify);
+      EXPECT_EQ(TestNetOrder,testDataVerifyNetOrder);
+
+      EtEndian::CHostOrder converterToHost (TestNetOrder);
+      const STestStructure& TestHostOrder2 = converterToHost.HostOrder();
+      const STestStructure& TestNetOrder2 = converterToHost.NetworkOrder();
+      EXPECT_EQ(TestHostOrder,TestHostOrder2);
+      EXPECT_EQ(TestNetOrder,TestNetOrder2);
+ 
+      EtEndian::CHostOrder converter3(converterToHost);
+      const STestStructure& TestHostOrder3 = converter3.HostOrder();
+      const STestStructure& TestNetOrder3 = converter3.NetworkOrder();
+      EXPECT_EQ(TestHostOrder,TestHostOrder3);
+      EXPECT_EQ(TestNetOrder,TestNetOrder3);
+   }
+
 
 }
 

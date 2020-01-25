@@ -3,8 +3,6 @@
 #include <cstring>
 #include <tuple>
 #include <algorithm>
-#include <endian.h>
-#include <EndianConvert.h>
 #include <stream/StreamDataLink.hpp>
 
 #define GTEST_BOX                   "[     cout ] "

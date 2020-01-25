@@ -2,9 +2,9 @@
 #include <tuple>
 #include <cstring>
 
-#include <EndianMembers.h>
-#include <detail/template_helpers.h>
-#include <detail/MetaHolder.h>
+#include "EndianMembers.h"
+#include "template_helpers.h"
+#include "MetaHolder.h"
 
 namespace EtEndian
 {

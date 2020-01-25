@@ -36,7 +36,7 @@ auto registerMembers<YourClass>()
 #include <type_traits>
 #include <tuple>
 #include <utility>
-#include <EndianMembers.h>
+#include "EndianMembers.h"
 
 namespace EtEndian
 {

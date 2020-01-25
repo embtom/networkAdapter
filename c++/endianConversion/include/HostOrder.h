@@ -23,8 +23,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _NETORDER_H_
-#define _NETORDER_H_
+#ifndef _HOSTORDER_H_
+#define _HOSTORDER_H_
 
 #include <string>
 #include <type_traits>
@@ -39,28 +39,30 @@ using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
 
 
 template<typename T>
-class CNetOrder
+class CHostOrder
 {
 public:
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>    
-    CNetOrder(U &&obj) noexcept :
-        m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
+    using class_type = T;
+
+    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CHostOrder>::value, int> = 0>    
+    CHostOrder(U &&obj) noexcept :
+        m_converterFunc(EConvertMode::HOST_ORDER, std::forward<U>(obj))
     {
         doForAllMembers<T>(m_converterFunc);
     }
 
-    CNetOrder()                            = delete;      
-    CNetOrder(const CNetOrder&)            = default;
-    CNetOrder& operator=(const CNetOrder&) = delete;
+    CHostOrder()                              = delete;      
+    CHostOrder(const CHostOrder&)             = default;
+    CHostOrder& operator=(const CHostOrder &) = delete;
 
     const T& HostOrder() const noexcept
     {
-        return m_converterFunc.value();
+        return m_converterFunc.converted();
     }
 
     const T& NetworkOrder() const noexcept
     {
-        return m_converterFunc.converted();
+        return m_converterFunc.value();
     }
 private:
     ConverterFunc<T> m_converterFunc;
@@ -68,8 +70,9 @@ private:
 
 //https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
 template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
+CHostOrder(U) -> CHostOrder<removeConstReference_t<U>>;
+
 }
 
 
-#endif //_NETORDER_H_
+#endif //_HOSTORDER_H_
