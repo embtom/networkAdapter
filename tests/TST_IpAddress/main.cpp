@@ -6,6 +6,8 @@
 
 using namespace EtNet;
 
+#define GTEST_BOX                   "[     cout ] "
+
 TEST(CIpAddress, IPv4_in_addr)
 {
     in_addr ipv4Addr;
@@ -132,9 +134,29 @@ TEST(HostName, NameToIP)
     CHostLookup host(std::string("localhost"));
 
 
-    CHostLookup::IpAddresses list = host.addresses();
-    std::string ipAddr = list.at(0).toString();
-    EXPECT_EQ(ipAddr, "127.0.0.1");
+    CHostLookup::IpAddresses ipList = host.addresses();
+    
+    auto it = std::find_if(ipList.begin(), ipList.end(),[] (const auto &elm) 
+    { 
+        if (elm.is_v4()) {
+            std::cout << GTEST_BOX << elm.toString() << std::endl;
+            return true;
+        }
+        else if (elm.is_v6()) {
+            std::cout << GTEST_BOX << elm.toString() << std::endl;
+            return true;
+        }
+        else {
+            return false;
+        }
+    });
+
+    EXPECT_NE(it, ipList.end());
+
+
+
+    // std::string ipAddr = list.at(0).toString();
+    // EXPECT_EQ(ipAddr, "127.0.0.1");
     
     // CHostLookup google(std::string("google.de"));
     // for(auto e : google.addresses())

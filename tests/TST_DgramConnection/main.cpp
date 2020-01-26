@@ -34,7 +34,7 @@ TEST_F(CDgramComTest, simple)
 {
     std::thread t([this]()
     {   
-        char rcvData[40];
+        char rcvData[40] = {0};
         CDgramDataLink a;
         std::tie(a) = m_Server.waitForConnection();
         //auto (a) = m_Server.waitForConnection();

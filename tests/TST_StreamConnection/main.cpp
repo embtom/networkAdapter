@@ -34,7 +34,7 @@ TEST_F(CStreamComTest, simple)
 {
     std::thread t([this]()
     {   
-        char rcvData[40];
+        char rcvData[40] = {0};
         CStreamDataLink a; 
         CIpAddress b;
         //auto [a, b] = m_Server.waitForConnection();
