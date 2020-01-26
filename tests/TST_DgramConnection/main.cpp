@@ -34,8 +34,10 @@ TEST_F(CDgramComTest, simple)
 {
     std::thread t([this]()
     {   
-        char rcvData[40];
-        auto [a] = m_Server.waitForConnection();
+        char rcvData[40] = {0};
+        CDgramDataLink a;
+        std::tie(a) = m_Server.waitForConnection();
+        //auto (a) = m_Server.waitForConnection();
 
         a.reciveFrom(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, std::size_t len) 
         {

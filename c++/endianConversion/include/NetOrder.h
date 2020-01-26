@@ -23,52 +23,53 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _NETWORKORDER_H_
-#define _NETWORKORDER_H_
+#ifndef _NETORDER_H_
+#define _NETORDER_H_
 
-#include <endian.h>   // __BYTE_ORDER __LITTLE_ENDIAN
+#include <string>
 #include <type_traits>
-#include <byteswap.h>
+#include <array>
+#include "detail/EndianConverter.h"
 
-namespace EtNet
+namespace EtEndian
 {
-
-template<typename T, std::enable_if_t<sizeof(T) == 2, int> = 0>
-constexpr T htonT (T value) noexcept
-{
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    return __builtin_bswap16(value); 
-#else
-    return value;
-#endif
-
-}
-
-template <typename T, std::enable_if_t<sizeof(T) == 4, int> = 0>
-constexpr T htonT (T value) noexcept
-{
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    return __builtin_bswap32(value);
-#else
-    return value;
-#endif
-}
-
-template <typename T, std::enable_if_t<sizeof(T) == 8, int> = 0>
-constexpr T htonT (T value) noexcept
-{
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    return __builtin_bswap64(value);  // __bswap_constant_64
-#else
-    return value;
-#endif
-}
 
 template <typename T>
-constexpr T ntohT (T value) noexcept
+using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
+
+
+template<typename T>
+class CNetOrder
 {
-    return htonT<T>(value);
+public:
+    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>    
+    CNetOrder(U &&obj) noexcept :
+        m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
+    {
+        doForAllMembers<T>(m_converterFunc);
+    }
+
+    CNetOrder()                            = delete;      
+    CNetOrder(const CNetOrder&)            = default;
+    CNetOrder& operator=(const CNetOrder&) = delete;
+
+    const T& HostOrder() const noexcept
+    {
+        return m_converterFunc.value();
+    }
+
+    const T& NetworkOrder() const noexcept
+    {
+        return m_converterFunc.converted();
+    }
+private:
+    ConverterFunc<T> m_converterFunc;
+};
+
+//https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
+template<class U>
+CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
 }
 
-} //EtNet
-#endif //_NETWORKORDER_H_
+
+#endif //_NETORDER_H_

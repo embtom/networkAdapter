@@ -1,4 +1,4 @@
-project(TST_DgramConnection)
+project(TST_EndianConversion)
 
 ######################################################
 #Build Sources
@@ -12,9 +12,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ./)
-target_link_libraries(${PROJECT_NAME}  networkingAdapter
+target_link_libraries(${PROJECT_NAME}  endianConversion
+                                       networkingAdapter
                                        GTest::GTest 
                                        GTest::Main)
 
-add_test(NAME TST_DgramConnection COMMAND ${PROJECT_NAME}) 
+add_test(NAME TST_EndianConversion COMMAND ${PROJECT_NAME}) 

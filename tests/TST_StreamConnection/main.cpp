@@ -34,9 +34,11 @@ TEST_F(CStreamComTest, simple)
 {
     std::thread t([this]()
     {   
-        char rcvData[40];
-        auto [a, b] = m_Server.waitForConnection();
-
+        char rcvData[40] = {0};
+        CStreamDataLink a; 
+        CIpAddress b;
+        //auto [a, b] = m_Server.waitForConnection();
+        std::tie(a, b) = m_Server.waitForConnection();
         std::cout << GTEST_BOX << "Server connectd from: " << b.toString() << std::endl;
         a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](std::size_t len)
         {

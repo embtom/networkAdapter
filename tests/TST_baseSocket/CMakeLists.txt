@@ -1,18 +1,11 @@
 project(TST_baseSocket)
-set(CMAKE_CXX_STANDARD  17)
-set(CMAKE_DEBUG_POSTFIX _g)
-set(CMAKE_CXX_EXTENSIONS yes)
 
-#######################################################################################
-#Build Settings 
-#######################################################################################
-find_package(GTest REQUIRED)
-
+######################################################
+#Build Sources
 set (SOURCES main.cpp)
 
-#######################################################################################
-#Build target settings
-#######################################################################################
+######################################################
+#Build target
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
