@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 ######################################################
 #Dependencies
 find_package(Threads REQUIRED)
+find_package(utilsCpp REQUIRED)
 
 ######################################################
 #Build Config
@@ -19,7 +20,7 @@ set(UTILSCPP_BUILD_TEST ${NETWORKINGADAPTER_BUILD_TEST})
 ######################################################
 #Library Version
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 1)
+set(VERSION_MINOR 2)
 set(VERSION_PATCH 0)
 
 ######################################################

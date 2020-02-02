@@ -38,7 +38,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE utilsCpp Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE        
+    PRIVATE EMBTOM::utilsCpp 
+    PRIVATE Threads::Threads
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -52,15 +55,21 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 ######################################################
 #Install rules
-install(TARGETS ${PROJECT_NAME} EXPORT networkingAdapter-config
+install(TARGETS ${PROJECT_NAME} EXPORT networkingadapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
 )
-install(DIRECTORY include
+
+install(FILES ${HEADERS_NA}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
 )
-install(EXPORT networkingAdapter-config
+
+install(EXPORT networkingadapter-targets
     NAMESPACE
         EMBTOM::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
+
+install(FILES "cmake/networkingadapter-config.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )
