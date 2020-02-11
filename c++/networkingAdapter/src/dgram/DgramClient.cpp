@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -51,7 +51,7 @@ namespace EtNet
 class CDgramClientPrivate
 {
 public:
-     CDgramClientPrivate(CBaseSocket&& rBaseSocket); 
+     CDgramClientPrivate(CBaseSocket&& rBaseSocket);
      std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
 private:
      CBaseSocket m_baseSocket;
@@ -65,22 +65,22 @@ using namespace EtNet;
 // Method definitions "CDgramClientPrivate"
 
 CDgramClientPrivate::CDgramClientPrivate(CBaseSocket&& rBaseSocket) :
-    m_baseSocket(std::move(rBaseSocket))     
+    m_baseSocket(std::move(rBaseSocket))
 { }
 
 std::tuple<CDgramDataLink, SPeerAddr> CDgramClientPrivate::getLink(const std::string& rHost, unsigned int port)
 {
-     CHostLookup::IpAddresses ipList; 
+     CHostLookup::IpAddresses ipList;
      try  { ipList = CHostLookup(CIpAddress(rHost)).addresses(); }  catch(...) {  }
-    
-     if (ipList.empty()) 
+
+     if (ipList.empty())
      {
-          ipList = CHostLookup(rHost).addresses(); 
+          ipList = CHostLookup(rHost).addresses();
      }
 
      int domain = m_baseSocket.getDomain();
-     auto it = std::find_if(ipList.begin(), ipList.end(),[&domain] (const auto &elm) 
-     { 
+     auto it = std::find_if(ipList.begin(), ipList.end(),[&domain] (const auto &elm)
+     {
         if (elm.is_v4() && (domain == AF_INET)) {
             return true;
         }

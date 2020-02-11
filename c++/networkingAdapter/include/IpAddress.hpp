@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -51,7 +51,7 @@ public:
 
     constexpr CIpAddress()
     { }
-    
+
     CIpAddress(const CIpAddress&)            = default;
     CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(const CIpAddress&) = default;
@@ -65,22 +65,22 @@ public:
     { }
 
     CIpAddress(const std::string& rIpStr);
-    CIpAddress(std::string&& rIpStr) : 
+    CIpAddress(std::string&& rIpStr) :
         CIpAddress(rIpStr)
     { }
 
-    std::string toString() const noexcept; 
+    std::string toString() const noexcept;
     bool is_v4() const noexcept;
     bool is_v6() const noexcept;
     EAddressFamily addressFamily() const noexcept;
-    
+
     const in_addr* to_v4() const noexcept;
     const in6_addr* to_v6() const noexcept;
 
     bool operator ==(const CIpAddress& rhs) const noexcept;
     bool operator !=(const CIpAddress& rhs) const noexcept;
 private:
-    
+
     static size_t charCount(const std::string& rIpStr, char toCount) noexcept;
     mutable std::variant<std::monostate, in6_addr, in_addr> m_address;
 };

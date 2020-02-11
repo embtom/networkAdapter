@@ -7,10 +7,6 @@
 
 #define GTEST_BOX                   "[     cout ] "
 
-
-
-
-
 using namespace EtNet;
 
 TEST(DataLink, MoveKonstruktor)

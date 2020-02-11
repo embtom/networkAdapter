@@ -4,7 +4,7 @@ include(GNUInstallDirs)
 
 ######################################################
 #Sources and Headers to build
-set(SOURCES_NA  
+set(SOURCES_NA
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
     "src/HostName.cpp"
@@ -17,7 +17,7 @@ set(SOURCES_NA
     "src/dgram/DgramClient.cpp"
 )
 
-set(HEADERS_NA  
+set(HEADERS_NA
     "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
     "include/HostName.h"
@@ -29,17 +29,17 @@ set(HEADERS_NA
     "include/dgram/DgramServer.hpp"
     "include/dgram/DgramClient.hpp"
 )
-                
+
 ######################################################
 #Build target
 add_library(${PROJECT_NAME} SHARED ${SOURCES_NA} ${HEADERS_NA})
-set_target_properties(${PROJECT_NAME} PROPERTIES 
+set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE        
-    PRIVATE EMBTOM::utilsCpp 
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    PRIVATE EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 

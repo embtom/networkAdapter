@@ -40,7 +40,7 @@ auto registerMembers<YourClass>()
 
 namespace EtEndian
 {
-    
+
 /*********************************************
  * User class registration
  * *******************************************/
@@ -55,13 +55,13 @@ constexpr auto registerName();
 template <typename Class>
 inline auto registerMembers();
 
-// helper routine to package the list of members into a tuple 
+// helper routine to package the list of members into a tuple
 template <typename... Args>
 auto members(Args&&... args);
 
 /*********************************************
- * Interfacing to data members of registerd 
- * class or struct 
+ * Interfacing to data members of registerd
+ * class or struct
  * *******************************************/
 
 // Request of Class Name, registerd

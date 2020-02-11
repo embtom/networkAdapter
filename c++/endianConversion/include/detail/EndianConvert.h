@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -34,19 +34,19 @@ namespace EtEndian
 {
 
 
-template<typename T, std::enable_if_t<std::is_arithmetic<T>::value && 
+template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                      (sizeof(T) == 2), int> = 0>
 constexpr T host_to_network (T value) noexcept
 {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    return __builtin_bswap16(value); 
+    return __builtin_bswap16(value);
 #else
     return value;
 #endif
 
 }
 
-template <typename T, std::enable_if_t<std::is_arithmetic<T>::value && 
+template <typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                        sizeof(T) == 4, int> = 0>
 constexpr T host_to_network (T value) noexcept
 {
@@ -57,7 +57,7 @@ constexpr T host_to_network (T value) noexcept
 #endif
 }
 
-template <typename T, std::enable_if_t<std::is_arithmetic<T>::value && 
+template <typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                        sizeof(T) == 8, int> = 0>
 constexpr T host_to_network (T value) noexcept
 {

@@ -29,7 +29,7 @@ inline auto registerMembers()
     return std::make_tuple();
 }
 
-// helper routine to package the list of members into a tuple 
+// helper routine to package the list of members into a tuple
 template <typename... Args>
 auto members(Args&&... args)
 {
@@ -37,8 +37,8 @@ auto members(Args&&... args)
 }
 
 /*********************************************
- * Interfacing to data members of registerd 
- * class or struct 
+ * Interfacing to data members of registerd
+ * class or struct
  * *******************************************/
 
 // Request of Class Name, registerd

@@ -12,13 +12,13 @@
 #define ANSI_TXT_MGT                "\033[0;35m" //Magenta
 #define ANSI_TXT_DFT                "\033[0;0m" //Console default
 #define GTEST_BOX                   "[     cout ] "
-#define COUT_GTEST                  ANSI_TXT_GRN << GTEST_BOX  
+#define COUT_GTEST                  ANSI_TXT_GRN << GTEST_BOX
 #define COUT_GTEST_MGT              COUT_GTEST << ANSI_TXT_DFT
 
 
 using namespace EtNet;
 
-class CDgramComTest : public  ::testing::Test 
+class CDgramComTest : public  ::testing::Test
 {
 protected:
     CDgramComTest() :
@@ -33,13 +33,13 @@ protected:
 TEST_F(CDgramComTest, simple)
 {
     std::thread t([this]()
-    {   
+    {
         char rcvData[40] = {0};
         CDgramDataLink a;
         std::tie(a) = m_Server.waitForConnection();
         //auto (a) = m_Server.waitForConnection();
 
-        a.reciveFrom(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, std::size_t len) 
+        a.reciveFrom(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, std::size_t len)
         {
             std::cout << GTEST_BOX << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
             a.sendTo(ClientAddr, &rcvData[0], strlen(rcvData));
@@ -52,7 +52,7 @@ TEST_F(CDgramComTest, simple)
     char rcvData[40];
     a.send(dataToSend.c_str(),dataToSend.length());
     a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]),sizeof(rcvData));
-    std::string dataRcv(rcvData); 
+    std::string dataRcv(rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);

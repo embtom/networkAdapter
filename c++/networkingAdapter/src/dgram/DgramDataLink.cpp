@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -28,7 +28,7 @@
 
 #include <stdexcept>
 #include <unistd.h>
-#include <errno.h>  
+#include <errno.h>
 #include <string.h>
 #include <error_msg.hpp>
 #include <dgram/DgramDataLink.hpp>
@@ -58,7 +58,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
         claddrLen = sizeof(sockaddr_in);
     }
     else if (rClientAddr.Ip.is_v6())
-    {   
+    {
         clAddr6.sin6_family      = AF_INET6;
         clAddr6.sin6_port        = rClientAddr.Port;
         std::memcpy(&clAddr6.sin6_addr, rClientAddr.Ip.to_v6(), sizeof(in6_addr));
@@ -88,7 +88,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
                 }
                 case EDQUOT:     [[fallthrough]];
                 case EFBIG:      [[fallthrough]];
-                case EIO:        [[fallthrough]];                    
+                case EIO:        [[fallthrough]];
                 case ENETDOWN:   [[fallthrough]];
                 case ENETUNREACH:[[fallthrough]];
                 case ENOSPC:
@@ -101,7 +101,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
                         //       Beyond the scope of this project
                         //       so continue normal operations.
                 case EAGAIN:
-                { 
+                {
                     // Temporary Error, retry the read.
                     continue;
                 }
@@ -119,7 +119,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
 std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd)
 {
     union e
-    {   
+    {
         sockaddr_storage  common;
         sockaddr_in       sin;
         sockaddr_in6      sin6;
@@ -127,7 +127,7 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
     socklen_t addr_size = sizeof(peerAdr);
 
     SPeerAddr peerAddress;
-    auto toCIpAddress = [&peerAddress] (e& peerAdr) 
+    auto toCIpAddress = [&peerAddress] (e& peerAdr)
     {
         switch (peerAdr.common.ss_family)
         {
@@ -138,14 +138,14 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
                 break;
             }
             case AF_INET6:
-            { 
+            {
                 if (IN6_IS_ADDR_V4MAPPED(&peerAdr.sin6.sin6_addr)) {
                     in_addr ip4;
                     std::memcpy(&ip4, &peerAdr.sin6.sin6_addr.__in6_u.__u6_addr8[12], sizeof(in_addr));
                     peerAddress.Ip = std::move(CIpAddress(ip4));
                 }
                 else {
-                    peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));    
+                    peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));
                 }
                 peerAddress.Port = peerAdr.sin6.sin6_port;
                 break;
@@ -209,7 +209,7 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
             break;
         }
         dataRead += get;
-        
+
         toCIpAddress(peerAdr);
         if (scanForEnd(peerAddress, dataRead))
         {

@@ -9,9 +9,9 @@ Standards-Version: 4.3.0
 Package: networkingadapter
 Architecture: any
 Section: libs
-Depends: ${shlibs:Depends}, 
+Depends: ${shlibs:Depends},
          ${misc:Depends},
-Description: Development headers of the emtom 
+Description: Development headers of the emtom
              networkingadapter
 
 Package: networkingadapter-dev

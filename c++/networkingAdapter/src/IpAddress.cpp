@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -37,10 +37,10 @@ template<class... Ts> overload(Ts...) -> overload<Ts...>;
 EtNet::CIpAddress::CIpAddress(const std::string& rIpStr)
 {
     size_t cnt = charCount(rIpStr, '.');
-    if(cnt == 3) 
+    if(cnt == 3)
     {
         in_addr IpAddr = {0};
-        if(inet_pton(AF_INET, rIpStr.c_str(), &IpAddr)) 
+        if(inet_pton(AF_INET, rIpStr.c_str(), &IpAddr))
         {
             m_address.emplace<in_addr>(IpAddr);
             return;
@@ -50,33 +50,33 @@ EtNet::CIpAddress::CIpAddress(const std::string& rIpStr)
     if (cnt)
     {
         in6_addr IpAddr = {0};
-        if(inet_pton(AF_INET6, rIpStr.c_str(), &IpAddr)) 
+        if(inet_pton(AF_INET6, rIpStr.c_str(), &IpAddr))
         {
             m_address.emplace<in6_addr>(IpAddr);
             return;
         }
     }
-    throw std::runtime_error(utils::buildErrorMessage("CIpAddress::", __func__," No valid Ip string"));   
+    throw std::runtime_error(utils::buildErrorMessage("CIpAddress::", __func__," No valid Ip string"));
 }
 
 std::string EtNet::CIpAddress::toString() const noexcept
 {
     std::string ret;
     std::visit(overload{
-        [&ret](const in_addr& val)        
+        [&ret](const in_addr& val)
         {
             char addrstr[INET_ADDRSTRLEN] = {0};
             inet_ntop(AF_INET, &val, addrstr, sizeof(addrstr));
             ret = std::string(addrstr);
         },
-        [&ret](const in6_addr& val)       
+        [&ret](const in6_addr& val)
         {
-            char addrstr[INET6_ADDRSTRLEN] = {0}; 
+            char addrstr[INET6_ADDRSTRLEN] = {0};
             inet_ntop(AF_INET6, &val, addrstr, sizeof(addrstr));
             ret = std::string(addrstr);
         },
-        [&ret](const std::monostate& ) 
-        { 
+        [&ret](const std::monostate& )
+        {
             ret = std::string();
         }
     }, m_address);
@@ -115,14 +115,14 @@ EtNet::EAddressFamily EtNet::CIpAddress::addressFamily() const noexcept
         [&ret](const std::monostate& ) { ret = EtNet::EAddressFamily::INV; }
     }, m_address);
 
-    return ret; 
+    return ret;
 }
 
 const in_addr* EtNet::CIpAddress::to_v4() const noexcept
 {
     if (!is_v4()) {
         return nullptr;
-    }   
+    }
     return std::get_if<in_addr>(&m_address);
 }
 
@@ -130,16 +130,16 @@ const in6_addr* EtNet::CIpAddress::to_v6() const noexcept
 {
     if (!is_v6()) {
         return nullptr;
-    }   
+    }
     return std::get_if<in6_addr>(&m_address);
 }
 
 size_t EtNet::CIpAddress::charCount(const std::string& rIpStr, char toCount) noexcept
 {
-    return std::count_if( rIpStr.begin(), rIpStr.end(), [toCount] ( char c ) 
-    { 
-        if(c == toCount) 
-            return true; 
+    return std::count_if( rIpStr.begin(), rIpStr.end(), [toCount] ( char c )
+    {
+        if(c == toCount)
+            return true;
         else
             return false;
     });
@@ -158,16 +158,16 @@ bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
     bool ret =false;
 
     std::visit(overload{
-    [rhs, &ret](const in_addr& val)        
+    [rhs, &ret](const in_addr& val)
     {
         ret = (std::memcmp(&val, rhs.to_v4(), sizeof(in_addr)) == 0);
     },
-    [rhs, &ret](const in6_addr& val)       
+    [rhs, &ret](const in6_addr& val)
     {
         ret = (std::memcmp(&val, rhs.to_v6(), sizeof(in6_addr)) == 0);
     },
-    [&ret](const std::monostate& ) 
-    { 
+    [&ret](const std::monostate& )
+    {
         ret = false;
     }
     }, m_address);

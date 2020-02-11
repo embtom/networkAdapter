@@ -14,12 +14,12 @@ int main(int argc, char *argv[])
     auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
     EtNet::CStreamServer CStreamServer(std::move(baseSocket), 5001);
     while(true)
-    {   
+    {
         uint8_t buffer [128];
         int rcvLen;
         auto [a,b] = CStreamServer.waitForConnection();
-        
-        rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) { 
+
+        rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) {
             std::cout << "Rcv Len:" << len << std::endl;;
             return true;
         });

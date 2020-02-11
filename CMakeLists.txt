@@ -24,7 +24,7 @@ set(VERSION_MINOR 2)
 set(VERSION_PATCH 0)
 
 ######################################################
-#Subdirectoris 
+#Subdirectoris
 add_subdirectory(c++)
 
 include(CTest)
@@ -34,8 +34,8 @@ if (${BUILD_TESTING} AND ${NETWORKINGADAPTER_BUILD_TEST})
     enable_testing()
     add_subdirectory(tests)
 endif()
-    
+
 if (${NETWORKINGADAPTER_BUILD_EXAMPLES})
     message(STATUS "Build with networkingAdapter Examples")
     add_subdirectory(examples)
-endif() 
+endif()

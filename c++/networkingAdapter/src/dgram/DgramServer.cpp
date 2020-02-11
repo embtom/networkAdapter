@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -105,7 +105,7 @@ CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int
         {
             throw std::logic_error(utils::buildErrorMessage("ServerSocket::", __func__));
             break;
-        } 
+        }
     }
 
     m_FdSet.AddFd(m_baseSocket.getFd(), [this] (int fd) {incomingConnectionCb(fd);});
@@ -121,14 +121,14 @@ void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
 {
     m_connectionPromise.set_value(fd);
 }
-    
+
 std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
 {
     m_connectionPromise = std::promise<int>{};
     if (utils::CFdSetRetval::UNBLOCK == m_FdSet.Select()) {
         return CDgramDataLink(-1);
     }
-    
+
     int fd =  m_connectionPromise.get_future().get();
     return std::tuple(CDgramDataLink(fd));
 }
@@ -139,7 +139,7 @@ std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
 void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
 {
     delete it;
-}   
+}
 
 CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))

@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -44,7 +44,7 @@ class CBaseDataLink
 {
 public:
     using CallbackReceive = std::function<bool (std::size_t len)>;
-    
+
     CBaseDataLink(CBaseDataLink &&rhs) noexcept;
     CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
     CBaseDataLink(CBaseDataLink const&)             = delete;

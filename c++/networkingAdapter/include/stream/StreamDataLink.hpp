@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -42,7 +42,7 @@ namespace EtNet
 //!
 class CStreamDataLink final : public CBaseDataLink
 {
-public:    
+public:
     CStreamDataLink(CStreamDataLink &&rhs)              = default;
     CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
     CStreamDataLink(CStreamDataLink const&)             = delete;

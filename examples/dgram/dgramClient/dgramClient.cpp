@@ -4,7 +4,7 @@
 #include <dgram/DgramClient.hpp>
 
 
-#define PORT_NUM 50002    
+#define PORT_NUM 50002
 
 
 int main(int argc, char *argv[])
@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
 
     auto[a, b] = dgramClient.getLink("localhost",PORT_NUM);
 
-    for (int i = 0 ; i < 2; i++) 
+    for (int i = 0 ; i < 2; i++)
     {
         std::string test = std::string("Hallo") + std::to_string(i);
         a.send(test.c_str(), test.length());
-            int rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) { 
+            int rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) {
             std::cout << "Rcv Len:" << len << std::endl;;
             return true;
         });

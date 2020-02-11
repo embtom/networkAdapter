@@ -10,20 +10,20 @@ stages:
 
 build_job:
   stage: build
-  tags: 
+  tags:
     - tomhp
   script:
     - ./debBuild.sh
   artifacts:
     paths:
-      - ./build_deb/  
+      - ./build_deb/
     expire_in: 4 week
   only:
     - master
 
 deploy_job:
   stage: deploy
-  tags: 
+  tags:
     - tomhp
   script:
     - cd ./build_deb
@@ -38,8 +38,8 @@ deploy_job:
     - master
 
 enable_merge:
-  stage: enable_merge    
-  tags: 
+  stage: enable_merge
+  tags:
     - tomhp
   script:
     - mkdir -p build_merge
@@ -47,9 +47,9 @@ enable_merge:
     - cmake --build ./build_merge
   artifacts:
     paths:
-      - ./build_merge/  
+      - ./build_merge/
     expire_in: 1 days
-  only: 
+  only:
     - merge_requests
 
 enable_merge_testing:
@@ -61,6 +61,6 @@ enable_merge_testing:
     script:
       - cd ./build_merge
       - ctest -T test --output-on-failure
-    only: 
+    only:
       - merge_requests
-    
+

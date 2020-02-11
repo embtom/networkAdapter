@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -44,14 +44,14 @@ class CHostOrder
 public:
     using class_type = T;
 
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CHostOrder>::value, int> = 0>    
+    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CHostOrder>::value, int> = 0>
     CHostOrder(U &&obj) noexcept :
         m_converterFunc(EConvertMode::HOST_ORDER, std::forward<U>(obj))
     {
         doForAllMembers<T>(m_converterFunc);
     }
 
-    CHostOrder()                              = delete;      
+    CHostOrder()                              = delete;
     CHostOrder(const CHostOrder&)             = default;
     CHostOrder& operator=(const CHostOrder &) = delete;
 

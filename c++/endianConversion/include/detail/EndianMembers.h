@@ -13,7 +13,7 @@ template <typename MemberType>
 using get_member_type = typename std::decay_t<MemberType>::member_type;
 
 template <typename Class, typename T>
-class Member 
+class Member
 {
 public:
     using class_type = Class;
@@ -24,9 +24,9 @@ public:
         m_ptr(ptr)
     {}
 
-    const char* getName() const             
+    const char* getName() const
     { return m_name; }
-    
+
     const member_type& get(const Class& obj) const
     { return obj.*m_ptr; };
 
@@ -40,13 +40,13 @@ public:
 
     member_type& getRef(Class& obj) const
     { return obj.*m_ptr; }
-    
+
     const member_type& getConstRef(const Class& obj) const
     { return obj.*m_ptr; }
-    
+
     member_ptr_t<Class, T> getPtr() const
     { return *m_ptr; }
-    
+
 
 private:
     const char*            m_name;

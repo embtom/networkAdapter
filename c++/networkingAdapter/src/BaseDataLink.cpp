@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -49,7 +49,7 @@ CBaseDataLink::CBaseDataLink(CBaseDataLink &&rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
 }
-   
+
 CBaseDataLink& CBaseDataLink::operator=(CBaseDataLink&& rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
@@ -91,7 +91,7 @@ void CBaseDataLink::send(const char* buffer, std::size_t len)
                 }
                 case EDQUOT:     [[fallthrough]];
                 case EFBIG:      [[fallthrough]];
-                case EIO:        [[fallthrough]];                    
+                case EIO:        [[fallthrough]];
                 case ENETDOWN:   [[fallthrough]];
                 case ENETUNREACH:[[fallthrough]];
                 case ENOSPC:

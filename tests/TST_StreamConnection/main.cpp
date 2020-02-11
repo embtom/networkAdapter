@@ -12,13 +12,13 @@
 #define ANSI_TXT_MGT                "\033[0;35m" //Magenta
 #define ANSI_TXT_DFT                "\033[0;0m" //Console default
 #define GTEST_BOX                   "[     cout ] "
-#define COUT_GTEST                  ANSI_TXT_GRN << GTEST_BOX  
+#define COUT_GTEST                  ANSI_TXT_GRN << GTEST_BOX
 #define COUT_GTEST_MGT              COUT_GTEST << ANSI_TXT_DFT
 
 
 using namespace EtNet;
 
-class CStreamComTest : public  ::testing::Test 
+class CStreamComTest : public  ::testing::Test
 {
 protected:
     CStreamComTest() :
@@ -33,9 +33,9 @@ protected:
 TEST_F(CStreamComTest, simple)
 {
     std::thread t([this]()
-    {   
+    {
         char rcvData[40] = {0};
-        CStreamDataLink a; 
+        CStreamDataLink a;
         CIpAddress b;
         //auto [a, b] = m_Server.waitForConnection();
         std::tie(a, b) = m_Server.waitForConnection();
@@ -53,7 +53,7 @@ TEST_F(CStreamComTest, simple)
     char rcvData[40];
     a.send(dataToSend.c_str(),dataToSend.length());
     a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]),sizeof(rcvData));
-    std::string dataRcv(rcvData); 
+    std::string dataRcv(rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);

@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -37,7 +37,7 @@
 #include <BaseDataLink.hpp>
 
 namespace EtNet
-{   
+{
 
 struct SPeerAddr
 {
@@ -54,7 +54,7 @@ class CDgramDataLink final : public CBaseDataLink
 {
 public:
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, std::size_t len)>;
- 
+
     CDgramDataLink()                                  = default;
     CDgramDataLink(CDgramDataLink &&rhs)              = default;
     CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;

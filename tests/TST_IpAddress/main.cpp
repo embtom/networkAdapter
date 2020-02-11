@@ -42,7 +42,7 @@ TEST(CIpAddress, IPv6_in_addr)
     EXPECT_EQ(strIpv6, "fd00::cece:1eff:fead:2fb5");
     EXPECT_EQ(ipv6Container.is_v4(), false);
     EXPECT_EQ(ipv6Container.is_v6(), true);
-    
+
     const in_addr *ip4 = ipv6Container.to_v4();
     EXPECT_EQ(ip4, nullptr);
 
@@ -60,16 +60,16 @@ TEST(CIpAddress, IPv4_string)
     std::string strIp4 = toIpv4.toString();
     EXPECT_EQ(strIp4, "192.168.0.1");
     EXPECT_EQ(toIpv4.is_v4(), true);
-    EXPECT_EQ(toIpv4.is_v6(), false); 
+    EXPECT_EQ(toIpv4.is_v6(), false);
 }
 
 TEST(CIpAddress, IPv6_string)
 {
     CIpAddress toIpv6(std::string("2003:f2:93cd:e100:9131:8000:5cf5:9f0c"));
-    std::string strIp6 = toIpv6.toString();  
-    EXPECT_EQ(strIp6, "2003:f2:93cd:e100:9131:8000:5cf5:9f0c");   
+    std::string strIp6 = toIpv6.toString();
+    EXPECT_EQ(strIp6, "2003:f2:93cd:e100:9131:8000:5cf5:9f0c");
     EXPECT_EQ(toIpv6.is_v4(), false);
-    EXPECT_EQ(toIpv6.is_v6(), true); 
+    EXPECT_EQ(toIpv6.is_v6(), true);
 }
 
 TEST(CIpAddress, IPv6_CopyConstruktor)
@@ -80,10 +80,10 @@ TEST(CIpAddress, IPv6_CopyConstruktor)
 
     CIpAddress MoveTest(std::move(Ipv6Copy));
     EXPECT_EQ(Ipv6Copy.is_v4(), false);
-    EXPECT_EQ(Ipv6Copy.is_v6(), true); 
+    EXPECT_EQ(Ipv6Copy.is_v6(), true);
     EXPECT_EQ(Ipv6Copy.to_v4(), nullptr);
-    EXPECT_NE(Ipv6Copy.to_v6(), nullptr); 
-}   
+    EXPECT_NE(Ipv6Copy.to_v6(), nullptr);
+}
 
 TEST(CIpAddress, IPv6_MoveConstruktor)
 {
@@ -91,24 +91,24 @@ TEST(CIpAddress, IPv6_MoveConstruktor)
     CIpAddress Ipv6Move;
 
     EXPECT_EQ(Ipv6.is_v4(), false);
-    EXPECT_EQ(Ipv6.is_v6(), true); 
+    EXPECT_EQ(Ipv6.is_v6(), true);
     EXPECT_EQ(Ipv6.to_v4(), nullptr);
-    EXPECT_NE(Ipv6.to_v6(), nullptr); 
+    EXPECT_NE(Ipv6.to_v6(), nullptr);
 
     Ipv6Move = std::move(Ipv6);
 
     EXPECT_EQ(Ipv6.is_v4(), false);
-    EXPECT_EQ(Ipv6.is_v6(), true); 
+    EXPECT_EQ(Ipv6.is_v6(), true);
     EXPECT_EQ(Ipv6.to_v4(), nullptr);
     EXPECT_NE(Ipv6.to_v6(), nullptr);
     EXPECT_EQ(Ipv6Move.is_v4(), false);
-    EXPECT_EQ(Ipv6Move.is_v6(), true); 
+    EXPECT_EQ(Ipv6Move.is_v6(), true);
     EXPECT_EQ(Ipv6Move.to_v4(), nullptr);
     EXPECT_NE(Ipv6Move.to_v6(), nullptr);
 }
 
 TEST(CIpAddress, CompareOperator)
-{  
+{
     in6_addr ipv6Addr;
     ipv6Addr.__in6_u.__u6_addr32[0] = 253;
     ipv6Addr.__in6_u.__u6_addr32[1] = 0;
@@ -118,11 +118,11 @@ TEST(CIpAddress, CompareOperator)
     CIpAddress cmp2(std::string("fd00::cece:1eff:fead:2fb5"));
     CIpAddress cmp3(std::string ("192.168.0.1"));
     CIpAddress cmp4(std::string("2003:f2:93cd:e100:9131:8000:5cf5:9f0c"));
-    
+
     in_addr ipv4Addr;
     ipv4Addr.s_addr =   0x0100007F;
     CIpAddress cmp5(ipv4Addr);
-           
+
     EXPECT_EQ(cmp1 == cmp2, true);
     EXPECT_EQ(cmp1 == cmp3, false);
     EXPECT_EQ(cmp1 == cmp4, false);
@@ -135,9 +135,9 @@ TEST(HostName, NameToIP)
 
 
     CHostLookup::IpAddresses ipList = host.addresses();
-    
-    auto it = std::find_if(ipList.begin(), ipList.end(),[] (const auto &elm) 
-    { 
+
+    auto it = std::find_if(ipList.begin(), ipList.end(),[] (const auto &elm)
+    {
         if (elm.is_v4()) {
             std::cout << GTEST_BOX << elm.toString() << std::endl;
             return true;
@@ -157,7 +157,7 @@ TEST(HostName, NameToIP)
 
     // std::string ipAddr = list.at(0).toString();
     // EXPECT_EQ(ipAddr, "127.0.0.1");
-    
+
     // CHostLookup google(std::string("google.de"));
     // for(auto e : google.addresses())
     // {

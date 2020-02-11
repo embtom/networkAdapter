@@ -4,7 +4,7 @@
 #include <thread>
 
 
-#define PORT_NUM 50002    
+#define PORT_NUM 50002
 
 int main()
 {
@@ -18,11 +18,11 @@ int main()
         EtNet::SPeerAddr addr;
 
         auto [a] = DgramServer.waitForConnection();
-        rcvLen = a.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SPeerAddr ClientAddr, std::size_t len) 
+        rcvLen = a.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SPeerAddr ClientAddr, std::size_t len)
         {
             addr = std::move(ClientAddr);
             std::cout << "Message form: " << addr.Ip.toString() << " with length: " << len << std::endl;
-           
+
             for (int j = 0; j < len; j++) {
                 buffer[j] = toupper((unsigned char) buffer[j]);
             }
