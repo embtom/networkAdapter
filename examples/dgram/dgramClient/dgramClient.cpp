@@ -22,9 +22,8 @@ int main(int argc, char *argv[])
         std::string test = std::string("Hallo") + std::to_string(i);
         a.send(utils::span<char>(test));
             a.recive(rxSpan, [](utils::span<char> rx) {
-            std::cout << "Rcv Len:" << rx.size() << std::endl;;
+            std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
             return true;
         });
-        std::cout << "Rcv: " << (char*)buffer << std::endl;
     }
 }

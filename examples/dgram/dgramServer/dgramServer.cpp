@@ -17,21 +17,20 @@ int main()
         char buffer [128] = {0};
         utils::span<char> rxtxSpan (buffer);
 
-        EtNet::SPeerAddr addr;
-
-        auto [a] = DgramServer.waitForConnection();
-        a.reciveFrom(rxtxSpan,[&addr, &buffer, &DgramServer](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
+        EtNet::CDgramDataLink a;
+        std::tie(a) = DgramServer.waitForConnection();
+        a.reciveFrom(rxtxSpan,[&a, &DgramServer](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
         {
-            addr = std::move(ClientAddr);
-            std::cout << "Message form: " << addr.Ip.toString() << " with length: " << rx.size() << std::endl;
+            std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
 
-            for (int j = 0; j < rx.size(); j++) {
-                buffer[j] = toupper((unsigned char) buffer[j]);
+            for(auto &elem : rx) {
+                elem = toupper(elem);
             }
+
+            a.sendTo(ClientAddr, rx);
             return true;
         });
 
-        a.sendTo(addr, rxtxSpan);
     }
 }
 

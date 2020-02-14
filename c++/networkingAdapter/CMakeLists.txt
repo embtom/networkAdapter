@@ -1,10 +1,7 @@
-project(networkingAdapter)
-
-include(GNUInstallDirs)
 
 ######################################################
 #Sources and Headers to build
-set(SOURCES_NA
+set(SOURCES
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
     "src/HostName.cpp"
@@ -17,7 +14,7 @@ set(SOURCES_NA
     "src/dgram/DgramClient.cpp"
 )
 
-set(HEADERS_NA
+set(HEADERS
     "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
     "include/HostName.h"
@@ -32,44 +29,49 @@ set(HEADERS_NA
 
 ######################################################
 #Build target
-add_library(${PROJECT_NAME} SHARED ${SOURCES_NA} ${HEADERS_NA})
-set_target_properties(${PROJECT_NAME} PROPERTIES
+add_library(networkingAdapter SHARED
+    ${SOURCES}
+    ${HEADERS}
+)
+
+set_target_properties(networkingAdapter PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE
+
+target_link_libraries(networkingAdapter PRIVATE
     PUBLIC EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(networkingAdapter PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter>
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
-    SOVERSION ${VERSION_MAJOR}
+set_target_properties(networkingAdapter PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 ######################################################
 #Install rules
-install(TARGETS ${PROJECT_NAME} EXPORT networkingadapter-targets
+install(TARGETS networkingAdapter EXPORT networkingadapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
 
-install(FILES ${HEADERS_NA}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
+install(FILES ${HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
 
 install(EXPORT networkingadapter-targets
     NAMESPACE
         EMBTOM::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )
 
 install(FILES "cmake/networkingadapter-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )

@@ -18,24 +18,21 @@ int main(int argc, char *argv[])
     {
         char buffer [128];
         utils::span<char> rxSpan(buffer);
-        int rcvLen;
-        auto [a,b] = CStreamServer.waitForConnection();
 
-        a.recive(rxSpan, [&buffer](utils::span<char> rx) {
+        EtNet::CStreamDataLink a;
+        EtNet::CIpAddress b;
+        std::tie(a,b) = CStreamServer.waitForConnection();
+
+        a.recive(rxSpan, [&a](utils::span<char> rx) {
             std::cout << "Rcv Len:" << rx.size() << std::endl;;
 
+            for (char& elem : rx) {
+                elem = toupper(elem);
+            }
 
-            // for (int j = 0; j < rx.size(); j++) {
-            //     buffer[j] = toupper((unsigned char) buffer[j]);
-            // }
-
+            a.send(rx);
             return true;
         });
-
-  
-
-
-        a.send(utils::span<char>((char*)buffer,rcvLen));
     }
 
 }

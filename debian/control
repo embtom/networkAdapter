@@ -1,5 +1,5 @@
 Source: networkingadapter
-Section: libs
+Section: devel
 Priority: optional
 Maintainer: Thomas Willetal <t.willetal@gmail.com>
 Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4),

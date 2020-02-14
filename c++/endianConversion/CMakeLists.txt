@@ -1,10 +1,6 @@
-project(endianConversion)
-
-include(GNUInstallDirs)
-
 ######################################################
 #Sources and Headers to build
-set(HEADERS_EC
+set(HEADERS
     "include/NetOrder.h"
     "include/HostOrder.h"
     "include/detail/EndianConvert.h"
@@ -20,25 +16,25 @@ set(HEADERS_EC
 ######################################################
 #Build target
 
-add_library(${PROJECT_NAME} INTERFACE)
+add_library(endianConversion INTERFACE)
 
-target_include_directories(${PROJECT_NAME} INTERFACE
+target_include_directories(endianConversion INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion>
 )
 
 ######################################################
 #Install rules
-install(TARGETS ${PROJECT_NAME} EXPORT endianConversion-config
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
+install(TARGETS endianConversion EXPORT endianConversion-config
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
 )
 
-install(FILES ${HEADERS_EC}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/${PROJECT_NAME}"
+install(FILES ${HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
 )
 
 install(EXPORT endianConversion-config
     NAMESPACE
         EMBTOM::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianConversion"
 )

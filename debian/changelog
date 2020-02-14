@@ -1,3 +1,10 @@
+networkingadapter (0.9.0) bionic; urgency=medium
+
+  * Add of span interface
+  * Endian conversion
+
+ -- Thomas Willetal <t.willetal@gmail.com>  Tue, 14 Feb 2020 20:15:00 +0200
+
 networkingadapter (0.1.0) bionic; urgency=medium
 
   * Initial creation of the networkingAdapter
