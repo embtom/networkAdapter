@@ -1,7 +1,7 @@
 /*
  * This file is part of the EMBTOM project
 
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -45,12 +45,12 @@ public:
     CHostLookup(CIpAddress&& rIpAddress);
     CHostLookup(const CIpAddress& rIpAddress);
 
-    CHostLookup()                              = default; 
+    CHostLookup()                              = default;
     CHostLookup(const CHostLookup&)            = default;
     CHostLookup& operator=(const CHostLookup&) = default;
     CHostLookup(CHostLookup&&)                 = default;
     CHostLookup& operator=(CHostLookup&&)      = default;
-    
+
     IpAddresses addresses() const noexcept;
     std::string hostname() const noexcept;
 

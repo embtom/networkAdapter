@@ -6,24 +6,23 @@ stages:
   - build
   - deploy
   - enable_merge
-  - enable_merge_testing
 
 build_job:
   stage: build
-  tags: 
+  tags:
     - tomhp
   script:
     - ./debBuild.sh
   artifacts:
     paths:
-      - ./build_deb/  
+      - ./build_deb/
     expire_in: 4 week
   only:
     - master
 
 deploy_job:
   stage: deploy
-  tags: 
+  tags:
     - tomhp
   script:
     - cd ./build_deb
@@ -38,29 +37,14 @@ deploy_job:
     - master
 
 enable_merge:
-  stage: enable_merge    
-  tags: 
+  stage: enable_merge
+  tags:
     - tomhp
   script:
-    - mkdir -p build_merge
-    - cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DNETWORKINGADAPTER_BUILD_TEST=ON -DNETWORKINGADAPTER_BUILD_EXAMPLES=ON -G"Ninja" -H. -Bbuild_merge
-    - cmake --build ./build_merge
+    - ./debBuild.sh
   artifacts:
     paths:
-      - ./build_merge/  
+      - ./build_deb/
     expire_in: 1 days
-  only: 
+  only:
     - merge_requests
-
-enable_merge_testing:
-    stage: enable_merge_testing
-    dependencies:
-      - enable_merge
-    tags:
-      - tomhp
-    script:
-      - cd ./build_merge
-      - ctest -T test --output-on-failure
-    only: 
-      - merge_requests
-    

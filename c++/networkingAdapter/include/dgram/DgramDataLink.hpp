@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -32,12 +32,14 @@
 #include <stdint.h>
 #include <cstddef>
 #include <functional>
+#include <span.h>
+
 #include <BaseSocket.hpp>
 #include <IpAddress.hpp>
 #include <BaseDataLink.hpp>
 
 namespace EtNet
-{   
+{
 
 struct SPeerAddr
 {
@@ -53,8 +55,8 @@ constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount
 class CDgramDataLink final : public CBaseDataLink
 {
 public:
-    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, std::size_t len)>;
- 
+    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
+
     CDgramDataLink()                                  = default;
     CDgramDataLink(CDgramDataLink &&rhs)              = default;
     CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;
@@ -64,8 +66,8 @@ public:
     CDgramDataLink(int socketFd);
     CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr);
 
-    void sendTo(const SPeerAddr& rClientAddr, const char* buffer, std::size_t len);
-    std::size_t reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd);
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
+    void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd);
 };
 
 } // EtNet

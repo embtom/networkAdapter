@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -42,14 +42,14 @@ template<typename T>
 class CNetOrder
 {
 public:
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>    
+    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
     CNetOrder(U &&obj) noexcept :
         m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
     {
         doForAllMembers<T>(m_converterFunc);
     }
 
-    CNetOrder()                            = delete;      
+    CNetOrder()                            = delete;
     CNetOrder(const CNetOrder&)            = default;
     CNetOrder& operator=(const CNetOrder&) = delete;
 

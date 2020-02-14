@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -70,7 +70,7 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
             ret = ::socket(AF_INET6, SOCK_STREAM, 0);
             break;
         }
-        
+
         case ESocketMode::NO_MODE: [[fallthrough]];
         default:
         {
@@ -124,4 +124,3 @@ CBaseSocket& CBaseSocket::SoBroadcast(CBaseSocket &&rBaseSocket)
     }
     return rBaseSocket;
 }
- 

@@ -3,6 +3,7 @@
 #include <BaseSocket.hpp>
 #include <stream/StreamServer.hpp>
 #include <stream/StreamDataLink.hpp>
+#include <span.h>
 #undef min
 #undef max
 
@@ -14,20 +15,24 @@ int main(int argc, char *argv[])
     auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
     EtNet::CStreamServer CStreamServer(std::move(baseSocket), 5001);
     while(true)
-    {   
-        uint8_t buffer [128];
-        int rcvLen;
-        auto [a,b] = CStreamServer.waitForConnection();
-        
-        rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) { 
-            std::cout << "Rcv Len:" << len << std::endl;;
+    {
+        char buffer [128];
+        utils::span<char> rxSpan(buffer);
+
+        EtNet::CStreamDataLink a;
+        EtNet::CIpAddress b;
+        std::tie(a,b) = CStreamServer.waitForConnection();
+
+        a.recive(rxSpan, [&a](utils::span<char> rx) {
+            std::cout << "Rcv Len:" << rx.size() << std::endl;;
+
+            for (char& elem : rx) {
+                elem = toupper(elem);
+            }
+
+            a.send(rx);
             return true;
         });
-
-        for (int j = 0; j < rcvLen; j++) {
-            buffer[j] = toupper((unsigned char) buffer[j]);
-        }
-        a.send((char*)buffer,(std::size_t)rcvLen);
     }
 
 }

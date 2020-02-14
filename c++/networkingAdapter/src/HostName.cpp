@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -41,7 +41,7 @@ CHostLookup::CHostLookup(std::string&& rHostName) :
 CHostLookup::CHostLookup(const std::string& rHostName) :
    m_hostName(rHostName),
    m_IpAddresses(requestIpAddresses(rHostName))
-{ 
+{
 
 }
 
@@ -87,10 +87,10 @@ CHostLookup::IpAddresses CHostLookup::requestIpAddresses(const std::string& rHos
         switch (result->ai_family)
         {
             case AF_INET:
-            {   
+            {
                 sockaddr_in *pSockAddr = reinterpret_cast<sockaddr_in*>(result->ai_addr);
                 hostIps.emplace_back(CIpAddress(pSockAddr->sin_addr));
-                
+
                 break;
             }
             case AF_INET6:
@@ -109,7 +109,7 @@ CHostLookup::IpAddresses CHostLookup::requestIpAddresses(const std::string& rHos
 std::string CHostLookup::requestHostname(const CIpAddress& rIpAddress)
 {
     std::string hostName;
-    auto requestHostname = [&hostName] (const sockaddr* sa, socklen_t saLen) 
+    auto requestHostname = [&hostName] (const sockaddr* sa, socklen_t saLen)
     {
         char name[NI_MAXHOST] = {0};
         int ret = getnameinfo((sockaddr*)sa, saLen, name, NI_MAXHOST, nullptr, 0, NI_NAMEREQD | NI_NOFQDN);
@@ -119,14 +119,14 @@ std::string CHostLookup::requestHostname(const CIpAddress& rIpAddress)
         hostName = std::string(name);
     };
 
-    if(rIpAddress.is_v4()) 
+    if(rIpAddress.is_v4())
     {
         sockaddr_in ip4;
         ip4.sin_family = AF_INET;
         std::memcpy(&ip4.sin_addr, rIpAddress.to_v4(), sizeof(in_addr));
         requestHostname((sockaddr*)&ip4, sizeof(sockaddr_in));
     }
-    else if (rIpAddress.is_v6()) 
+    else if (rIpAddress.is_v6())
     {
         sockaddr_in6 ip6;
         ip6.sin6_family = AF_INET6;

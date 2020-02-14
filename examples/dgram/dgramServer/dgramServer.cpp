@@ -2,9 +2,10 @@
 #include <iostream>
 #include <dgram/DgramServer.hpp>
 #include <thread>
+#include <span.h>
 
 
-#define PORT_NUM 50002    
+#define PORT_NUM 50002
 
 int main()
 {
@@ -13,22 +14,23 @@ int main()
 
     while (true)
     {
-        uint8_t buffer [128];
-        int rcvLen;
-        EtNet::SPeerAddr addr;
+        char buffer [128] = {0};
+        utils::span<char> rxtxSpan (buffer);
 
-        auto [a] = DgramServer.waitForConnection();
-        rcvLen = a.reciveFrom(buffer, sizeof(buffer), [&addr, &buffer, &DgramServer](EtNet::SPeerAddr ClientAddr, std::size_t len) 
+        EtNet::CDgramDataLink a;
+        std::tie(a) = DgramServer.waitForConnection();
+        a.reciveFrom(rxtxSpan,[&a, &DgramServer](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
         {
-            addr = std::move(ClientAddr);
-            std::cout << "Message form: " << addr.Ip.toString() << " with length: " << len << std::endl;
-           
-            for (int j = 0; j < len; j++) {
-                buffer[j] = toupper((unsigned char) buffer[j]);
+            std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
+
+            for(auto &elem : rx) {
+                elem = toupper(elem);
             }
+
+            a.sendTo(ClientAddr, rx);
             return true;
         });
-        a.sendTo(addr,(char*)buffer,rcvLen);
+
     }
 }
 

@@ -6,6 +6,7 @@
 #include <NetOrder.h>
 #include <HostOrder.h>
 
+
 #include "SwapEndian.h"
 
 #define GTEST_BOX                   "[     cout ] "
@@ -143,12 +144,12 @@ TEST(EndianMeta, EndianMeta)
       using MemberT = EtEndian::get_member_type<decltype(member)>;
       MemberT td = member.get(person);
       std::cout << GTEST_BOX << member.getName() << std::endl;
-   });   
+   });
 }
 
 TEST(NetOrder, ConvertToNet)
 {
-   STestStructure testDataVerify ({0xfaba, 0x020408ff, 
+   STestStructure testDataVerify ({0xfaba, 0x020408ff,
                             {0x1122, 0x3344, 0xAABB, 0xCCDD},
                             {0x1122AABB, 0x3344CCDD, 0xAABBEEFF, 0xCCDD1122, 0x1223ABBC, 0x3445CDDE, 0xABBCEFFA, 0xCDDE1223}});
 
@@ -156,13 +157,13 @@ TEST(NetOrder, ConvertToNet)
       {EtEndian::host_to_network(testDataVerify.member16), EtEndian::host_to_network(testDataVerify.member32)} );
 
    //todo should be a constexpr initializer
-   std::transform(testDataVerify.arrayOf16.begin(), testDataVerify.arrayOf16.end(), testDataVerifyNetOrder.arrayOf16.begin(), 
+   std::transform(testDataVerify.arrayOf16.begin(), testDataVerify.arrayOf16.end(), testDataVerifyNetOrder.arrayOf16.begin(),
          [](const auto& a) { return  EtEndian::host_to_network(a); });
 
-   std::transform(testDataVerify.arrayOf32.begin(), testDataVerify.arrayOf32.end(), testDataVerifyNetOrder.arrayOf32.begin(), 
+   std::transform(testDataVerify.arrayOf32.begin(), testDataVerify.arrayOf32.end(), testDataVerifyNetOrder.arrayOf32.begin(),
          [](const auto& a) { return  EtEndian::host_to_network(a); });
 
-   
+
    {
       EtEndian::CNetOrder converter (testDataVerify);
       const STestStructure& TestHostOrder = converter.HostOrder();
@@ -174,7 +175,7 @@ TEST(NetOrder, ConvertToNet)
    }
 
    {
-      EtEndian::CNetOrder converter (STestStructure({0xfaba, 0x020408ff, 
+      EtEndian::CNetOrder converter (STestStructure({0xfaba, 0x020408ff,
                                                     {0x1122, 0x3344, 0xAABB, 0xCCDD},
                                                     {0x1122AABB, 0x3344CCDD, 0xAABBEEFF, 0xCCDD1122, 0x1223ABBC, 0x3445CDDE, 0xABBCEFFA, 0xCDDE1223}})
                                                    );
@@ -197,7 +198,7 @@ TEST(NetOrder, ConvertToNet)
       const STestStructure& TestNetOrder2 = converterToHost.NetworkOrder();
       EXPECT_EQ(TestHostOrder,TestHostOrder2);
       EXPECT_EQ(TestNetOrder,TestNetOrder2);
- 
+
       EtEndian::CHostOrder converter3(converterToHost);
       const STestStructure& TestHostOrder3 = converter3.HostOrder();
       const STestStructure& TestNetOrder3 = converter3.NetworkOrder();

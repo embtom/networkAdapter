@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -51,18 +51,16 @@ public:
     template<typename U>
     ConverterFunc(EConvertMode mode, U&& rObj) noexcept :
         m_ConvertMode(mode),
-        m_initialObj(std::forward<U>(rObj)) 
+        m_initialObj(std::forward<U>(rObj))
     { };
 
     ConverterFunc(const ConverterFunc&) = default;
 
-    template<typename Member,
-             typename = std::enable_if_t<std::is_arithmetic<EtEndian::get_member_type<Member>>::value>
-    >
+    template<typename Member, std::enable_if_t<std::is_arithmetic<EtEndian::get_member_type<Member>>::value, int> = 0>
     void operator()(const Member& member) noexcept
     {
         using element_t = EtEndian::get_member_type<Member>;
-        const element_t& source = member.getConstRef(m_initialObj);  
+        const element_t& source = member.getConstRef(m_initialObj);
 
         switch (m_ConvertMode)
         {
@@ -75,21 +73,18 @@ public:
             {
                 member.set(m_convertedObj, network_to_host(source));
                 break;
-            } 
+            }
         }
     }
 
-    template<typename Member,
-                typename = std::enable_if_t<detail::is_array<EtEndian::get_member_type<Member>>::value>,
-                typename = void
-    >   
+    template<typename Member, std::enable_if_t<detail::is_array<EtEndian::get_member_type<Member>>::value, int> = 0>
     void operator()(const Member& member) noexcept
     {
         using array_t = EtEndian::get_member_type<Member>;
         using array_element_t = std::decay_t<decltype(std::declval<array_t>()[0])>;
 
         static_assert(std::is_arithmetic<array_element_t>::value, "No arithmetic type");
-        
+
         constexpr std::size_t N = decltype(std::declval<array_t>()){}.size();
 
         const array_t& sourceArray= member.getConstRef(m_initialObj);
@@ -99,18 +94,18 @@ public:
         {
             case EConvertMode::NET_ORDER:
             {
-                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(), 
+                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(),
                     [](const auto& a) { return host_to_network(a); });
                 break;
             }
             case EConvertMode::HOST_ORDER:
             {
-                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(), 
+                std::transform(sourceArray.begin(), sourceArray.end(), destArray.begin(),
                     [](const auto& a) { return network_to_host(a); });
                 break;
-            }    
+            }
         }
-        
+
     }
 
     const T& value() const noexcept

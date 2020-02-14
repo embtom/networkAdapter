@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -60,7 +60,7 @@ public:
 
 private:
     static void privateDeleterHook(CDgramServerPrivate *it);
-   
+
     struct privateDeleter
     {
         void operator()(CDgramServerPrivate *it) {

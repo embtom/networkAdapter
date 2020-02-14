@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -49,13 +49,13 @@ class CStreamServer
 {
 public:
     CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
-    
+
     CStreamServer(const CStreamServer&)             = delete;
     CStreamServer& operator= (const CStreamServer&) = delete;
     CStreamServer(CStreamServer&&)                  = default;
     CStreamServer& operator= (CStreamServer&&)      = default;
     CStreamServer()                                 = default;
-    
+
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
     static void privateDeleterHook(CStreamServerPrivate *it);

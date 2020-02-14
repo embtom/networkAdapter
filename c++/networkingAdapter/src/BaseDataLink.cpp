@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -49,7 +49,7 @@ CBaseDataLink::CBaseDataLink(CBaseDataLink &&rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
 }
-   
+
 CBaseDataLink& CBaseDataLink::operator=(CBaseDataLink&& rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
@@ -69,13 +69,13 @@ void CBaseDataLink::closeFd() noexcept
     }
 }
 
-void CBaseDataLink::send(const char* buffer, std::size_t len)
+void CBaseDataLink::send(const utils::span<char>& rTxSpan)
 {
     std::size_t dataWritten = 0;
 
-    while(dataWritten < len)
+    while(dataWritten < rTxSpan.size_bytes())
     {
-        std::size_t put = ::write(getFd(), buffer + dataWritten, len - dataWritten);
+        std::size_t put = write(getFd(), rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -91,7 +91,7 @@ void CBaseDataLink::send(const char* buffer, std::size_t len)
                 }
                 case EDQUOT:     [[fallthrough]];
                 case EFBIG:      [[fallthrough]];
-                case EIO:        [[fallthrough]];                    
+                case EIO:        [[fallthrough]];
                 case ENETDOWN:   [[fallthrough]];
                 case ENETUNREACH:[[fallthrough]];
                 case ENOSPC:
@@ -119,7 +119,7 @@ void CBaseDataLink::send(const char* buffer, std::size_t len)
     return;
 }
 
-std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd)
+void CBaseDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
 {
     if (getFd() == 0)
     {
@@ -127,10 +127,12 @@ std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, CallbackRece
     }
 
     std::size_t dataRead  = 0;
-    while(dataRead < len)
+    char* readBuffer = rRxSpan.data();
+
+    while(dataRead < rRxSpan.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::read(getFd(), buffer + dataRead, len - dataRead);
+        std::size_t get = read(getFd(), readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -181,11 +183,12 @@ std::size_t CBaseDataLink::recive(uint8_t* buffer, std::size_t len, CallbackRece
             break;
         }
         dataRead += get;
-        if (scanForEnd(dataRead))
+        if (scanForEnd(utils::span<char>(readBuffer, dataRead)))
         {
             break;
         }
     }
 
-    return dataRead;
+    rRxSpan = utils::span<char>(readBuffer, dataRead);
+    //return dataRead;
 }

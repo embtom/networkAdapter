@@ -11,7 +11,7 @@ TEST(CBaseSocket,INET_DGRAM )
     CSocketImpl testSocket;
     try {
         testSocket = std::move(CSocketImpl(ESocketMode::INET_DGRAM));
-        
+
         //CBaseSocket testSocket2 = std::move(CBaseSocket::ReuseSocket(CSocketImpl(ESocketMode::INET_DGRAM)));
 
     }

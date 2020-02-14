@@ -1,17 +1,17 @@
 Source: networkingadapter
-Section: comm
+Section: devel
 Priority: optional
 Maintainer: Thomas Willetal <t.willetal@gmail.com>
 Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4),
-               libgtest-dev
+               utilscpp-dev, libgtest-dev
 Standards-Version: 4.3.0
 
 Package: networkingadapter
 Architecture: any
 Section: libs
-Depends: ${shlibs:Depends}, 
+Depends: ${shlibs:Depends},
          ${misc:Depends},
-Description: Development headers of the emtom 
+Description: Development headers of the emtom
              networkingadapter
 
 Package: networkingadapter-dev

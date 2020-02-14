@@ -4,11 +4,13 @@
 #include <stream/StreamDataLink.hpp>
 #include <HostName.h>
 #include <algorithm>
+#include <span.h>
 
 int main(int argc, char *argv[])
 {
-    uint8_t buffer [128];
-    
+    char buffer [128];
+    utils::span<char> rxSpan(buffer);
+
     auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
     EtNet::CStreamClient streamClient(std::move(baseSocket));
 //    EtNet::CStreamDataLink dataSocket = streamClient.connect("192.168.1.22",5001);
@@ -16,10 +18,9 @@ int main(int argc, char *argv[])
     auto [a] = streamClient.connect("localhost",5001);
 
     std::string test ("Hallo");
-    a.send(test.c_str(),test.length());
-    int rcvLen= a.recive(buffer, sizeof(buffer), [](std::size_t len) { 
-         std::cout << "Rcv Len:" << len << std::endl;;
+    a.send(utils::span<char>(test));
+    a.recive(rxSpan, [] (utils::span<char> rx) {
+         std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;;
          return true;
     });
-    std::cout << "Rcv: " << (char*)buffer << std::endl;
 }

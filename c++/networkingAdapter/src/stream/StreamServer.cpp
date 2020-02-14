@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -108,7 +108,7 @@ CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, unsigned i
         {
             throw std::logic_error(utils::buildErrorMessage("ServerSocket::", __func__));
             break;
-        }    
+        }
 
     }
 }
@@ -116,12 +116,12 @@ CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, unsigned i
 std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection()
 {
     union
-    {   
+    {
         sockaddr_storage  common;
         sockaddr_in       sin;
         sockaddr_in6      sin6;
     } peerAdr;
-    
+
     socklen_t addr_size   = sizeof(peerAdr);
     int newSocket = ::accept(m_baseSocket.getFd(), (struct sockaddr*)&peerAdr, &addr_size);
 
@@ -134,19 +134,19 @@ std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection(
             break;
         }
         case AF_INET6:
-        { 
+        {
             if (IN6_IS_ADDR_V4MAPPED(&peerAdr.sin6.sin6_addr)) {
                 in_addr ip4;
                 std::memcpy(&ip4, &peerAdr.sin6.sin6_addr.__in6_u.__u6_addr8[12], sizeof(in_addr));
                 peerAddress = std::move(CIpAddress(ip4));
             }
             else {
-                peerAddress = std::move(CIpAddress(peerAdr.sin6.sin6_addr));    
+                peerAddress = std::move(CIpAddress(peerAdr.sin6.sin6_addr));
             }
         }
         break;
     }
-    
+
     if (newSocket == -1)
     {
         throw std::runtime_error(utils::buildErrorMessage("ServerSocket:", __func__, ": accept: ", strerror(errno)));
@@ -160,7 +160,7 @@ std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection(
 void CStreamServer::privateDeleterHook(CStreamServerPrivate *it)
 {
     delete it;
-}   
+}
 
 CStreamServer::CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port) :
     m_pPrivate(new CStreamServerPrivate(std::move(rBaseSocket), port))
