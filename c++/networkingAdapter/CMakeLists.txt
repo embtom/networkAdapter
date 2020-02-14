@@ -39,7 +39,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    PRIVATE EMBTOM::utilsCpp
+    PUBLIC EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 

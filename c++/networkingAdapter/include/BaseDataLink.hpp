@@ -32,10 +32,11 @@
 #include <functional>
 #include <BaseSocket.hpp>
 #include <stdint.h>
+#include <span.h>
 
 namespace EtNet
 {
-constexpr auto defaultOneRead = [](std::size_t rcvCount){ return true; };
+constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
 
 //*****************************************************************************
 //! \brief CBaseDataLink
@@ -43,7 +44,7 @@ constexpr auto defaultOneRead = [](std::size_t rcvCount){ return true; };
 class CBaseDataLink
 {
 public:
-    using CallbackReceive = std::function<bool (std::size_t len)>;
+    using CallbackReceive = std::function<bool (utils::span<char> rx)>;
 
     CBaseDataLink(CBaseDataLink &&rhs) noexcept;
     CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
@@ -53,8 +54,9 @@ public:
 
     virtual ~CBaseDataLink()                        = default;
 
-    std::size_t recive(uint8_t* buffer, std::size_t len, CallbackReceive scanForEnd = defaultOneRead);
-    void        send(const char* buffer, std::size_t len);
+    void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    void send(const utils::span<char>& rTxSpan);
+
 
 protected:
 

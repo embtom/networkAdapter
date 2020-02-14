@@ -37,12 +37,13 @@ TEST_F(CDgramComTest, simple)
         char rcvData[40] = {0};
         CDgramDataLink a;
         std::tie(a) = m_Server.waitForConnection();
-        //auto (a) = m_Server.waitForConnection();
 
-        a.reciveFrom(reinterpret_cast<uint8_t*>(&rcvData[0]), sizeof(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, std::size_t len)
+        utils::span<char> rxtxData(rcvData);
+
+        a.reciveFrom(rxtxData, [&a, &rcvData](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
         {
             std::cout << GTEST_BOX << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
-            a.sendTo(ClientAddr, &rcvData[0], strlen(rcvData));
+            a.sendTo(ClientAddr, rx);
             return true;
         });
     });
@@ -50,8 +51,9 @@ TEST_F(CDgramComTest, simple)
     auto [a, b] = m_Client.getLink(std::string("localhost"),50002);
     std::string dataToSend ("hallo litte dgram test");
     char rcvData[40];
-    a.send(dataToSend.c_str(),dataToSend.length());
-    a.recive(reinterpret_cast<uint8_t*>(&rcvData[0]),sizeof(rcvData));
+    utils::span<char> rxSpan (rcvData);
+    a.send(utils::span<char>(dataToSend));
+    a.recive(rxSpan);
     std::string dataRcv(rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 

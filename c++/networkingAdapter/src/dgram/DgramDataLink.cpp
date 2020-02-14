@@ -42,7 +42,7 @@ CDgramDataLink::CDgramDataLink(int socketFd) :
     CBaseDataLink(socketFd)
 { }
 
-void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, std::size_t len)
+void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
 {
     sockaddr_in clAddr{};
     sockaddr_in6 clAddr6{};
@@ -70,9 +70,9 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
     }
 
     std::size_t dataWritten = 0;
-    while(dataWritten < len)
+    while(dataWritten < rSpanTx.size_bytes())
     {
-        std::size_t put = ::sendto(getFd(), buffer + dataWritten, len - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(getFd(), rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -116,7 +116,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const char* buffer, st
     return;
 }
 
-std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, CallbackReciveFrom scanForEnd)
+void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd)
 {
     union e
     {
@@ -152,13 +152,13 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
             }
         }
     };
-    uint8_t* readBuffer = buffer;
+    char* readBuffer = rSpanRx.data();
     std::size_t dataRead  = 0;
 
-    while(dataRead < len)
+    while(dataRead < rSpanRx.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, len - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -211,11 +211,11 @@ std::size_t CDgramDataLink::reciveFrom(uint8_t* buffer, std::size_t len, Callbac
         dataRead += get;
 
         toCIpAddress(peerAdr);
-        if (scanForEnd(peerAddress, dataRead))
+        if (scanForEnd(peerAddress, utils::span<char>(readBuffer, dataRead)))
         {
             break;
         }
     }
-    return dataRead;
-}
 
+    rSpanRx = utils::span<char>(readBuffer, dataRead);
+}
