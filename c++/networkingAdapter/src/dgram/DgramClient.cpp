@@ -38,7 +38,7 @@
 #include <netinet/in.h>
 
 #include <error_msg.hpp>
-#include <HostName.h>
+#include <HostLookup.h>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
 

@@ -4,7 +4,7 @@
 set(SOURCES
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
-    "src/HostName.cpp"
+    "src/HostLookup.cpp"
     "src/BaseDataLink.cpp"
     "src/stream/StreamDataLink.cpp"
     "src/stream/StreamServer.cpp"
@@ -17,7 +17,7 @@ set(SOURCES
 set(HEADERS
     "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
-    "include/HostName.h"
+    "include/HostLookup.h"
     "include/BaseDataLink.hpp"
     "include/stream/StreamDataLink.hpp"
     "include/stream/StreamServer.hpp"

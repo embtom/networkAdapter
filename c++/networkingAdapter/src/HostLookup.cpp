@@ -23,7 +23,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <HostName.h>
+#include <HostLookup.h>
 #include <iostream> //std::cout
 #include <string> //std::string
 #include <netdb.h> //getaddrinfo

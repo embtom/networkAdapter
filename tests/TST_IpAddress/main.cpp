@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include <HostName.h>
+#include <HostLookup.h>
 #include <IpAddress.hpp>
 #include <cstring>
 

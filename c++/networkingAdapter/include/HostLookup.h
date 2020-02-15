@@ -24,13 +24,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _HOSTNAME_H_
-#define _HOSTNAME_H_
+#ifndef _HOSTLOOKUP_H_
+#define _HOSTLOOKUP_H_
 
 #include <unordered_map> //std::unordered
 #include <vector> //std::vector
 #include <IpAddress.hpp> //CIpAddress
-
 
 namespace EtNet
 {
@@ -64,4 +63,4 @@ private:
 
 } //EtNet
 
-#endif // _HOSTNAME_H_
+#endif //_HOSTLOOKUP_H_
