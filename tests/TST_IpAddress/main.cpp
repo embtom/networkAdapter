@@ -129,6 +129,16 @@ TEST(CIpAddress, CompareOperator)
     EXPECT_EQ(cmp3 != cmp5, true);
 }
 
+TEST(CIpAddress, calculateBroadcast)
+{
+    CIpAddress ipv4 (std::string("192.168.0.1"));
+    CIpAddress ipv4Submask (std::string("255.255.255.0"));
+    CIpAddress ipv6 (std::string("2003:f2:93cd:e100:9131:8000:5cf5:9f0c"));
+
+    CIpAddress broadcastIpv4 = ipv4.broadcast(ipv4Submask);
+}
+
+
 TEST(HostName, NameToIP)
 {
     CHostLookup host(std::string("localhost"));
@@ -152,8 +162,6 @@ TEST(HostName, NameToIP)
     });
 
     EXPECT_NE(it, ipList.end());
-
-
 
     // std::string ipAddr = list.at(0).toString();
     // EXPECT_EQ(ipAddr, "127.0.0.1");

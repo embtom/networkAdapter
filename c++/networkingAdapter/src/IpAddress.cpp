@@ -145,6 +145,20 @@ size_t EtNet::CIpAddress::charCount(const std::string& rIpStr, char toCount) noe
     });
 }
 
+EtNet::CIpAddress EtNet::CIpAddress::broadcast(const EtNet::CIpAddress& rSubmask) const
+{
+    if(is_v4() != rSubmask.is_v4()) {
+        return EtNet::CIpAddress();
+    }
+
+    if(is_v6() != rSubmask.is_v6()) {
+        return EtNet::CIpAddress();
+    }
+
+    return EtNet::CIpAddress();
+}
+
+
 bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
 {
     if(is_v4() != rhs.is_v4()) {
