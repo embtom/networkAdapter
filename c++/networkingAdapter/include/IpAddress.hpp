@@ -72,12 +72,14 @@ public:
     std::string toString() const noexcept;
     bool is_v4() const noexcept;
     bool is_v6() const noexcept;
+    bool empty() const noexcept;
+
     EAddressFamily addressFamily() const noexcept;
 
     const in_addr* to_v4() const noexcept;
     const in6_addr* to_v6() const noexcept;
 
-    CIpAddress broadcast(const CIpAddress& rSubmask) const;
+    CIpAddress broadcast(const CIpAddress& rSubmask) const noexcept;
 
     bool operator ==(const CIpAddress& rhs) const noexcept;
     bool operator !=(const CIpAddress& rhs) const noexcept;

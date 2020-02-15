@@ -132,10 +132,10 @@ TEST(CIpAddress, CompareOperator)
 TEST(CIpAddress, calculateBroadcast)
 {
     CIpAddress ipv4 (std::string("192.168.0.1"));
-    CIpAddress ipv4Submask (std::string("255.255.255.0"));
+    CIpAddress ipv4Submask (std::string("255.255.0.0"));
     CIpAddress ipv6 (std::string("2003:f2:93cd:e100:9131:8000:5cf5:9f0c"));
-
     CIpAddress broadcastIpv4 = ipv4.broadcast(ipv4Submask);
+    EXPECT_EQ(broadcastIpv4,CIpAddress(std::string("192.168.255.255")));
 }
 
 
