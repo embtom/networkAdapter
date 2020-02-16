@@ -1,7 +1,7 @@
 
 #include <iostream>
-#include <stream/StreamClient.hpp>
-#include <stream/StreamDataLink.hpp>
+#include <Stream/StreamClient.hpp>
+#include <Stream/StreamDataLink.hpp>
 #include <algorithm>
 #include <span.h>
 

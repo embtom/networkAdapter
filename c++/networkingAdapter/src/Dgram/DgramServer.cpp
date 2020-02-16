@@ -26,7 +26,7 @@
 //******************************************************************************
 // Header
 
-#include <dgram/DgramServer.hpp>
+#include <Dgram/DgramServer.hpp>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>

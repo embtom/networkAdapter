@@ -2,8 +2,8 @@
 #include <iostream>
 #include <thread>
 #include <span.h>
-#include <HostLookup.h>
-#include <dgram/DgramServer.hpp>
+#include <Lookup/HostLookup.hpp>
+#include <Dgram/DgramServer.hpp>
 
 
 #include <stdio.h>      

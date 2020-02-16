@@ -23,49 +23,29 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _CStreamClient_H_
-#define _CStreamClient_H_
-
 //******************************************************************************
 // Header
 
-#include <tuple>
-#include <memory>
-#include <string>
-#include <stream/StreamDataLink.hpp>
+#include <iostream>
+#include <stdexcept>
 
-namespace EtNet
-{
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
-class CBaseSocket;
-class CStreamClientPrivate;
+#include <error_msg.hpp>
+#include <Stream/StreamDataLink.hpp>
+
+using namespace EtNet;
 
 //*****************************************************************************
-//! \brief CStreamClient
-//!
-class CStreamClient
+// Method definitions "CStreamDataLink"
+
+CStreamDataLink::CStreamDataLink(int socketFd) :
+    CBaseDataLink(socketFd)
+{ }
+
+CStreamDataLink::~CStreamDataLink()
 {
-public:
-    CStreamClient(CBaseSocket &&rBaseSocket);
-
-    CStreamClient(const CStreamClient&)             = delete;
-    CStreamClient& operator= (const CStreamClient&) = delete;
-    CStreamClient(CStreamClient&&)                  = default;
-    CStreamClient& operator= (CStreamClient&&)      = default;
-    CStreamClient()                                 = default;
-
-    std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
-private:
-    static void privateDeleterHook(CStreamClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CStreamClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-    std::unique_ptr<CStreamClientPrivate,privateDeleter> m_pPrivate;
-};
-
+    closeFd();
 }
-#endif // _CStreamClient_H_

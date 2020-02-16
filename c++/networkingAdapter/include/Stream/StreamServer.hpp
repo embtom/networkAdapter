@@ -23,29 +23,51 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef _CSTREAMSERVER_H_
+#define _CSTREAMSERVER_H_
+
 //******************************************************************************
 // Header
 
-#include <iostream>
-#include <stdexcept>
+#include <tuple>
+#include <memory>
+#include <IpAddress.hpp>
+#include <Stream/StreamDataLink.hpp>
 
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+namespace EtNet
+{
 
-#include <error_msg.hpp>
-#include <stream/StreamDataLink.hpp>
+constexpr int maxConnectionBacklog = 5;
 
-using namespace EtNet;
+class CBaseSocket;
+class CStreamServerPrivate;
 
 //*****************************************************************************
-// Method definitions "CStreamDataLink"
-
-CStreamDataLink::CStreamDataLink(int socketFd) :
-    CBaseDataLink(socketFd)
-{ }
-
-CStreamDataLink::~CStreamDataLink()
+//! \brief CStreamServer
+//!
+class CStreamServer
 {
-    closeFd();
-}
+public:
+    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
+
+    CStreamServer(const CStreamServer&)             = delete;
+    CStreamServer& operator= (const CStreamServer&) = delete;
+    CStreamServer(CStreamServer&&)                  = default;
+    CStreamServer& operator= (CStreamServer&&)      = default;
+    CStreamServer()                                 = default;
+
+    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
+private:
+    static void privateDeleterHook(CStreamServerPrivate *it);
+    struct privateDeleter
+    {
+        void operator()(CStreamServerPrivate *it) {
+            privateDeleterHook(it);
+        }
+    };
+
+    std::unique_ptr<CStreamServerPrivate,privateDeleter> m_pPrivate;
+};
+
+} //EtNet
+#endif // _CSTREAMSERVER_H_

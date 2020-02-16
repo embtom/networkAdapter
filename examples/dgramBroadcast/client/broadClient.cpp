@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <BaseSocket.hpp>
-#include <dgram/DgramClient.hpp>
+#include <Dgram/DgramClient.hpp>
 #include <span.h>
 
 

@@ -26,7 +26,7 @@
 //******************************************************************************
 // Header
 
-#include <stream/StreamClient.hpp>
+#include <Stream/StreamClient.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -38,7 +38,7 @@
 #include <netinet/in.h>
 
 #include <error_msg.hpp>
-#include <HostLookup.h>
+#include <Lookup/HostLookup.hpp>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
 

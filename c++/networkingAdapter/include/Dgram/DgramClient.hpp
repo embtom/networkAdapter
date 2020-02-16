@@ -32,7 +32,7 @@
 #include <tuple>
 #include <string>
 #include <memory>
-#include <dgram/DgramDataLink.hpp>
+#include <Dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {

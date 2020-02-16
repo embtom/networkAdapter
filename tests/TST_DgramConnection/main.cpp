@@ -3,9 +3,9 @@
 #include <cstring>
 #include <tuple>
 #include <thread>
-#include <dgram/DgramClient.hpp>
+#include <Dgram/DgramClient.hpp>
 #include <BaseSocket.hpp>
-#include <dgram/DgramServer.hpp>
+#include <Dgram/DgramServer.hpp>
 
 
 #define ANSI_TXT_GRN                "\033[0;32m"

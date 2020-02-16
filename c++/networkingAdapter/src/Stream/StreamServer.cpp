@@ -27,7 +27,7 @@
 // Header
 
 #include <iostream>
-#include <stream/StreamServer.hpp>
+#include <Stream/StreamServer.hpp>
 #include <BaseSocket.hpp>
 #include <stdexcept>
 

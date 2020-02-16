@@ -31,7 +31,7 @@
 #include <errno.h>
 #include <string.h>
 #include <error_msg.hpp>
-#include <dgram/DgramDataLink.hpp>
+#include <Dgram/DgramDataLink.hpp>
 
 using namespace EtNet;
 

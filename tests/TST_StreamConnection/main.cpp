@@ -4,8 +4,8 @@
 #include <tuple>
 #include <thread>
 #include <BaseSocket.hpp>
-#include <stream/StreamClient.hpp>
-#include <stream/StreamServer.hpp>
+#include <Stream/StreamClient.hpp>
+#include <Stream/StreamServer.hpp>
 
 
 #define ANSI_TXT_GRN                "\033[0;32m"

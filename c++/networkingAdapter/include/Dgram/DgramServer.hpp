@@ -23,51 +23,53 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _CSTREAMSERVER_H_
-#define _CSTREAMSERVER_H_
+#ifndef _DGRAMSERVER_H_
+#define _DGRAMSERVER_H_
 
 //******************************************************************************
 // Header
 
+
 #include <tuple>
 #include <memory>
 #include <IpAddress.hpp>
-#include <stream/StreamDataLink.hpp>
+#include <Dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {
 
-constexpr int maxConnectionBacklog = 5;
-
 class CBaseSocket;
-class CStreamServerPrivate;
+class CDgramServerPrivate;
 
 //*****************************************************************************
-//! \brief CStreamServer
+//! \brief CDgramServer
 //!
-class CStreamServer
+class CDgramServer
 {
 public:
-    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
+    CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
-    CStreamServer(const CStreamServer&)             = delete;
-    CStreamServer& operator= (const CStreamServer&) = delete;
-    CStreamServer(CStreamServer&&)                  = default;
-    CStreamServer& operator= (CStreamServer&&)      = default;
-    CStreamServer()                                 = default;
+    CDgramServer(const CDgramServer&)             = delete;
+    CDgramServer& operator= (const CDgramServer&) = delete;
+    CDgramServer(CDgramServer&&)                  = default;
+    CDgramServer& operator= (CDgramServer&&)      = default;
+    CDgramServer()                                = default;
+    ~CDgramServer();
 
-    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
+    std::tuple<CDgramDataLink> waitForConnection();
+
 private:
-    static void privateDeleterHook(CStreamServerPrivate *it);
+    static void privateDeleterHook(CDgramServerPrivate *it);
+
     struct privateDeleter
     {
-        void operator()(CStreamServerPrivate *it) {
+        void operator()(CDgramServerPrivate *it) {
             privateDeleterHook(it);
         }
     };
 
-    std::unique_ptr<CStreamServerPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CDgramServerPrivate,privateDeleter> m_pPrivate;
 };
 
-} //EtNet
-#endif // _CSTREAMSERVER_H_
+} // EtNet
+#endif // _DGRAMCLIENT_H_
