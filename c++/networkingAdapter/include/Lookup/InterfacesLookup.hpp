@@ -27,14 +27,42 @@
 #ifndef _INTERFACESLOOKUP_H_
 #define _INTERFACESLOOKUP_H_
 
+#include <map>
+#include <string>
+#include <memory>
+#include <enum_reflect.hpp>
+#include <IpAddress.hpp>
+
+DECLARE_ENUM(EIfState, unsigned, down, up, running);
+
 namespace EtNet
 {
 
-class CInterfacesLookup
+class CNetInterfacePrivat;
+class CNetInterface
 {
+public:
+    using IfMap = std::map<unsigned int, CNetInterface>;
 
+    CNetInterface(const CNetInterface&) noexcept            = delete;
+    CNetInterface& operator=(const CNetInterface&) noexcept = delete;
+    CNetInterface(CNetInterface&&) noexcept                 = default;
+    CNetInterface& operator=(CNetInterface&&) noexcept      = default;
+    ~CNetInterface();
 
+    unsigned getIfIndex() const noexcept;
+    std::string getName() const noexcept;
+    CIpAddress::IpAddresses getAddresses() const noexcept;
+    CIpAddress::IpAddresses getSubMask() const noexcept;
+    CIpAddress::IpAddresses getBroadcast() const noexcept;
+    EIfState getState() const noexcept;
+    unsigned getMtu() const noexcept;
 
+    static IfMap getInterfaceMap(bool bUpOnly) noexcept;
+
+private:
+    CNetInterface(unsigned int index, std::string&& name );
+    std::unique_ptr<CNetInterfacePrivat> m_private;
 };
 
 } //EtNet

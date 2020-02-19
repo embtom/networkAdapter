@@ -27,6 +27,7 @@
 #define _IPADDRESS_H_
 
 #include <variant> //std::variant
+#include <vector>
 #include <type_traits> //enable_if, remove_reference
 #include <string> //std::string
 #include <cstring> //std::memcmp
@@ -47,7 +48,7 @@ enum class EAddressFamily{
 class CIpAddress
 {
 public:
-    //enum class EIpType {Ipv4, Ipv6 , NoData};
+    using IpAddresses = std::vector<CIpAddress>;
 
     constexpr CIpAddress()
     { }
@@ -72,6 +73,10 @@ public:
     std::string toString() const noexcept;
     bool is_v4() const noexcept;
     bool is_v6() const noexcept;
+    bool is_loopback() const noexcept;
+    bool is_broadcast() const noexcept;
+    bool is_submask() const noexcept;
+
     bool empty() const noexcept;
 
     EAddressFamily addressFamily() const noexcept;
