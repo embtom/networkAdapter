@@ -24,6 +24,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <iostream>
 #include <tuple>
 #include <type_traits>
@@ -44,26 +47,34 @@
 
 namespace EtNet
 {
-    struct CNetInterfacePrivat
-    {
-        CNetInterfacePrivat (unsigned int index, std::string&& name) noexcept;
-        void requestMtu() noexcept;
-        void addAddress(CIpAddress&& address) noexcept;
-        void addMask(CIpAddress&& mask) noexcept;
-        void addBroadcast(CIpAddress&& broadcast) noexcept;
 
-        std::string m_name;
-	    unsigned    m_index {0};
-        CIpAddress::IpAddresses m_addressList;
-        CIpAddress::IpAddresses m_maskList;
-        CIpAddress::IpAddresses m_broadcastList;
-    	bool        m_up {0};
-	    bool        m_running {0};
-	    unsigned    m_mtu {0};
-    };
+//*****************************************************************************
+//! \brief CNetInterfacePrivat
+//!
+struct CNetInterfacePrivat
+{
+    CNetInterfacePrivat (unsigned int index, std::string&& name) noexcept;
+    void requestMtu() noexcept;
+    void addAddress(CIpAddress&& address) noexcept;
+    void addMask(CIpAddress&& mask) noexcept;
+    void addBroadcast(CIpAddress&& broadcast) noexcept;
+
+    std::string m_name;
+    unsigned    m_index {0};
+    CIpAddress::IpAddresses m_addressList;
+    CIpAddress::IpAddresses m_maskList;
+    CIpAddress::IpAddresses m_broadcastList;
+    bool        m_up {0};
+    bool        m_running {0};
+    unsigned    m_mtu {0};
+};
+
 }
 
 using namespace EtNet;
+
+//*****************************************************************************
+// Method definitions "CNetInterfacePrivat"
 
 CNetInterfacePrivat::CNetInterfacePrivat (unsigned int index, std::string&& name) noexcept :
     m_name(std::move(name)), m_index(index)
@@ -118,12 +129,14 @@ void CNetInterfacePrivat::requestMtu() noexcept
     m_mtu = ifr.ifr_mtu;
 }
 
+//*****************************************************************************
+// Method definitions "CNetInterface"
+
 CNetInterface::CNetInterface(unsigned int index, std::string&& name) :
     m_private(std::make_unique<CNetInterfacePrivat>(index,std::move(name)))
 { }
 
-CNetInterface::~CNetInterface() = default;
-
+CNetInterface::~CNetInterface() noexcept = default;
 
 unsigned CNetInterface::getIfIndex() const noexcept
 {
@@ -252,7 +265,6 @@ CNetInterface::IfMap CNetInterface::getInterfaceMap(bool OnlyRunning) noexcept
             {
                 ifIt->second.m_private->m_up = (ifa->ifa_flags && IFF_UP);
                 ifIt->second.m_private->m_up = (ifa->ifa_flags && IFF_RUNNING);
-
                 ifIt->second.m_private->addAddress(std::move(address));
                 ifIt->second.m_private->addMask(std::move(subnetMask));
                 ifIt->second.m_private->addBroadcast(std::move(broadcastAddress));

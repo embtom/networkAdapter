@@ -31,9 +31,6 @@ int main ()
             }
             std::cout << broadcast.toString() << std::endl;
         }
-
-
-
     }
 
 }

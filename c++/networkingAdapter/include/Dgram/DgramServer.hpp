@@ -29,7 +29,6 @@
 //******************************************************************************
 // Header
 
-
 #include <tuple>
 #include <memory>
 #include <IpAddress.hpp>
@@ -49,26 +48,17 @@ class CDgramServer
 public:
     CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
-    CDgramServer(const CDgramServer&)             = delete;
-    CDgramServer& operator= (const CDgramServer&) = delete;
-    CDgramServer(CDgramServer&&)                  = default;
-    CDgramServer& operator= (CDgramServer&&)      = default;
-    CDgramServer()                                = default;
-    ~CDgramServer();
+    CDgramServer(const CDgramServer&)                 = delete;
+    CDgramServer& operator= (const CDgramServer&)     = delete;
+    CDgramServer(CDgramServer&&) noexcept             = default;
+    CDgramServer& operator= (CDgramServer&&) noexcept = default;
+    CDgramServer() noexcept                           = default;
+    ~CDgramServer() noexcept;
 
     std::tuple<CDgramDataLink> waitForConnection();
 
 private:
-    static void privateDeleterHook(CDgramServerPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CDgramServerPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CDgramServerPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CDgramServerPrivate> m_pPrivate;
 };
 
 } // EtNet

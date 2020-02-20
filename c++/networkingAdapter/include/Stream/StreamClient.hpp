@@ -46,26 +46,19 @@ class CStreamClientPrivate;
 class CStreamClient
 {
 public:
+    CStreamClient() noexcept                            = default;
+    CStreamClient(const CStreamClient&)                 = delete;
+    CStreamClient& operator= (const CStreamClient&)     = delete;
+    CStreamClient(CStreamClient&&) noexcept             = default;
+    CStreamClient& operator= (CStreamClient&&) noexcept = default;
+
     CStreamClient(CBaseSocket &&rBaseSocket);
-
-    CStreamClient(const CStreamClient&)             = delete;
-    CStreamClient& operator= (const CStreamClient&) = delete;
-    CStreamClient(CStreamClient&&)                  = default;
-    CStreamClient& operator= (CStreamClient&&)      = default;
-    CStreamClient()                                 = default;
-
+    ~CStreamClient() noexcept;
+    
     std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
 private:
-    static void privateDeleterHook(CStreamClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CStreamClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-    std::unique_ptr<CStreamClientPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CStreamClientPrivate> m_pPrivate;
 };
 
-}
+} //EtNet
 #endif // _CStreamClient_H_

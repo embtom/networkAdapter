@@ -48,25 +48,19 @@ class CStreamServerPrivate;
 class CStreamServer
 {
 public:
-    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
-    CStreamServer(const CStreamServer&)             = delete;
-    CStreamServer& operator= (const CStreamServer&) = delete;
-    CStreamServer(CStreamServer&&)                  = default;
-    CStreamServer& operator= (CStreamServer&&)      = default;
-    CStreamServer()                                 = default;
+    CStreamServer(const CStreamServer&)                 = delete;
+    CStreamServer& operator= (const CStreamServer&)     = delete;
+    CStreamServer(CStreamServer&&) noexcept             = default;
+    CStreamServer& operator= (CStreamServer&&) noexcept = default;
+    CStreamServer() noexcept                            = default;
+
+    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
+    ~CStreamServer() noexcept;
 
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
-    static void privateDeleterHook(CStreamServerPrivate *it);
-    struct privateDeleter
-    {
-        void operator()(CStreamServerPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CStreamServerPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CStreamServerPrivate> m_pPrivate;
 };
 
 } //EtNet

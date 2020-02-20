@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##############################################################################
 # 1. Install of the pbuilder
@@ -9,7 +9,7 @@
 #   sudo visudo    
 #   thomas ALL=(root) SETENV: NOPASSWD: /usr/sbin/pbuilder
 
-rm build_deb -R
-mkdir -p build_deb
-sudo pbuilder update
-pdebuild --buildresult ./build_deb
+#Creation of the chroot "/var/cache/pbuilder/base.tgz"
+sudo pbuilder create --debootstrapopts --variant=buildd \
+--othermirror "deb [trusted=yes] http://tomhp/reprepo bionic main" \
+--extrapackages "utilscpp-dev libgtest-dev"

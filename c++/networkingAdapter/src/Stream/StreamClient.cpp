@@ -127,14 +127,11 @@ std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHo
 //*****************************************************************************
 // Method definitions "CStreamClient"
 
-void CStreamClient::privateDeleterHook(CStreamClientPrivate *it)
-{
-     delete it;
-}
-
 CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
     m_pPrivate(new CStreamClientPrivate(std::move(rBaseSocket)))
 { }
+
+CStreamClient::~CStreamClient() noexcept = default;
 
 std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, unsigned int port)
 {

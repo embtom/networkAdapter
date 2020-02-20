@@ -26,6 +26,9 @@
 #ifndef _IPADDRESS_H_
 #define _IPADDRESS_H_
 
+//******************************************************************************
+// Headers
+
 #include <variant> //std::variant
 #include <vector>
 #include <type_traits> //enable_if, remove_reference
@@ -45,17 +48,18 @@ enum class EAddressFamily{
     INV
 };
 
+//*****************************************************************************
+//! \brief CIpAddress
+//!
 class CIpAddress
 {
 public:
     using IpAddresses = std::vector<CIpAddress>;
 
-    constexpr CIpAddress()
-    { }
-
+    constexpr CIpAddress() noexcept         = default;
     CIpAddress(const CIpAddress&)            = default;
-    CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(const CIpAddress&) = default;
+    CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(CIpAddress&&)      = default;
 
     template <typename T,
@@ -86,14 +90,14 @@ public:
 
     CIpAddress broadcast(const CIpAddress& rSubmask) const noexcept;
 
-    bool operator ==(const CIpAddress& rhs) const noexcept;
-    bool operator !=(const CIpAddress& rhs) const noexcept;
+    bool operator== (const CIpAddress& rhs) const noexcept;
+    bool operator!= (const CIpAddress& rhs) const noexcept;
 private:
 
     static size_t charCount(const std::string& rIpStr, char toCount) noexcept;
     mutable std::variant<std::monostate, in6_addr, in_addr> m_address;
 };
 
-}
+} //EtNet
 
 #endif // _IPADDRESS_H_

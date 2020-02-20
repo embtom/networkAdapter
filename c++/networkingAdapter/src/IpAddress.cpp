@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <iostream>
 #include <algorithm>
 #include <netinet/in.h>
@@ -33,6 +36,9 @@
 
 template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
 template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
+//*****************************************************************************
+// Method definitions "CIpAddress"
 
 EtNet::CIpAddress::CIpAddress(const std::string& rIpStr)
 {
@@ -237,8 +243,7 @@ EtNet::CIpAddress EtNet::CIpAddress::broadcast(const EtNet::CIpAddress& rSubmask
     return broadcastIp;
 }
 
-
-bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
+bool EtNet::CIpAddress::operator== (const EtNet::CIpAddress& rhs) const noexcept
 {
     if(is_v4() != rhs.is_v4()) {
         return false;
@@ -248,7 +253,7 @@ bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
         return false;
     }
 
-    bool ret =false;
+    bool ret = false;
 
     std::visit(overload{
     [rhs, &ret](const in_addr& val)

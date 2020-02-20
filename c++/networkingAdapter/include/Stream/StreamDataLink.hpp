@@ -43,14 +43,14 @@ namespace EtNet
 class CStreamDataLink final : public CBaseDataLink
 {
 public:
-    CStreamDataLink(CStreamDataLink &&rhs)              = default;
-    CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
-    CStreamDataLink(CStreamDataLink const&)             = delete;
-    CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
-    CStreamDataLink()                                   = default;
+    CStreamDataLink() noexcept                                 = default;
+    CStreamDataLink(CStreamDataLink const&)                    = delete;
+    CStreamDataLink& operator=(CStreamDataLink const&)         = delete;
+    CStreamDataLink(CStreamDataLink &&rhs) noexcept            = default;
+    CStreamDataLink& operator=(CStreamDataLink&& rhs) noexcept = default;
 
     CStreamDataLink(int socketFd);
-    virtual ~CStreamDataLink();
+    virtual ~CStreamDataLink() noexcept;
 };
 
 }

@@ -128,14 +128,11 @@ std::tuple<CDgramDataLink, SPeerAddr> CDgramClientPrivate::getLink(const std::st
 //*****************************************************************************
 // Method definitions "CDgramClient"
 
-void CDgramClient::privateDeleterHook(CDgramClientPrivate *it)
-{
-     delete it;
-}
-
 CDgramClient::CDgramClient(CBaseSocket &&rBaseSocket) :
-     m_pPrivate(new CDgramClientPrivate(std::move(rBaseSocket)))
+     m_pPrivate(std::make_unique<CDgramClientPrivate>((std::move(rBaseSocket))))
 { }
+
+CDgramClient::~CDgramClient() noexcept = default;
 
 std::tuple<CDgramDataLink, SPeerAddr> CDgramClient::getLink(const std::string& rHost, unsigned int port)
 {

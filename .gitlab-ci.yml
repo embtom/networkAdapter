@@ -12,7 +12,7 @@ build_job:
   tags:
     - tomhp
   script:
-    - ./debBuild.sh
+    - ./scripts/buildPackage.sh
   artifacts:
     paths:
       - ./build_deb/
@@ -41,7 +41,7 @@ enable_merge:
   tags:
     - tomhp
   script:
-    - ./debBuild.sh
+    - ./scripts/buildPackage.sh
   artifacts:
     paths:
       - ./build_deb/

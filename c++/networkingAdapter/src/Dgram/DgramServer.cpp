@@ -136,16 +136,11 @@ std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
 //*****************************************************************************
 // Method definitions "CDgramServer"
 
-void CDgramServer::privateDeleterHook(CDgramServerPrivate *it)
-{
-    delete it;
-}
-
 CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port) :
-    m_pPrivate(new CDgramServerPrivate(std::move(rBaseSocket),port))
+    m_pPrivate(std::make_unique<CDgramServerPrivate>(std::move(rBaseSocket),port))
 { }
 
-CDgramServer::~CDgramServer() = default;
+CDgramServer::~CDgramServer() noexcept = default;
 
 
 std::tuple<CDgramDataLink> CDgramServer::waitForConnection()

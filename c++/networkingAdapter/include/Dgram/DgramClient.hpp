@@ -46,27 +46,19 @@ class CDgramClientPrivate;
 class CDgramClient
 {
 public:
-    CDgramClient(CBaseSocket &&rBaseSocket);
+    CDgramClient() noexcept                           = default;
+    CDgramClient(CDgramClient&&) noexcept             = default;
+    CDgramClient& operator= (CDgramClient&&) noexcept = default;
+    CDgramClient(const CDgramClient&)                 = delete;
+    CDgramClient& operator= (const CDgramClient&)     = delete;
 
-    CDgramClient(const CDgramClient&)             = delete;
-    CDgramClient& operator= (const CDgramClient&) = delete;
-    CDgramClient(CDgramClient&&)                  = default;
-    CDgramClient& operator= (CDgramClient&&)      = default;
-    CDgramClient()                                = default;
+    CDgramClient(CBaseSocket &&rBaseSocket);
+    ~CDgramClient() noexcept;
 
     std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
 
 private:
-    static void privateDeleterHook(CDgramClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CDgramClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CDgramClientPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CDgramClientPrivate> m_pPrivate;
 };
 
 } // EtNet

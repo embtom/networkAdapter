@@ -46,20 +46,18 @@ class CBaseDataLink
 public:
     using CallbackReceive = std::function<bool (utils::span<char> rx)>;
 
-    CBaseDataLink(CBaseDataLink &&rhs) noexcept;
-    CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
+    CBaseDataLink()                                 = default;
     CBaseDataLink(CBaseDataLink const&)             = delete;
     CBaseDataLink& operator=(CBaseDataLink const&)  = delete;
-    CBaseDataLink()                                 = default;
-
     virtual ~CBaseDataLink()                        = default;
+
+    CBaseDataLink(CBaseDataLink &&rhs) noexcept;
+    CBaseDataLink& operator=(CBaseDataLink&& rhs) noexcept;
 
     void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
     void send(const utils::span<char>& rTxSpan);
 
-
 protected:
-
     CBaseDataLink(int socketFd) noexcept;
     int getFd() const noexcept;
     void closeFd() noexcept;
@@ -68,8 +66,6 @@ private:
     int m_socketFd {-1};
 };
 
-
 }
-
 
 #endif // _BASEDATALINK_H_

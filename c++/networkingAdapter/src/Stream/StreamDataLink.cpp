@@ -45,7 +45,7 @@ CStreamDataLink::CStreamDataLink(int socketFd) :
     CBaseDataLink(socketFd)
 { }
 
-CStreamDataLink::~CStreamDataLink()
+CStreamDataLink::~CStreamDataLink() noexcept
 {
     closeFd();
 }

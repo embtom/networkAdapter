@@ -27,6 +27,9 @@
 #ifndef _INTERFACESLOOKUP_H_
 #define _INTERFACESLOOKUP_H_
 
+//******************************************************************************
+// Header
+
 #include <map>
 #include <string>
 #include <memory>
@@ -38,6 +41,9 @@ DECLARE_ENUM(EIfState, unsigned, down, up, running);
 namespace EtNet
 {
 
+//*****************************************************************************
+//! \brief CNetInterface
+//!
 class CNetInterfacePrivat;
 class CNetInterface
 {
@@ -48,7 +54,7 @@ public:
     CNetInterface& operator=(const CNetInterface&) noexcept = delete;
     CNetInterface(CNetInterface&&) noexcept                 = default;
     CNetInterface& operator=(CNetInterface&&) noexcept      = default;
-    ~CNetInterface();
+    ~CNetInterface() noexcept;
 
     unsigned getIfIndex() const noexcept;
     std::string getName() const noexcept;

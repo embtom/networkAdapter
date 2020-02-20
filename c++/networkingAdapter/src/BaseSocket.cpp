@@ -84,7 +84,7 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
     m_socketFd = ret;
 }
 
-CBaseSocket::~CBaseSocket()
+CBaseSocket::~CBaseSocket() noexcept
 {
     if (m_socketFd > 0) {
         ::close(m_socketFd);
