@@ -7,11 +7,11 @@
 #include <Dgram/DgramServer.hpp>
 
 
-#include <stdio.h>      
+#include <stdio.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-#include <netinet/in.h> 
-#include <string.h> 
+#include <netinet/in.h>
+#include <string.h>
 #include <arpa/inet.h>
 
 #define PORT_NUM 50002
@@ -26,12 +26,12 @@ int main()
     }
 
 
-    auto a = CNetInterface::getInterfaceMap(false);
+    auto a = CNetInterface::getStateMap(false);
 
     std::cout << "hallo" << std::endl;
 
     // auto baseSocket = std::move(CBaseSocket::SoReuseSocket(CBaseSocket(ESocketMode::INET_DGRAM)));
-    
+
     // EtNet::CDgramServer DgramServer(std::move(baseSocket), PORT_NUM);
 
     // while (true)

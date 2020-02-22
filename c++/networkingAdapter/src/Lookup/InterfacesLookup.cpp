@@ -31,6 +31,7 @@
 #include <tuple>
 #include <type_traits>
 #include <algorithm>
+#include <iterator>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -178,7 +179,7 @@ unsigned CNetInterface::getMtu() const noexcept
     return m_private->m_mtu;
 }
 
-CNetInterface::IfMap CNetInterface::getInterfaceMap(bool OnlyRunning) noexcept
+CNetInterface::IfMap CNetInterface::getStateMap(bool OnlyRunning) noexcept
 {
     ifaddrs *ifAddrStruct=NULL, *ifa=NULL;
     void * tmpAddrPtr=NULL;
@@ -281,4 +282,73 @@ CNetInterface::IfMap CNetInterface::getInterfaceMap(bool OnlyRunning) noexcept
         std::cerr << "Failed to setup interface map with error" << e.what() << std::endl;
         return IfMap();
     }
+}
+
+CIpAddress::IpAddresses CNetInterface::getAllIpv4(bool bWithLoopback) noexcept
+{
+    EtNet::CIpAddress::IpAddresses Ipv4;
+
+    auto IpPred = [&bWithLoopback] (CIpAddress& ip) {
+        if (!ip.is_v4()) {
+            return false;
+        }
+        if(!bWithLoopback && ip.is_loopback()) {
+            return false;
+        }
+        return true;
+    };
+
+    auto interfaces = EtNet::CNetInterface::getStateMap(true);
+    for (auto& interface : interfaces)
+    {
+        auto list = std::move(interface.second.getAddresses());
+        std::copy_if(list.begin(), list.end(), std::back_inserter(Ipv4), IpPred);
+    }
+    return Ipv4;
+}
+
+CIpAddress::IpAddresses CNetInterface::getAllIpv6(bool bWithLoopback) noexcept
+{
+    EtNet::CIpAddress::IpAddresses Ipv6;
+
+    auto IpPred = [&bWithLoopback] (CIpAddress& ip) {
+        if (!ip.is_v6()) {
+            return false;
+        }
+        if(!bWithLoopback && ip.is_loopback()) {
+            return false;
+        }
+        return true;
+    };
+
+    auto interfaces = EtNet::CNetInterface::getStateMap(true);
+    for (auto& interface : interfaces)
+    {
+        auto list = std::move(interface.second.getAddresses());
+        std::copy_if(list.begin(), list.end(), std::back_inserter(Ipv6), IpPred);
+    }
+    return Ipv6;
+}
+
+CIpAddress::IpAddresses CNetInterface::getAllIpv4Submask() noexcept
+{
+    EtNet::CIpAddress::IpAddresses Ipv4Submask;
+
+    auto IpPred = [] (CIpAddress& ip) {
+        if (!ip.is_v4()) {
+            return false;
+        }
+        if (ip.is_submask()) {
+            return true;
+        }
+        return false;
+    };
+
+    auto interfaces = EtNet::CNetInterface::getStateMap(true);
+    for (auto& interface : interfaces)
+    {
+        auto list = std::move(interface.second.getSubMask());
+        std::copy_if(list.begin(), list.end(), std::back_inserter(Ipv4Submask), IpPred);
+    }
+    return Ipv4Submask;
 }

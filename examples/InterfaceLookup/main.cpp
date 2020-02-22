@@ -1,11 +1,12 @@
 
 #include <iostream>
+#include <IpAddress.hpp>
 #include <Lookup/InterfacesLookup.hpp>
 
 int main ()
 {
-    auto interfaces = EtNet::CNetInterface::getInterfaceMap(false);
-
+    auto interfaces = EtNet::CNetInterface::getStateMap(true);
+    std::cout << "Network Interfaces overview:" << std::endl;
     for (auto& it : interfaces)
     {
         std::cout << "--------------------------------------------------" << std::endl;
@@ -33,4 +34,25 @@ int main ()
         }
     }
 
+    std::cout << "\n All local Ipv4 addresses:" << std::endl;
+
+    for(auto& a : EtNet::CNetInterface::getAllIpv4(false))
+    {
+        std::cout << "Ipv4 :" << a.toString() << std::endl;
+    }
+
+    std::cout << "\n All local Ipv4 addresses:" << std::endl;
+
+    for(auto& a : EtNet::CNetInterface::getAllIpv6(false))
+    {
+        std::cout << "Ipv6 :" << a.toString() << std::endl;
+    }
+
+    std::cout << "\n All local Ipv4 Submask:" << std::endl;
+
+    for(auto& a : EtNet::CNetInterface::getAllIpv4Submask())
+    {
+        std::cout << "Ipv6 Submask:" << a.toString() << std::endl;
+    }
 }
+
