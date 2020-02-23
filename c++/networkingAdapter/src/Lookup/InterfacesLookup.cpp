@@ -284,7 +284,7 @@ CNetInterface::IfMap CNetInterface::getStateMap(bool OnlyRunning) noexcept
     }
 }
 
-CIpAddress::IpAddresses CNetInterface::getAllIpv4(bool bWithLoopback) noexcept
+CIpAddress::IpAddresses CNetInterface::getAllIpv4Ip(bool bWithLoopback) noexcept
 {
     EtNet::CIpAddress::IpAddresses Ipv4;
 
@@ -307,7 +307,7 @@ CIpAddress::IpAddresses CNetInterface::getAllIpv4(bool bWithLoopback) noexcept
     return Ipv4;
 }
 
-CIpAddress::IpAddresses CNetInterface::getAllIpv6(bool bWithLoopback) noexcept
+CIpAddress::IpAddresses CNetInterface::getAllIpv6Ip(bool bWithLoopback) noexcept
 {
     EtNet::CIpAddress::IpAddresses Ipv6;
 
@@ -351,4 +351,27 @@ CIpAddress::IpAddresses CNetInterface::getAllIpv4Submask() noexcept
         std::copy_if(list.begin(), list.end(), std::back_inserter(Ipv4Submask), IpPred);
     }
     return Ipv4Submask;
+}
+
+CIpAddress::IpAddresses CNetInterface::getAllIpv4Broadcast() noexcept
+{
+    EtNet::CIpAddress::IpAddresses Ipv4Broadcast;
+
+    auto IpPred = [] (CIpAddress& ip) {
+        if (!ip.is_v4()) {
+            return false;
+        }
+        if (ip.is_broadcast()) {
+            return true;
+        }
+        return false;
+    };
+
+    auto interfaces = EtNet::CNetInterface::getStateMap(true);
+    for (auto& interface : interfaces)
+    {
+        auto list = std::move(interface.second.getBroadcast());
+        std::copy_if(list.begin(), list.end(), std::back_inserter(Ipv4Broadcast), IpPred);
+    }
+    return Ipv4Broadcast;
 }

@@ -36,14 +36,14 @@ int main ()
 
     std::cout << "\n All local Ipv4 addresses:" << std::endl;
 
-    for(auto& a : EtNet::CNetInterface::getAllIpv4(false))
+    for(auto& a : EtNet::CNetInterface::getAllIpv4Ip(false))
     {
         std::cout << "Ipv4 :" << a.toString() << std::endl;
     }
 
     std::cout << "\n All local Ipv4 addresses:" << std::endl;
 
-    for(auto& a : EtNet::CNetInterface::getAllIpv6(false))
+    for(auto& a : EtNet::CNetInterface::getAllIpv6Ip(false))
     {
         std::cout << "Ipv6 :" << a.toString() << std::endl;
     }

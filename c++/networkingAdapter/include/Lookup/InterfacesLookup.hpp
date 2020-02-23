@@ -65,9 +65,10 @@ public:
     unsigned getMtu() const noexcept;
 
     static IfMap getStateMap(bool bUpOnly) noexcept;
-    static CIpAddress::IpAddresses getAllIpv4(bool bWithLoopback) noexcept;
-    static CIpAddress::IpAddresses getAllIpv6(bool bWithLoopback) noexcept;
+    static CIpAddress::IpAddresses getAllIpv4Ip(bool bWithLoopback) noexcept;
+    static CIpAddress::IpAddresses getAllIpv6Ip(bool bWithLoopback) noexcept;
     static CIpAddress::IpAddresses getAllIpv4Submask() noexcept;
+    static CIpAddress::IpAddresses getAllIpv4Broadcast() noexcept;
 
 private:
     CNetInterface(unsigned int index, std::string&& name );

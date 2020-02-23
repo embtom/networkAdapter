@@ -20,39 +20,32 @@ using namespace EtNet;
 
 int main()
 {
-    auto loopup = std::move(EtNet::CHostLookup("localhost"));
-    for(auto& elem: loopup.addresses()) {
-        std::cout << "Addr: " << elem.toString() << std::endl;
-    }
-
-
     auto a = CNetInterface::getStateMap(false);
 
-    std::cout << "hallo" << std::endl;
+    auto baseSocket = CBaseSocket::SoBroadcast(CBaseSocket::SoReuseSocket(
+                      CBaseSocket(ESocketMode::INET_DGRAM)));
+    //auto baseSocket = std::move(CBaseSocket::SoReuseSocket(CBaseSocket(ESocketMode::INET_DGRAM)));
 
-    // auto baseSocket = std::move(CBaseSocket::SoReuseSocket(CBaseSocket(ESocketMode::INET_DGRAM)));
+    EtNet::CDgramServer DgramServer(std::move(baseSocket), PORT_NUM);
 
-    // EtNet::CDgramServer DgramServer(std::move(baseSocket), PORT_NUM);
+    while (true)
+    {
+        char buffer [128] = {0};
+        utils::span<char> rxtxSpan (buffer);
 
-    // while (true)
-    // {
-    //     char buffer [128] = {0};
-    //     utils::span<char> rxtxSpan (buffer);
+        EtNet::CDgramDataLink a;
+        std::tie(a) = DgramServer.waitForConnection();
+        a.reciveFrom(rxtxSpan,[&a](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
+        {
+            EtNet::SPeerAddr peer {CIpAddress("192.168.1.255"), ClientAddr.Port};
+            std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
+            for(auto &elem : rx) {
+                elem = toupper(elem);
+            }
+            a.sendTo(ClientAddr, rx);
+            return true;
+        });
 
-    //     EtNet::CDgramDataLink a;
-    //     std::tie(a) = DgramServer.waitForConnection();
-    //     a.reciveFrom(rxtxSpan,[&a, &DgramServer](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
-    //     {
-    //         std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
-
-    //         for(auto &elem : rx) {
-    //             elem = toupper(elem);
-    //         }
-
-    //         a.sendTo(ClientAddr, rx);
-    //         return true;
-    //     });
-
-    // }
+    }
 }
 
