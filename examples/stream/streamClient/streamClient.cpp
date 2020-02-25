@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <BaseSocket.hpp>
 #include <Stream/StreamClient.hpp>
 #include <Stream/StreamDataLink.hpp>
 #include <algorithm>

@@ -61,6 +61,7 @@ public:
     CIpAddress& operator=(const CIpAddress&) = default;
     CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(CIpAddress&&)      = default;
+    virtual ~CIpAddress() noexcept           = default;
 
     template <typename T,
               typename std::enable_if_t<std::is_same<std::remove_reference_t<T>, in_addr>::value ||

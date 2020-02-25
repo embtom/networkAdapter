@@ -36,7 +36,6 @@
 
 #include <BaseSocket.hpp>
 #include <IpAddress.hpp>
-#include <BaseDataLink.hpp>
 
 namespace EtNet
 {
@@ -52,22 +51,28 @@ constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount
 //*****************************************************************************
 //! \brief CDgramDataLink
 //!
-class CDgramDataLink final : public CBaseDataLink
+class CDgramDataLink
 {
 public:
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
 
-    CDgramDataLink()                                  = default;
-    CDgramDataLink(CDgramDataLink &&rhs)              = default;
-    CDgramDataLink& operator=(CDgramDataLink&& rhs)   = default;
+    CDgramDataLink() noexcept                         = default;
     CDgramDataLink(CDgramDataLink const&)             = delete;
     CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
+    virtual ~CDgramDataLink() noexcept;
 
-    CDgramDataLink(int socketFd);
-    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr);
+    CDgramDataLink(int socketFd) noexcept;
+    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept;
+    CDgramDataLink(CDgramDataLink &&rhs) noexcept;
+    CDgramDataLink& operator=(CDgramDataLink&& rhs) noexcept;
 
+    void send(const utils::span<char>& rSpanTx);
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
     void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd);
+
+private:
+    int m_socketFd        {-1};
+    SPeerAddr m_peerAdr   {CIpAddress(), 0};
 };
 
 } // EtNet

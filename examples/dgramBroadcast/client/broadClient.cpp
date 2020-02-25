@@ -24,15 +24,9 @@ int main(int argc, char *argv[])
                       CBaseSocket::SoReuseSocket(
                       CBaseSocket(ESocketMode::INET_DGRAM)));
 
-    // auto baseSocket = CBaseSocket::SoReuseSocket(
-    //                   CBaseSocket(ESocketMode::INET_DGRAM));
-
-
-    //auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_DGRAM);
     EtNet::CDgramClient dgramClient(std::move(baseSocket));
 
-    //auto[a, b] = dgramClient.getLink("192.168.1.22", PORT_NUM);
-    auto[a, b] = dgramClient.getLink(broadIp.at(0).toString(), PORT_NUM);
+    CDgramDataLink a = dgramClient.getLink(broadIp.at(0).toString(), PORT_NUM);
 
     for (int i = 0 ; i < 2; i++)
     {

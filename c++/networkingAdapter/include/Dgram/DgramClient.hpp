@@ -53,9 +53,9 @@ public:
     CDgramClient& operator= (const CDgramClient&)     = delete;
 
     CDgramClient(CBaseSocket &&rBaseSocket);
-    ~CDgramClient() noexcept;
+    virtual ~CDgramClient() noexcept;
 
-    std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
+    CDgramDataLink getLink(const std::string& rHost, unsigned int port);
 
 private:
     std::unique_ptr<CDgramClientPrivate> m_pPrivate;

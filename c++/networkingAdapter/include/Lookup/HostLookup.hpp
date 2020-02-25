@@ -46,11 +46,12 @@ class CHostLookup
 public:
     using IpAddresses = std::vector<CIpAddress>;
 
-    CHostLookup()                              = default;
-    CHostLookup(const CHostLookup&)            = default;
-    CHostLookup& operator=(const CHostLookup&) = default;
-    CHostLookup(CHostLookup&&)                 = default;
-    CHostLookup& operator=(CHostLookup&&)      = default;
+    CHostLookup() noexcept                              = default;
+    CHostLookup(const CHostLookup&)                     = default;
+    CHostLookup& operator=(const CHostLookup&)          = default;
+    CHostLookup(CHostLookup&&) noexcept                 = default;
+    CHostLookup& operator=(CHostLookup&&) noexcept      = default;
+    virtual ~CHostLookup() noexcept;
 
     CHostLookup(std::string&& rHostName);
     CHostLookup(const std::string& rHostName);

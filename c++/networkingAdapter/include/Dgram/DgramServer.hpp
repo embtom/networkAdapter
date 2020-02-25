@@ -55,7 +55,7 @@ public:
     CDgramServer() noexcept                           = default;
     ~CDgramServer() noexcept;
 
-    std::tuple<CDgramDataLink> waitForConnection();
+    CDgramDataLink waitForConnection();
 
 private:
     std::unique_ptr<CDgramServerPrivate> m_pPrivate;

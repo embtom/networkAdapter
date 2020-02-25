@@ -22,9 +22,9 @@ int main()
 {
     auto a = CNetInterface::getStateMap(false);
 
-    auto baseSocket = CBaseSocket::SoBroadcast(CBaseSocket::SoReuseSocket(
+    auto baseSocket = CBaseSocket::SoBroadcast(
+                      CBaseSocket::SoReuseSocket(
                       CBaseSocket(ESocketMode::INET_DGRAM)));
-    //auto baseSocket = std::move(CBaseSocket::SoReuseSocket(CBaseSocket(ESocketMode::INET_DGRAM)));
 
     EtNet::CDgramServer DgramServer(std::move(baseSocket), PORT_NUM);
 
@@ -33,8 +33,7 @@ int main()
         char buffer [128] = {0};
         utils::span<char> rxtxSpan (buffer);
 
-        EtNet::CDgramDataLink a;
-        std::tie(a) = DgramServer.waitForConnection();
+        EtNet::CDgramDataLink a = DgramServer.waitForConnection();
         a.reciveFrom(rxtxSpan,[&a](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
         {
             EtNet::SPeerAddr peer {CIpAddress("192.168.1.255"), ClientAddr.Port};

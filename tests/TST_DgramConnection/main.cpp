@@ -35,9 +35,8 @@ TEST_F(CDgramComTest, simple)
     std::thread t([this]()
     {
         char rcvData[40] = {0};
-        CDgramDataLink a;
-        std::tie(a) = m_Server.waitForConnection();
 
+        CDgramDataLink a = m_Server.waitForConnection();
         utils::span<char> rxtxData(rcvData);
 
         a.reciveFrom(rxtxData, [&a, &rcvData](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
@@ -48,12 +47,16 @@ TEST_F(CDgramComTest, simple)
         });
     });
 
-    auto [a, b] = m_Client.getLink(std::string("localhost"),50002);
+    auto a = m_Client.getLink(std::string("localhost"),50002);
     std::string dataToSend ("hallo litte dgram test");
     char rcvData[40];
     utils::span<char> rxSpan (rcvData);
     a.send(utils::span<char>(dataToSend));
-    a.recive(rxSpan);
+    a.reciveFrom(rxSpan, [] (EtNet::SPeerAddr ClientAddr, utils::span<char> rx) 
+    {
+        std::cout << "Called" << std::endl;
+        return true;
+    });
     std::string dataRcv(rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 

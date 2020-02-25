@@ -31,26 +31,35 @@
 
 #include <cstddef>
 #include <functional>
-#include <BaseDataLink.hpp>
 #include <stdint.h>
+#include <span.h>
 
 namespace EtNet
 {
 
+constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
+
 //*****************************************************************************
 //! \brief CStreamDataLink
 //!
-class CStreamDataLink final : public CBaseDataLink
+class CStreamDataLink
 {
 public:
+    using CallbackReceive = std::function<bool (utils::span<char> rx)>;
+
     CStreamDataLink() noexcept                                 = default;
     CStreamDataLink(CStreamDataLink const&)                    = delete;
     CStreamDataLink& operator=(CStreamDataLink const&)         = delete;
-    CStreamDataLink(CStreamDataLink &&rhs) noexcept            = default;
-    CStreamDataLink& operator=(CStreamDataLink&& rhs) noexcept = default;
-
-    CStreamDataLink(int socketFd);
     virtual ~CStreamDataLink() noexcept;
+
+    CStreamDataLink(int socketFd) noexcept;
+    CStreamDataLink(CStreamDataLink &&rhs) noexcept;
+    CStreamDataLink& operator=(CStreamDataLink&& rhs) noexcept;
+
+    void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    void send(const utils::span<char>& rTxSpan);
+private:
+    int m_socketFd {-1};
 };
 
 }

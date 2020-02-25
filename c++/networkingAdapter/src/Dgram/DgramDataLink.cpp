@@ -38,9 +38,35 @@ using namespace EtNet;
 //*****************************************************************************
 // Method definitions "CDgramDataLink"
 
-CDgramDataLink::CDgramDataLink(int socketFd) :
-    CBaseDataLink(socketFd)
+CDgramDataLink::CDgramDataLink(int socketFd) noexcept :
+    m_socketFd(socketFd),
+    m_peerAdr({CIpAddress(), 0})
 { }
+
+CDgramDataLink::CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept :
+    m_socketFd(socketFd),
+    m_peerAdr(rPeerAddr)
+{ }
+
+CDgramDataLink::CDgramDataLink(CDgramDataLink &&rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+    std::swap(m_peerAdr, rhs.m_peerAdr);
+}
+
+CDgramDataLink& CDgramDataLink::operator=(CDgramDataLink&& rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+    std::swap(m_peerAdr, rhs.m_peerAdr);
+    return *this;
+}
+
+CDgramDataLink::~CDgramDataLink() noexcept = default;
+
+void CDgramDataLink::send(const utils::span<char>& rSpanTx)
+{
+    sendTo(m_peerAdr, rSpanTx);
+}
 
 void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
 {
@@ -52,7 +78,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     if (rClientAddr.Ip.is_v4())
     {
         clAddr.sin_family       = AF_INET;
-        clAddr.sin_port         = rClientAddr.Port;
+        clAddr.sin_port         = htons(rClientAddr.Port);
         std::memcpy(&clAddr.sin_addr, rClientAddr.Ip.to_v4(), sizeof(in_addr));
         claddr = (sockaddr*)&clAddr;
         claddrLen = sizeof(sockaddr_in);
@@ -60,7 +86,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     else if (rClientAddr.Ip.is_v6())
     {
         clAddr6.sin6_family      = AF_INET6;
-        clAddr6.sin6_port        = rClientAddr.Port;
+        clAddr6.sin6_port        = htons(rClientAddr.Port);
         std::memcpy(&clAddr6.sin6_addr, rClientAddr.Ip.to_v6(), sizeof(in6_addr));
         claddr = (sockaddr*)&clAddr6;
         claddrLen = sizeof(sockaddr_in6);
@@ -72,7 +98,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     std::size_t dataWritten = 0;
     while(dataWritten < rSpanTx.size_bytes())
     {
-        std::size_t put = ::sendto(getFd(), rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(m_socketFd, rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -134,7 +160,7 @@ void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom s
             case AF_INET:
             {
                 peerAddress.Ip = std::move(CIpAddress(peerAdr.sin.sin_addr));
-                peerAddress.Port = peerAdr.sin.sin_port;
+                peerAddress.Port = ntohs(peerAdr.sin.sin_port);
                 break;
             }
             case AF_INET6:
@@ -147,7 +173,7 @@ void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom s
                 else {
                     peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));
                 }
-                peerAddress.Port = peerAdr.sin6.sin6_port;
+                peerAddress.Port = ntohs(peerAdr.sin6.sin6_port);
                 break;
             }
         }
@@ -158,7 +184,7 @@ void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom s
     while(dataRead < rSpanRx.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(m_socketFd, readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

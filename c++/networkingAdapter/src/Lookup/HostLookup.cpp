@@ -58,6 +58,8 @@ CHostLookup::CHostLookup(CIpAddress&& rIpAddress) :
     CHostLookup(rIpAddress)
 { }
 
+CHostLookup::~CHostLookup() noexcept = default;
+
 CHostLookup::IpAddresses CHostLookup::addresses() const noexcept
 {
     return m_IpAddresses;

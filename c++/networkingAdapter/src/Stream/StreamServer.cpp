@@ -27,7 +27,6 @@
 // Header
 
 #include <iostream>
-#include <Stream/StreamServer.hpp>
 #include <BaseSocket.hpp>
 #include <stdexcept>
 
@@ -39,6 +38,7 @@
 #include <error_msg.hpp>
 #include <make_unordered_map.h>
 #include <BaseSocket.hpp>
+#include <Stream/StreamServer.hpp>
 
 namespace EtNet
 {

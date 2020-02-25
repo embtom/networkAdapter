@@ -51,10 +51,10 @@ public:
     CStreamClient& operator= (const CStreamClient&)     = delete;
     CStreamClient(CStreamClient&&) noexcept             = default;
     CStreamClient& operator= (CStreamClient&&) noexcept = default;
+    virtual ~CStreamClient() noexcept;
 
     CStreamClient(CBaseSocket &&rBaseSocket);
-    ~CStreamClient() noexcept;
-    
+
     std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
 private:
     std::unique_ptr<CStreamClientPrivate> m_pPrivate;

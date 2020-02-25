@@ -48,15 +48,14 @@ class CStreamServerPrivate;
 class CStreamServer
 {
 public:
-
+    CStreamServer() noexcept                            = default;
     CStreamServer(const CStreamServer&)                 = delete;
     CStreamServer& operator= (const CStreamServer&)     = delete;
     CStreamServer(CStreamServer&&) noexcept             = default;
     CStreamServer& operator= (CStreamServer&&) noexcept = default;
-    CStreamServer() noexcept                            = default;
+    virtual ~CStreamServer() noexcept;
 
     CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
-    ~CStreamServer() noexcept;
 
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:

@@ -54,7 +54,7 @@ public:
     CNetInterface& operator=(const CNetInterface&) noexcept = delete;
     CNetInterface(CNetInterface&&) noexcept                 = default;
     CNetInterface& operator=(CNetInterface&&) noexcept      = default;
-    ~CNetInterface() noexcept;
+    virtual ~CNetInterface() noexcept;
 
     unsigned getIfIndex() const noexcept;
     std::string getName() const noexcept;

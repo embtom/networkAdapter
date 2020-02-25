@@ -54,7 +54,7 @@ public:
     CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port);
     ~CDgramServerPrivate();
     void incomingConnectionCb(int fd) noexcept;
-    std::tuple<CDgramDataLink> waitForConnection();
+    CDgramDataLink waitForConnection();
 
 private:
     utils::CFdSet       m_FdSet;
@@ -122,7 +122,7 @@ void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
     m_connectionPromise.set_value(fd);
 }
 
-std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
+CDgramDataLink CDgramServerPrivate::waitForConnection()
 {
     m_connectionPromise = std::promise<int>{};
     if (utils::CFdSetRetval::UNBLOCK == m_FdSet.Select()) {
@@ -130,7 +130,7 @@ std::tuple<CDgramDataLink> CDgramServerPrivate::waitForConnection()
     }
 
     int fd =  m_connectionPromise.get_future().get();
-    return std::tuple(CDgramDataLink(fd));
+    return CDgramDataLink(fd);
 }
 
 //*****************************************************************************
@@ -142,8 +142,7 @@ CDgramServer::CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port) :
 
 CDgramServer::~CDgramServer() noexcept = default;
 
-
-std::tuple<CDgramDataLink> CDgramServer::waitForConnection()
+CDgramDataLink CDgramServer::waitForConnection()
 {
     return m_pPrivate->waitForConnection();
 }
