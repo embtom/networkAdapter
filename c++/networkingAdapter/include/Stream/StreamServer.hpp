@@ -23,49 +23,44 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _CStreamClient_H_
-#define _CStreamClient_H_
+#ifndef _CSTREAMSERVER_H_
+#define _CSTREAMSERVER_H_
 
 //******************************************************************************
 // Header
 
 #include <tuple>
 #include <memory>
-#include <string>
-#include <stream/StreamDataLink.hpp>
+#include <IpAddress.hpp>
+#include <Stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
 
+constexpr int maxConnectionBacklog = 5;
+
 class CBaseSocket;
-class CStreamClientPrivate;
+class CStreamServerPrivate;
 
 //*****************************************************************************
-//! \brief CStreamClient
+//! \brief CStreamServer
 //!
-class CStreamClient
+class CStreamServer
 {
 public:
-    CStreamClient(CBaseSocket &&rBaseSocket);
+    CStreamServer() noexcept                            = default;
+    CStreamServer(const CStreamServer&)                 = delete;
+    CStreamServer& operator= (const CStreamServer&)     = delete;
+    CStreamServer(CStreamServer&&) noexcept             = default;
+    CStreamServer& operator= (CStreamServer&&) noexcept = default;
+    virtual ~CStreamServer() noexcept;
 
-    CStreamClient(const CStreamClient&)             = delete;
-    CStreamClient& operator= (const CStreamClient&) = delete;
-    CStreamClient(CStreamClient&&)                  = default;
-    CStreamClient& operator= (CStreamClient&&)      = default;
-    CStreamClient()                                 = default;
+    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
-    std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
+    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
-    static void privateDeleterHook(CStreamClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CStreamClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-    std::unique_ptr<CStreamClientPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CStreamServerPrivate> m_pPrivate;
 };
 
-}
-#endif // _CStreamClient_H_
+} //EtNet
+#endif // _CSTREAMSERVER_H_

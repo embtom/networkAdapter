@@ -27,7 +27,6 @@
 // Header
 
 #include <iostream>
-#include <stream/StreamServer.hpp>
 #include <BaseSocket.hpp>
 #include <stdexcept>
 
@@ -39,6 +38,7 @@
 #include <error_msg.hpp>
 #include <make_unordered_map.h>
 #include <BaseSocket.hpp>
+#include <Stream/StreamServer.hpp>
 
 namespace EtNet
 {
@@ -52,10 +52,7 @@ public:
     std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
 private:
     CBaseSocket m_baseSocket;
-
 };
-
-
 }
 
 using namespace EtNet;
@@ -109,7 +106,6 @@ CStreamServerPrivate::CStreamServerPrivate(CBaseSocket&& rBaseSocket, unsigned i
             throw std::logic_error(utils::buildErrorMessage("ServerSocket::", __func__));
             break;
         }
-
     }
 }
 
@@ -157,14 +153,11 @@ std::tuple<CStreamDataLink, CIpAddress> CStreamServerPrivate::waitForConnection(
 //*****************************************************************************
 // Method definitions "CStreamServer"
 
-void CStreamServer::privateDeleterHook(CStreamServerPrivate *it)
-{
-    delete it;
-}
-
 CStreamServer::CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port) :
-    m_pPrivate(new CStreamServerPrivate(std::move(rBaseSocket), port))
+    m_pPrivate(std::make_unique<CStreamServerPrivate>(std::move(rBaseSocket), port))
 { }
+
+CStreamServer::~CStreamServer() noexcept = default;
 
 std::tuple<CStreamDataLink, CIpAddress> CStreamServer::waitForConnection()
 {

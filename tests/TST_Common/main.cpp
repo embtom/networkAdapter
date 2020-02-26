@@ -3,7 +3,7 @@
 #include <cstring>
 #include <tuple>
 #include <algorithm>
-#include <stream/StreamDataLink.hpp>
+#include <Stream/StreamDataLink.hpp>
 
 #define GTEST_BOX                   "[     cout ] "
 

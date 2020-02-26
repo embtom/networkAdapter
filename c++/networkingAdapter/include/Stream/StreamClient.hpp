@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal 
+ * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -23,51 +23,42 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _DGRAMCLIENT_H_
-#define _DGRAMCLIENT_H_
+#ifndef _CStreamClient_H_
+#define _CStreamClient_H_
 
 //******************************************************************************
 // Header
 
 #include <tuple>
-#include <string>
 #include <memory>
-#include <dgram/DgramDataLink.hpp>
+#include <string>
+#include <Stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
 
 class CBaseSocket;
-class CDgramClientPrivate;
+class CStreamClientPrivate;
 
 //*****************************************************************************
-//! \brief CDgramClient
+//! \brief CStreamClient
 //!
-class CDgramClient
+class CStreamClient
 {
 public:
-    CDgramClient(CBaseSocket &&rBaseSocket);
+    CStreamClient() noexcept                            = default;
+    CStreamClient(const CStreamClient&)                 = delete;
+    CStreamClient& operator= (const CStreamClient&)     = delete;
+    CStreamClient(CStreamClient&&) noexcept             = default;
+    CStreamClient& operator= (CStreamClient&&) noexcept = default;
+    virtual ~CStreamClient() noexcept;
 
-    CDgramClient(const CDgramClient&)             = delete;
-    CDgramClient& operator= (const CDgramClient&) = delete;
-    CDgramClient(CDgramClient&&)                  = default;
-    CDgramClient& operator= (CDgramClient&&)      = default;
-    CDgramClient()                                = default;
+    CStreamClient(CBaseSocket &&rBaseSocket);
 
-    std::tuple<CDgramDataLink, SPeerAddr> getLink(const std::string& rHost, unsigned int port);
-
+    std::tuple<CStreamDataLink> connect(const std::string& rHost, unsigned int port);
 private:
-    static void privateDeleterHook(CDgramClientPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CDgramClientPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CDgramClientPrivate,privateDeleter> m_pPrivate;
+    std::unique_ptr<CStreamClientPrivate> m_pPrivate;
 };
 
-} // EtNet
-#endif // _DGRAMCLIENT_H_
+} //EtNet
+#endif // _CStreamClient_H_

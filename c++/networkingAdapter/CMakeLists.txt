@@ -4,27 +4,27 @@
 set(SOURCES
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
-    "src/HostName.cpp"
-    "src/BaseDataLink.cpp"
-    "src/stream/StreamDataLink.cpp"
-    "src/stream/StreamServer.cpp"
-    "src/stream/StreamClient.cpp"
-    "src/dgram/DgramDataLink.cpp"
-    "src/dgram/DgramServer.cpp"
-    "src/dgram/DgramClient.cpp"
+    "src/Lookup/HostLookup.cpp"
+    "src/Lookup/InterfacesLookup.cpp"
+    "src/Stream/StreamDataLink.cpp"
+    "src/Stream/StreamServer.cpp"
+    "src/Stream/StreamClient.cpp"
+    "src/Dgram/DgramClient.cpp"
+    "src/Dgram/DgramDataLink.cpp"
+    "src/Dgram/DgramServer.cpp"
 )
 
 set(HEADERS
     "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
-    "include/HostName.h"
-    "include/BaseDataLink.hpp"
-    "include/stream/StreamDataLink.hpp"
-    "include/stream/StreamServer.hpp"
-    "include/stream/StreamClient.hpp"
-    "include/dgram/DgramDataLink.hpp"
-    "include/dgram/DgramServer.hpp"
-    "include/dgram/DgramClient.hpp"
+    "include/Lookup/HostLookup.hpp"
+    "include/Lookup/InterfacesLookup.hpp"
+    "include/Stream/StreamDataLink.hpp"
+    "include/Stream/StreamServer.hpp"
+    "include/Stream/StreamClient.hpp"
+    "include/Dgram/DgramClient.hpp"
+    "include/Dgram/DgramDataLink.hpp"
+    "include/Dgram/DgramServer.hpp"
 )
 
 ######################################################

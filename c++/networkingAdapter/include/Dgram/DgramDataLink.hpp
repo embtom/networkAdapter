@@ -14,7 +14,7 @@
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITdgramClientHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -23,51 +23,58 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _CSTREAMSERVER_H_
-#define _CSTREAMSERVER_H_
+#ifndef _DGRAMDATALINK_H_
+#define _DGRAMDATALINK_H_
 
 //******************************************************************************
 // Header
 
-#include <tuple>
-#include <memory>
+#include <stdint.h>
+#include <cstddef>
+#include <functional>
+#include <span.h>
+
+#include <BaseSocket.hpp>
 #include <IpAddress.hpp>
-#include <stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
 
-constexpr int maxConnectionBacklog = 5;
-
-class CBaseSocket;
-class CStreamServerPrivate;
-
-//*****************************************************************************
-//! \brief CStreamServer
-//!
-class CStreamServer
+struct SPeerAddr
 {
-public:
-    CStreamServer(CBaseSocket&& rBaseSocket, unsigned int port);
-
-    CStreamServer(const CStreamServer&)             = delete;
-    CStreamServer& operator= (const CStreamServer&) = delete;
-    CStreamServer(CStreamServer&&)                  = default;
-    CStreamServer& operator= (CStreamServer&&)      = default;
-    CStreamServer()                                 = default;
-
-    std::tuple<CStreamDataLink, CIpAddress> waitForConnection();
-private:
-    static void privateDeleterHook(CStreamServerPrivate *it);
-    struct privateDeleter
-    {
-        void operator()(CStreamServerPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CStreamServerPrivate,privateDeleter> m_pPrivate;
+    CIpAddress Ip;
+    unsigned int Port {0};
 };
 
-} //EtNet
-#endif // _CSTREAMSERVER_H_
+constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount){ return false; };
+
+//*****************************************************************************
+//! \brief CDgramDataLink
+//!
+class CDgramDataLink
+{
+public:
+    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
+
+    CDgramDataLink() noexcept                         = default;
+    CDgramDataLink(CDgramDataLink const&)             = delete;
+    CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
+    virtual ~CDgramDataLink() noexcept;
+
+    CDgramDataLink(int socketFd) noexcept;
+    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept;
+    CDgramDataLink(CDgramDataLink &&rhs) noexcept;
+    CDgramDataLink& operator=(CDgramDataLink&& rhs) noexcept;
+
+    void send(const utils::span<char>& rSpanTx);
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
+    void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd);
+
+private:
+    int m_socketFd        {-1};
+    SPeerAddr m_peerAdr   {CIpAddress(), 0};
+};
+
+} // EtNet
+
+#endif // _DGRAMDATALINK_H_

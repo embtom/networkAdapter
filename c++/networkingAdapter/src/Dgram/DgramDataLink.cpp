@@ -27,55 +27,78 @@
 // Header
 
 #include <stdexcept>
-
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-
 #include <error_msg.hpp>
-#include <BaseDataLink.hpp>
-#include <iostream>
+#include <Dgram/DgramDataLink.hpp>
 
 using namespace EtNet;
 
 //*****************************************************************************
-// Method definitions "CBaseDataLink"
+// Method definitions "CDgramDataLink"
 
-CBaseDataLink::CBaseDataLink(int socketFd) noexcept :
-    m_socketFd(socketFd)
+CDgramDataLink::CDgramDataLink(int socketFd) noexcept :
+    m_socketFd(socketFd),
+    m_peerAdr({CIpAddress(), 0})
 { }
 
-CBaseDataLink::CBaseDataLink(CBaseDataLink &&rhs) noexcept
+CDgramDataLink::CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept :
+    m_socketFd(socketFd),
+    m_peerAdr(rPeerAddr)
+{ }
+
+CDgramDataLink::CDgramDataLink(CDgramDataLink &&rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
+    std::swap(m_peerAdr, rhs.m_peerAdr);
 }
 
-CBaseDataLink& CBaseDataLink::operator=(CBaseDataLink&& rhs) noexcept
+CDgramDataLink& CDgramDataLink::operator=(CDgramDataLink&& rhs) noexcept
 {
     std::swap(m_socketFd, rhs.m_socketFd);
+    std::swap(m_peerAdr, rhs.m_peerAdr);
     return *this;
 }
 
-int CBaseDataLink::getFd() const noexcept
+CDgramDataLink::~CDgramDataLink() noexcept = default;
+
+void CDgramDataLink::send(const utils::span<char>& rSpanTx)
 {
-    return m_socketFd;
+    sendTo(m_peerAdr, rSpanTx);
 }
 
-void CBaseDataLink::closeFd() noexcept
+void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
 {
-    if (m_socketFd > 0) {
-        close (m_socketFd);
-        m_socketFd=-1;
-    }
-}
+    sockaddr_in clAddr{};
+    sockaddr_in6 clAddr6{};
+    sockaddr* claddr;
+    socklen_t claddrLen;
 
-void CBaseDataLink::send(const utils::span<char>& rTxSpan)
-{
-    std::size_t dataWritten = 0;
-
-    while(dataWritten < rTxSpan.size_bytes())
+    if (rClientAddr.Ip.is_v4())
     {
-        std::size_t put = write(getFd(), rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
+        clAddr.sin_family       = AF_INET;
+        clAddr.sin_port         = htons(rClientAddr.Port);
+        std::memcpy(&clAddr.sin_addr, rClientAddr.Ip.to_v4(), sizeof(in_addr));
+        claddr = (sockaddr*)&clAddr;
+        claddrLen = sizeof(sockaddr_in);
+    }
+    else if (rClientAddr.Ip.is_v6())
+    {
+        clAddr6.sin6_family      = AF_INET6;
+        clAddr6.sin6_port        = htons(rClientAddr.Port);
+        std::memcpy(&clAddr6.sin6_addr, rClientAddr.Ip.to_v6(), sizeof(in6_addr));
+        claddr = (sockaddr*)&clAddr6;
+        claddrLen = sizeof(sockaddr_in6);
+    }
+    else {
+        throw std::logic_error(utils::buildErrorMessage("CDgramServer::", __func__, " : No valid Ip to connect"));
+    }
+
+    std::size_t dataWritten = 0;
+    while(dataWritten < rSpanTx.size_bytes())
+    {
+        std::size_t put = ::sendto(m_socketFd, rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -119,20 +142,49 @@ void CBaseDataLink::send(const utils::span<char>& rTxSpan)
     return;
 }
 
-void CBaseDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
+void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd)
 {
-    if (getFd() == 0)
+    union e
     {
-        throw std::logic_error(utils::buildErrorMessage("DataSocket::", __func__, ": accept called on a bad socket object (this object was moved)"));
-    }
+        sockaddr_storage  common;
+        sockaddr_in       sin;
+        sockaddr_in6      sin6;
+    } peerAdr;
+    socklen_t addr_size = sizeof(peerAdr);
 
+    SPeerAddr peerAddress;
+    auto toCIpAddress = [&peerAddress] (e& peerAdr)
+    {
+        switch (peerAdr.common.ss_family)
+        {
+            case AF_INET:
+            {
+                peerAddress.Ip = std::move(CIpAddress(peerAdr.sin.sin_addr));
+                peerAddress.Port = ntohs(peerAdr.sin.sin_port);
+                break;
+            }
+            case AF_INET6:
+            {
+                if (IN6_IS_ADDR_V4MAPPED(&peerAdr.sin6.sin6_addr)) {
+                    in_addr ip4;
+                    std::memcpy(&ip4, &peerAdr.sin6.sin6_addr.__in6_u.__u6_addr8[12], sizeof(in_addr));
+                    peerAddress.Ip = std::move(CIpAddress(ip4));
+                }
+                else {
+                    peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));
+                }
+                peerAddress.Port = ntohs(peerAdr.sin6.sin6_port);
+                break;
+            }
+        }
+    };
+    char* readBuffer = rSpanRx.data();
     std::size_t dataRead  = 0;
-    char* readBuffer = rRxSpan.data();
 
-    while(dataRead < rRxSpan.size_bytes())
+    while(dataRead < rSpanRx.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = read(getFd(), readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
+        std::size_t get = ::recvfrom(m_socketFd, readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -183,12 +235,13 @@ void CBaseDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEn
             break;
         }
         dataRead += get;
-        if (scanForEnd(utils::span<char>(readBuffer, dataRead)))
+
+        toCIpAddress(peerAdr);
+        if (scanForEnd(peerAddress, utils::span<char>(readBuffer, dataRead)))
         {
             break;
         }
     }
 
-    rRxSpan = utils::span<char>(readBuffer, dataRead);
-    //return dataRead;
+    rSpanRx = utils::span<char>(readBuffer, dataRead);
 }

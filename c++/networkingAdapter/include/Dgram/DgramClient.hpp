@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2019 Thomas Willetal 
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -23,36 +23,43 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _STREAMDATALINK_H_
-#define _STREAMDATALINK_H_
+#ifndef _DGRAMCLIENT_H_
+#define _DGRAMCLIENT_H_
 
 //******************************************************************************
 // Header
 
-#include <cstddef>
-#include <functional>
-#include <BaseDataLink.hpp>
-#include <stdint.h>
+#include <tuple>
+#include <string>
+#include <memory>
+#include <Dgram/DgramDataLink.hpp>
 
 namespace EtNet
 {
 
+class CBaseSocket;
+class CDgramClientPrivate;
+
 //*****************************************************************************
-//! \brief CStreamDataLink
+//! \brief CDgramClient
 //!
-class CStreamDataLink final : public CBaseDataLink
+class CDgramClient
 {
 public:
-    CStreamDataLink(CStreamDataLink &&rhs)              = default;
-    CStreamDataLink& operator=(CStreamDataLink&& rhs)   = default;
-    CStreamDataLink(CStreamDataLink const&)             = delete;
-    CStreamDataLink& operator=(CStreamDataLink const&)  = delete;
-    CStreamDataLink()                                   = default;
+    CDgramClient() noexcept                           = default;
+    CDgramClient(CDgramClient&&) noexcept             = default;
+    CDgramClient& operator= (CDgramClient&&) noexcept = default;
+    CDgramClient(const CDgramClient&)                 = delete;
+    CDgramClient& operator= (const CDgramClient&)     = delete;
 
-    CStreamDataLink(int socketFd);
-    virtual ~CStreamDataLink();
+    CDgramClient(CBaseSocket &&rBaseSocket);
+    virtual ~CDgramClient() noexcept;
+
+    CDgramDataLink getLink(const std::string& rHost, unsigned int port);
+
+private:
+    std::unique_ptr<CDgramClientPrivate> m_pPrivate;
 };
 
-}
-
-#endif /* _STREAMDATALINK_H_ */
+} // EtNet
+#endif // _DGRAMCLIENT_H_

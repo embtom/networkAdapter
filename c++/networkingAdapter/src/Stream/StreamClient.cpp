@@ -26,7 +26,7 @@
 //******************************************************************************
 // Header
 
-#include <stream/StreamClient.hpp>
+#include <Stream/StreamClient.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -38,7 +38,7 @@
 #include <netinet/in.h>
 
 #include <error_msg.hpp>
-#include <HostName.h>
+#include <Lookup/HostLookup.hpp>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>
 
@@ -127,14 +127,11 @@ std::tuple<CStreamDataLink> CStreamClientPrivate::connect(const std::string& rHo
 //*****************************************************************************
 // Method definitions "CStreamClient"
 
-void CStreamClient::privateDeleterHook(CStreamClientPrivate *it)
-{
-     delete it;
-}
-
 CStreamClient::CStreamClient(CBaseSocket&& rBaseSocket) :
     m_pPrivate(new CStreamClientPrivate(std::move(rBaseSocket)))
 { }
+
+CStreamClient::~CStreamClient() noexcept = default;
 
 std::tuple<CStreamDataLink> CStreamClient::connect(const std::string& rHost, unsigned int port)
 {

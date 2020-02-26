@@ -24,32 +24,39 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _HOSTNAME_H_
-#define _HOSTNAME_H_
+#ifndef _HOSTLOOKUP_H_
+#define _HOSTLOOKUP_H_
+
+//******************************************************************************
+// Headers
 
 #include <unordered_map> //std::unordered
 #include <vector> //std::vector
 #include <IpAddress.hpp> //CIpAddress
 
-
 namespace EtNet
 {
 
+//*****************************************************************************
+//! \brief CHostLookup
+//!
 class CHostLookup
 {
 
 public:
     using IpAddresses = std::vector<CIpAddress>;
+
+    CHostLookup() noexcept                              = default;
+    CHostLookup(const CHostLookup&)                     = default;
+    CHostLookup& operator=(const CHostLookup&)          = default;
+    CHostLookup(CHostLookup&&) noexcept                 = default;
+    CHostLookup& operator=(CHostLookup&&) noexcept      = default;
+    virtual ~CHostLookup() noexcept;
+
     CHostLookup(std::string&& rHostName);
     CHostLookup(const std::string& rHostName);
     CHostLookup(CIpAddress&& rIpAddress);
     CHostLookup(const CIpAddress& rIpAddress);
-
-    CHostLookup()                              = default;
-    CHostLookup(const CHostLookup&)            = default;
-    CHostLookup& operator=(const CHostLookup&) = default;
-    CHostLookup(CHostLookup&&)                 = default;
-    CHostLookup& operator=(CHostLookup&&)      = default;
 
     IpAddresses addresses() const noexcept;
     std::string hostname() const noexcept;
@@ -64,4 +71,4 @@ private:
 
 } //EtNet
 
-#endif // _HOSTNAME_H_
+#endif //_HOSTLOOKUP_H_

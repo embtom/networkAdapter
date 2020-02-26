@@ -84,7 +84,7 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
     m_socketFd = ret;
 }
 
-CBaseSocket::~CBaseSocket()
+CBaseSocket::~CBaseSocket() noexcept
 {
     if (m_socketFd > 0) {
         ::close(m_socketFd);
@@ -107,20 +107,20 @@ int CBaseSocket::getDomain() const noexcept
     return domain;
 }
 
-CBaseSocket& CBaseSocket::SoReuseSocket(CBaseSocket &&rBaseSocket)
+CBaseSocket&& CBaseSocket::SoReuseSocket(CBaseSocket &&rBaseSocket)
 {
     int reuseaddr = 1;
     if(setsockopt(rBaseSocket.getFd(), SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)) == -1) {
         throw std::runtime_error(utils::buildErrorMessage("CBaseSocket::", __func__, ": SoReuseSocket: ", strerror(errno)));
     }
-    return rBaseSocket;
+    return std::move(rBaseSocket);
 }
 
-CBaseSocket& CBaseSocket::SoBroadcast(CBaseSocket &&rBaseSocket)
+CBaseSocket&& CBaseSocket::SoBroadcast(CBaseSocket &&rBaseSocket)
 {
     int broadcast = 1;
     if(setsockopt(rBaseSocket.getFd(),SOL_SOCKET,SO_BROADCAST,&broadcast,sizeof(broadcast)) == -1) {
         throw std::runtime_error(utils::buildErrorMessage("CBaseSocket::", __func__, ": SoBroadcast: ", strerror(errno)));
     }
-    return rBaseSocket;
+    return std::move(rBaseSocket);
 }

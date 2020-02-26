@@ -1,5 +1,6 @@
 /*
  * This file is part of the EMBTOM project
+
  * Copyright (c) 2018-2019 Thomas Willetal
  * (https://github.com/embtom)
  *
@@ -23,53 +24,57 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _DGRAMSERVER_H_
-#define _DGRAMSERVER_H_
+#ifndef _INTERFACESLOOKUP_H_
+#define _INTERFACESLOOKUP_H_
 
 //******************************************************************************
 // Header
 
-
-#include <tuple>
+#include <map>
+#include <string>
 #include <memory>
+#include <enum_reflect.hpp>
 #include <IpAddress.hpp>
-#include <dgram/DgramDataLink.hpp>
+
+DECLARE_ENUM(EIfState, unsigned, down, up, running);
 
 namespace EtNet
 {
 
-class CBaseSocket;
-class CDgramServerPrivate;
-
 //*****************************************************************************
-//! \brief CDgramServer
+//! \brief CNetInterface
 //!
-class CDgramServer
+class CNetInterfacePrivat;
+class CNetInterface
 {
 public:
-    CDgramServer(CBaseSocket&& rBaseSocket, unsigned int port);
+    using IfMap = std::map<unsigned int, CNetInterface>;
 
-    CDgramServer(const CDgramServer&)             = delete;
-    CDgramServer& operator= (const CDgramServer&) = delete;
-    CDgramServer(CDgramServer&&)                  = default;
-    CDgramServer& operator= (CDgramServer&&)      = default;
-    CDgramServer()                                = default;
-    ~CDgramServer();
+    CNetInterface(const CNetInterface&) noexcept            = delete;
+    CNetInterface& operator=(const CNetInterface&) noexcept = delete;
+    CNetInterface(CNetInterface&&) noexcept                 = default;
+    CNetInterface& operator=(CNetInterface&&) noexcept      = default;
+    virtual ~CNetInterface() noexcept;
 
-    std::tuple<CDgramDataLink> waitForConnection();
+    unsigned getIfIndex() const noexcept;
+    std::string getName() const noexcept;
+    CIpAddress::IpAddresses getAddresses() const noexcept;
+    CIpAddress::IpAddresses getSubMask() const noexcept;
+    CIpAddress::IpAddresses getBroadcast() const noexcept;
+    EIfState getState() const noexcept;
+    unsigned getMtu() const noexcept;
+
+    static IfMap getStateMap(bool bUpOnly) noexcept;
+    static CIpAddress::IpAddresses getAllIpv4Ip(bool bWithLoopback) noexcept;
+    static CIpAddress::IpAddresses getAllIpv6Ip(bool bWithLoopback) noexcept;
+    static CIpAddress::IpAddresses getAllIpv4Submask() noexcept;
+    static CIpAddress::IpAddresses getAllIpv4Broadcast() noexcept;
 
 private:
-    static void privateDeleterHook(CDgramServerPrivate *it);
-
-    struct privateDeleter
-    {
-        void operator()(CDgramServerPrivate *it) {
-            privateDeleterHook(it);
-        }
-    };
-
-    std::unique_ptr<CDgramServerPrivate,privateDeleter> m_pPrivate;
+    CNetInterface(unsigned int index, std::string&& name );
+    std::unique_ptr<CNetInterfacePrivat> m_private;
 };
 
-} // EtNet
-#endif // _DGRAMCLIENT_H_
+} //EtNet
+
+#endif //_INTERFACESLOOKUP_H_

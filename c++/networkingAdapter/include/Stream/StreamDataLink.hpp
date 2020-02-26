@@ -23,29 +23,45 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef _STREAMDATALINK_H_
+#define _STREAMDATALINK_H_
+
 //******************************************************************************
 // Header
 
-#include <iostream>
-#include <stdexcept>
+#include <cstddef>
+#include <functional>
+#include <stdint.h>
+#include <span.h>
 
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+namespace EtNet
+{
 
-#include <error_msg.hpp>
-#include <stream/StreamDataLink.hpp>
-
-using namespace EtNet;
+constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
 
 //*****************************************************************************
-// Method definitions "CStreamDataLink"
-
-CStreamDataLink::CStreamDataLink(int socketFd) :
-    CBaseDataLink(socketFd)
-{ }
-
-CStreamDataLink::~CStreamDataLink()
+//! \brief CStreamDataLink
+//!
+class CStreamDataLink
 {
-    closeFd();
+public:
+    using CallbackReceive = std::function<bool (utils::span<char> rx)>;
+
+    CStreamDataLink() noexcept                                 = default;
+    CStreamDataLink(CStreamDataLink const&)                    = delete;
+    CStreamDataLink& operator=(CStreamDataLink const&)         = delete;
+    virtual ~CStreamDataLink() noexcept;
+
+    CStreamDataLink(int socketFd) noexcept;
+    CStreamDataLink(CStreamDataLink &&rhs) noexcept;
+    CStreamDataLink& operator=(CStreamDataLink&& rhs) noexcept;
+
+    void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    void send(const utils::span<char>& rTxSpan);
+private:
+    int m_socketFd {-1};
+};
+
 }
+
+#endif /* _STREAMDATALINK_H_ */

@@ -1,8 +1,8 @@
 
 #include <iostream>
 #include <BaseSocket.hpp>
-#include <stream/StreamServer.hpp>
-#include <stream/StreamDataLink.hpp>
+#include <Stream/StreamServer.hpp>
+#include <Stream/StreamDataLink.hpp>
 #include <span.h>
 #undef min
 #undef max

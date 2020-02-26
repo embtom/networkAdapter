@@ -23,6 +23,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//******************************************************************************
+// Header
+
 #include <iostream>
 #include <algorithm>
 #include <netinet/in.h>
@@ -33,6 +36,9 @@
 
 template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
 template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
+//*****************************************************************************
+// Method definitions "CIpAddress"
 
 EtNet::CIpAddress::CIpAddress(const std::string& rIpStr)
 {
@@ -106,6 +112,74 @@ bool EtNet::CIpAddress::is_v6() const noexcept
     return ret;
 }
 
+bool EtNet::CIpAddress::is_loopback() const noexcept
+{
+    bool ret;
+    std::visit(overload{
+        [&ret](const in_addr& addr)
+        {
+	        ret =(ntohl(addr.s_addr) & 0xFF000000) == 0x7F000000;
+        },
+        [&ret](const in6_addr& addr)
+        {
+            if ((ntohl(addr.__in6_u.__u6_addr32[3]) == 0x00000001) &&
+                (addr.__in6_u.__u6_addr32[2] == 0x0000) &&
+                (addr.__in6_u.__u6_addr32[1] == 0x0000) &&
+                (addr.__in6_u.__u6_addr32[0] == 0x0000)) {
+                ret = true;
+            }
+            else {
+                ret = false;
+            }
+        },
+        [&ret](const std::monostate& ) { ret = false; }
+    }, m_address);
+    return ret;
+}
+
+bool EtNet::CIpAddress::is_submask() const noexcept
+{
+    bool ret;
+    std::visit(overload{
+        [&ret](const in_addr& addr)
+        {
+	        ret =(ntohl(addr.s_addr) & 0xFF000000) == 0xFF000000;
+        },
+        [&ret](const in6_addr& addr)
+        {
+            ret = (addr.__in6_u.__u6_addr32[0] == 0xffff);
+        },
+        [&ret](const std::monostate& ) { ret = false; }
+    }, m_address);
+    return ret;
+}
+
+bool EtNet::CIpAddress::is_broadcast() const noexcept
+{
+    bool ret;
+    std::visit(overload{
+        [&ret](const in_addr& addr)
+        {
+	        ret = (ntohl(addr.s_addr) & 0x000000FF) == 0x000000FF;
+        },
+        [&ret](const in6_addr& )       { ret = false; },
+        [&ret](const std::monostate& ) { ret = false; }
+    }, m_address);
+
+    return ret;
+}
+
+bool EtNet::CIpAddress::empty() const noexcept
+{
+    bool ret;
+    std::visit(overload{
+        [&ret](const in_addr& )        { ret = false; },
+        [&ret](const in6_addr& )       { ret = false; },
+        [&ret](const std::monostate& ) { ret = true; }
+    }, m_address);
+    return ret;
+}
+
 EtNet::EAddressFamily EtNet::CIpAddress::addressFamily() const noexcept
 {
     EtNet::EAddressFamily ret;
@@ -145,7 +219,31 @@ size_t EtNet::CIpAddress::charCount(const std::string& rIpStr, char toCount) noe
     });
 }
 
-bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
+EtNet::CIpAddress EtNet::CIpAddress::broadcast(const EtNet::CIpAddress& rSubmask) const noexcept
+{
+    if(is_v4() != rSubmask.is_v4()) {
+        return EtNet::CIpAddress();
+    }
+
+    if(is_v6() != rSubmask.is_v6()) {
+        return EtNet::CIpAddress();
+    }
+
+    CIpAddress broadcastIp;
+    std::visit(overload{
+        [&broadcastIp, &rSubmask](const in_addr& val) {
+            broadcastIp = CIpAddress(in_addr{(val.s_addr | ~(rSubmask.to_v4()->s_addr))});
+        },
+        [&broadcastIp, &rSubmask](const in6_addr& val) {
+            ;
+        },
+        [](const std::monostate& ){ }
+    }, m_address);
+
+    return broadcastIp;
+}
+
+bool EtNet::CIpAddress::operator== (const EtNet::CIpAddress& rhs) const noexcept
 {
     if(is_v4() != rhs.is_v4()) {
         return false;
@@ -155,7 +253,7 @@ bool EtNet::CIpAddress::operator ==(const EtNet::CIpAddress& rhs) const noexcept
         return false;
     }
 
-    bool ret =false;
+    bool ret = false;
 
     std::visit(overload{
     [rhs, &ret](const in_addr& val)

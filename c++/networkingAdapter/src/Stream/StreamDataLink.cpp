@@ -26,53 +26,51 @@
 //******************************************************************************
 // Header
 
+#include <iostream>
 #include <stdexcept>
+
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
 #include <error_msg.hpp>
-#include <dgram/DgramDataLink.hpp>
+#include <Stream/StreamDataLink.hpp>
 
 using namespace EtNet;
 
 //*****************************************************************************
-// Method definitions "CDgramDataLink"
+// Method definitions "CStreamDataLink"
 
-CDgramDataLink::CDgramDataLink(int socketFd) :
-    CBaseDataLink(socketFd)
+CStreamDataLink::CStreamDataLink(int socketFd) noexcept :
+    m_socketFd(socketFd)
 { }
 
-void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
+CStreamDataLink::~CStreamDataLink() noexcept
 {
-    sockaddr_in clAddr{};
-    sockaddr_in6 clAddr6{};
-    sockaddr* claddr;
-    socklen_t claddrLen;
+    if (m_socketFd > 0) {
+        close (m_socketFd);
+        m_socketFd=-1;
+    }
+}
 
-    if (rClientAddr.Ip.is_v4())
-    {
-        clAddr.sin_family       = AF_INET;
-        clAddr.sin_port         = rClientAddr.Port;
-        std::memcpy(&clAddr.sin_addr, rClientAddr.Ip.to_v4(), sizeof(in_addr));
-        claddr = (sockaddr*)&clAddr;
-        claddrLen = sizeof(sockaddr_in);
-    }
-    else if (rClientAddr.Ip.is_v6())
-    {
-        clAddr6.sin6_family      = AF_INET6;
-        clAddr6.sin6_port        = rClientAddr.Port;
-        std::memcpy(&clAddr6.sin6_addr, rClientAddr.Ip.to_v6(), sizeof(in6_addr));
-        claddr = (sockaddr*)&clAddr6;
-        claddrLen = sizeof(sockaddr_in6);
-    }
-    else {
-        throw std::logic_error(utils::buildErrorMessage("CDgramServer::", __func__, " : No valid Ip to connect"));
-    }
+CStreamDataLink::CStreamDataLink(CStreamDataLink &&rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+}
 
+CStreamDataLink& CStreamDataLink::operator=(CStreamDataLink&& rhs) noexcept
+{
+    std::swap(m_socketFd, rhs.m_socketFd);
+    return *this;
+}
+
+void CStreamDataLink::send(const utils::span<char>& rTxSpan)
+{
     std::size_t dataWritten = 0;
-    while(dataWritten < rSpanTx.size_bytes())
+
+    while(dataWritten < rTxSpan.size_bytes())
     {
-        std::size_t put = ::sendto(getFd(), rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = write(m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -116,49 +114,20 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     return;
 }
 
-void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd)
+void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
 {
-    union e
+    if (m_socketFd == 0)
     {
-        sockaddr_storage  common;
-        sockaddr_in       sin;
-        sockaddr_in6      sin6;
-    } peerAdr;
-    socklen_t addr_size = sizeof(peerAdr);
+        throw std::logic_error(utils::buildErrorMessage("DataSocket::", __func__, ": accept called on a bad socket object (this object was moved)"));
+    }
 
-    SPeerAddr peerAddress;
-    auto toCIpAddress = [&peerAddress] (e& peerAdr)
-    {
-        switch (peerAdr.common.ss_family)
-        {
-            case AF_INET:
-            {
-                peerAddress.Ip = std::move(CIpAddress(peerAdr.sin.sin_addr));
-                peerAddress.Port = peerAdr.sin.sin_port;
-                break;
-            }
-            case AF_INET6:
-            {
-                if (IN6_IS_ADDR_V4MAPPED(&peerAdr.sin6.sin6_addr)) {
-                    in_addr ip4;
-                    std::memcpy(&ip4, &peerAdr.sin6.sin6_addr.__in6_u.__u6_addr8[12], sizeof(in_addr));
-                    peerAddress.Ip = std::move(CIpAddress(ip4));
-                }
-                else {
-                    peerAddress.Ip = std::move(CIpAddress(peerAdr.sin6.sin6_addr));
-                }
-                peerAddress.Port = peerAdr.sin6.sin6_port;
-                break;
-            }
-        }
-    };
-    char* readBuffer = rSpanRx.data();
     std::size_t dataRead  = 0;
+    char* readBuffer = rRxSpan.data();
 
-    while(dataRead < rSpanRx.size_bytes())
+    while(dataRead < rRxSpan.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(getFd(), readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = read(m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -209,13 +178,12 @@ void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom s
             break;
         }
         dataRead += get;
-
-        toCIpAddress(peerAdr);
-        if (scanForEnd(peerAddress, utils::span<char>(readBuffer, dataRead)))
+        if (scanForEnd(utils::span<char>(readBuffer, dataRead)))
         {
             break;
         }
     }
 
-    rSpanRx = utils::span<char>(readBuffer, dataRead);
+    rRxSpan = utils::span<char>(readBuffer, dataRead);
+    //return dataRead;
 }

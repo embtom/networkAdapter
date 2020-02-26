@@ -23,7 +23,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <HostName.h>
+//******************************************************************************
+// Header
+
+#include <Lookup/HostLookup.hpp>
 #include <iostream> //std::cout
 #include <string> //std::string
 #include <netdb.h> //getaddrinfo
@@ -34,6 +37,9 @@
 
 using namespace EtNet;
 
+//*****************************************************************************
+// Method definitions "CHostLookup"
+
 CHostLookup::CHostLookup(std::string&& rHostName) :
     CHostLookup(rHostName)
 { }
@@ -41,9 +47,7 @@ CHostLookup::CHostLookup(std::string&& rHostName) :
 CHostLookup::CHostLookup(const std::string& rHostName) :
    m_hostName(rHostName),
    m_IpAddresses(requestIpAddresses(rHostName))
-{
-
-}
+{ }
 
 CHostLookup::CHostLookup(const CIpAddress& rIpAddress) :
     m_hostName(requestHostname(rIpAddress)),
@@ -53,6 +57,8 @@ CHostLookup::CHostLookup(const CIpAddress& rIpAddress) :
 CHostLookup::CHostLookup(CIpAddress&& rIpAddress) :
     CHostLookup(rIpAddress)
 { }
+
+CHostLookup::~CHostLookup() noexcept = default;
 
 CHostLookup::IpAddresses CHostLookup::addresses() const noexcept
 {
@@ -136,6 +142,5 @@ std::string CHostLookup::requestHostname(const CIpAddress& rIpAddress)
     else {
         throw std::invalid_argument(utils::buildErrorMessage("CHostLookup::", __func__, ": unknown ipAddress type"));
     }
-
     return hostName;
 }

@@ -26,7 +26,11 @@
 #ifndef _IPADDRESS_H_
 #define _IPADDRESS_H_
 
+//******************************************************************************
+// Headers
+
 #include <variant> //std::variant
+#include <vector>
 #include <type_traits> //enable_if, remove_reference
 #include <string> //std::string
 #include <cstring> //std::memcmp
@@ -44,18 +48,20 @@ enum class EAddressFamily{
     INV
 };
 
+//*****************************************************************************
+//! \brief CIpAddress
+//!
 class CIpAddress
 {
 public:
-    //enum class EIpType {Ipv4, Ipv6 , NoData};
+    using IpAddresses = std::vector<CIpAddress>;
 
-    constexpr CIpAddress()
-    { }
-
+    constexpr CIpAddress() noexcept         = default;
     CIpAddress(const CIpAddress&)            = default;
-    CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(const CIpAddress&) = default;
+    CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(CIpAddress&&)      = default;
+    virtual ~CIpAddress() noexcept           = default;
 
     template <typename T,
               typename std::enable_if_t<std::is_same<std::remove_reference_t<T>, in_addr>::value ||
@@ -72,19 +78,27 @@ public:
     std::string toString() const noexcept;
     bool is_v4() const noexcept;
     bool is_v6() const noexcept;
+    bool is_loopback() const noexcept;
+    bool is_broadcast() const noexcept;
+    bool is_submask() const noexcept;
+
+    bool empty() const noexcept;
+
     EAddressFamily addressFamily() const noexcept;
 
     const in_addr* to_v4() const noexcept;
     const in6_addr* to_v6() const noexcept;
 
-    bool operator ==(const CIpAddress& rhs) const noexcept;
-    bool operator !=(const CIpAddress& rhs) const noexcept;
+    CIpAddress broadcast(const CIpAddress& rSubmask) const noexcept;
+
+    bool operator== (const CIpAddress& rhs) const noexcept;
+    bool operator!= (const CIpAddress& rhs) const noexcept;
 private:
 
     static size_t charCount(const std::string& rIpStr, char toCount) noexcept;
     mutable std::variant<std::monostate, in6_addr, in_addr> m_address;
 };
 
-}
+} //EtNet
 
 #endif // _IPADDRESS_H_

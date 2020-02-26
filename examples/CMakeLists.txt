@@ -1,2 +1,4 @@
 add_subdirectory(dgram)
+add_subdirectory(dgramBroadcast)
+add_subdirectory(InterfaceLookup)
 add_subdirectory(stream)

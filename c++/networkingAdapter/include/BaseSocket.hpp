@@ -38,28 +38,29 @@ enum class ESocketMode
     NO_MODE
 };
 
-
+//*****************************************************************************
+//! \brief CBaseSocket
+//!
 class CBaseSocket
 {
 public:
-    CBaseSocket()                              = default;
-
-    CBaseSocket(CBaseSocket &&rhs)             noexcept;
-    CBaseSocket& operator=(CBaseSocket&& rhs)  noexcept;
+    CBaseSocket() noexcept                     = default;
     CBaseSocket(CBaseSocket const&)            = delete;
     CBaseSocket& operator=(CBaseSocket const&) = delete;
+    virtual ~CBaseSocket() noexcept;
+
     CBaseSocket(ESocketMode opMode);
+    CBaseSocket(CBaseSocket &&rhs) noexcept;
+    CBaseSocket& operator=(CBaseSocket&& rhs) noexcept;
 
-    static CBaseSocket& SoReuseSocket(CBaseSocket &&rBaseSocket);
-    static CBaseSocket& SoBroadcast(CBaseSocket &&rBaseSocket);
-
-    virtual ~CBaseSocket();
     int getFd() const noexcept;
     int getDomain() const noexcept;
 
+    static CBaseSocket&& SoReuseSocket(CBaseSocket &&rBaseSocket);
+    static CBaseSocket&& SoBroadcast(CBaseSocket &&rBaseSocket);
 private:
     int         m_socketFd{-1};
 };
 
-}
+} //EtNet
 #endif /*_SOCKET_H_*/
