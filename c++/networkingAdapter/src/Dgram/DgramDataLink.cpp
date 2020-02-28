@@ -33,31 +33,59 @@
 #include <error_msg.hpp>
 #include <Dgram/DgramDataLink.hpp>
 
+namespace EtNet
+{
+//*****************************************************************************
+//! \brief CDgramDataLink
+//!
+struct CDgramDataLinkPrivate
+{
+    CDgramDataLinkPrivate() noexcept = default;
+    CDgramDataLinkPrivate(int socketFd) noexcept :
+        m_socketFd(socketFd),
+        m_peerAdr({CIpAddress(), 0})
+    { }
+    CDgramDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept :
+        m_socketFd(socketFd),
+        m_peerAdr(peerAdr)
+    { }
+    int m_socketFd        {-1};
+    SPeerAddr m_peerAdr   {CIpAddress(), 0};
+};
+
+}
+
+
 using namespace EtNet;
 
 //*****************************************************************************
 // Method definitions "CDgramDataLink"
 
 CDgramDataLink::CDgramDataLink(int socketFd) noexcept :
-    m_socketFd(socketFd),
-    m_peerAdr({CIpAddress(), 0})
+    m_pPrivate(std::make_unique<CDgramDataLinkPrivate>(socketFd))
 { }
 
 CDgramDataLink::CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept :
-    m_socketFd(socketFd),
-    m_peerAdr(rPeerAddr)
+    m_pPrivate(std::make_unique<CDgramDataLinkPrivate>(socketFd, rPeerAddr))
 { }
 
-CDgramDataLink::CDgramDataLink(CDgramDataLink &&rhs) noexcept
+CDgramDataLink::CDgramDataLink(CDgramDataLink const &rhs) :
+    m_pPrivate(std::make_unique<CDgramDataLinkPrivate>(*rhs.m_pPrivate))
+{ }
+
+CDgramDataLink& CDgramDataLink::operator=(CDgramDataLink const &rhs)
 {
-    std::swap(m_socketFd, rhs.m_socketFd);
-    std::swap(m_peerAdr, rhs.m_peerAdr);
+    m_pPrivate = std::make_unique<CDgramDataLinkPrivate>(*rhs.m_pPrivate);
+    return *this;
 }
+
+CDgramDataLink::CDgramDataLink(CDgramDataLink &&rhs) noexcept :
+    m_pPrivate(std::move(rhs.m_pPrivate))
+{ }
 
 CDgramDataLink& CDgramDataLink::operator=(CDgramDataLink&& rhs) noexcept
 {
-    std::swap(m_socketFd, rhs.m_socketFd);
-    std::swap(m_peerAdr, rhs.m_peerAdr);
+    m_pPrivate = std::move(rhs.m_pPrivate);
     return *this;
 }
 
@@ -65,7 +93,7 @@ CDgramDataLink::~CDgramDataLink() noexcept = default;
 
 void CDgramDataLink::send(const utils::span<char>& rSpanTx)
 {
-    sendTo(m_peerAdr, rSpanTx);
+    sendTo(m_pPrivate->m_peerAdr, rSpanTx);
 }
 
 void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
@@ -98,7 +126,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     std::size_t dataWritten = 0;
     while(dataWritten < rSpanTx.size_bytes())
     {
-        std::size_t put = ::sendto(m_socketFd, rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
+        std::size_t put = ::sendto(m_pPrivate->m_socketFd, rSpanTx.data() + dataWritten, rSpanTx.size_bytes() - dataWritten, 0, claddr, claddrLen);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -142,7 +170,7 @@ void CDgramDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char
     return;
 }
 
-void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd)
+void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const
 {
     union e
     {
@@ -184,7 +212,7 @@ void CDgramDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom s
     while(dataRead < rSpanRx.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = ::recvfrom(m_socketFd, readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
+        std::size_t get = ::recvfrom(m_pPrivate->m_socketFd, readBuffer + dataRead, rSpanRx.size_bytes() - dataRead, 0, (sockaddr*)&peerAdr, &addr_size);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

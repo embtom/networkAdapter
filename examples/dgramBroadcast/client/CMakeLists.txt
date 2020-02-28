@@ -3,7 +3,7 @@ project(EXA_Broadclient)
 #######################################################################################
 #Build Settings
 #######################################################################################
-set (SOURCES broadClient.cpp)
+set (SOURCES "broadClient.cpp")
 
 #######################################################################################
 #Build target settings
@@ -14,5 +14,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ./)
-target_link_libraries(${PROJECT_NAME} networkingAdapter)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE networkingAdapter
+    Threads::Threads
+)

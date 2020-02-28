@@ -32,8 +32,8 @@
 #include <stdint.h>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <span.h>
-
 #include <BaseSocket.hpp>
 #include <IpAddress.hpp>
 
@@ -48,6 +48,7 @@ struct SPeerAddr
 
 constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount){ return false; };
 
+class CDgramDataLinkPrivate;
 //*****************************************************************************
 //! \brief CDgramDataLink
 //!
@@ -56,9 +57,9 @@ class CDgramDataLink
 public:
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
 
-    CDgramDataLink() noexcept                         = default;
-    CDgramDataLink(CDgramDataLink const&)             = delete;
-    CDgramDataLink& operator=(CDgramDataLink const&)  = delete;
+    CDgramDataLink() noexcept                         = delete;
+    CDgramDataLink(CDgramDataLink const&);
+    CDgramDataLink& operator=(CDgramDataLink const&);
     virtual ~CDgramDataLink() noexcept;
 
     CDgramDataLink(int socketFd) noexcept;
@@ -68,11 +69,10 @@ public:
 
     void send(const utils::span<char>& rSpanTx);
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
-    void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd);
+    void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const;
 
 private:
-    int m_socketFd        {-1};
-    SPeerAddr m_peerAdr   {CIpAddress(), 0};
+    std::unique_ptr<CDgramDataLinkPrivate> m_pPrivate;
 };
 
 } // EtNet
