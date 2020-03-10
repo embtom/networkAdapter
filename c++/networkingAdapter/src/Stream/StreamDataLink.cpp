@@ -36,31 +36,44 @@
 #include <error_msg.hpp>
 #include <Stream/StreamDataLink.hpp>
 
+namespace EtNet
+{
+    struct CStreamDataLinkPrivate : public std::enable_shared_from_this<CStreamDataLinkPrivate>
+    {
+        CStreamDataLinkPrivate() noexcept = default;
+        CStreamDataLinkPrivate(int socketFd) noexcept :
+            m_socketFd(socketFd)
+        { }
+        ~CStreamDataLinkPrivate() noexcept
+        {
+            if (m_socketFd > 0) {
+                close (m_socketFd);
+                m_socketFd=-1;
+            }
+        }
+        int m_socketFd {-1};
+    };
+
+}
+
 using namespace EtNet;
 
 //*****************************************************************************
 // Method definitions "CStreamDataLink"
 
 CStreamDataLink::CStreamDataLink(int socketFd) noexcept :
-    m_socketFd(socketFd)
+    m_pPrivate(std::make_shared<CStreamDataLinkPrivate>(socketFd))
 { }
 
-CStreamDataLink::~CStreamDataLink() noexcept
-{
-    if (m_socketFd > 0) {
-        close (m_socketFd);
-        m_socketFd=-1;
-    }
-}
+CStreamDataLink::~CStreamDataLink() noexcept = default;
 
-CStreamDataLink::CStreamDataLink(CStreamDataLink &&rhs) noexcept
-{
-    std::swap(m_socketFd, rhs.m_socketFd);
-}
+CStreamDataLink::CStreamDataLink(CStreamDataLink &&rhs) noexcept :
+    m_pPrivate(std::move(rhs.m_pPrivate))
+{ }
 
 CStreamDataLink& CStreamDataLink::operator=(CStreamDataLink&& rhs) noexcept
 {
-    std::swap(m_socketFd, rhs.m_socketFd);
+    m_pPrivate = std::move(rhs.m_pPrivate);
     return *this;
 }
 
@@ -70,7 +83,7 @@ void CStreamDataLink::send(const utils::span<char>& rTxSpan)
 
     while(dataWritten < rTxSpan.size_bytes())
     {
-        std::size_t put = write(m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
+        std::size_t put = write(m_pPrivate->m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -116,7 +129,7 @@ void CStreamDataLink::send(const utils::span<char>& rTxSpan)
 
 void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
 {
-    if (m_socketFd == 0)
+    if (m_pPrivate->m_socketFd == 0)
     {
         throw std::logic_error(utils::buildErrorMessage("DataSocket::", __func__, ": accept called on a bad socket object (this object was moved)"));
     }
@@ -127,7 +140,7 @@ void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanFor
     while(dataRead < rRxSpan.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = read(m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
+        std::size_t get = read(m_pPrivate->m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)

@@ -3,6 +3,7 @@
 #include <BaseSocket.hpp>
 #include <Lookup/InterfacesLookup.hpp>
 #include <Dgram/DgramClient.hpp>
+#include <threadLoop.h>
 #include <span.h>
 #include <thread>
 
@@ -16,7 +17,6 @@ int main(int argc, char *argv[])
     char buffer [128];
     utils::span<char> rxSpan(buffer);
 
-
     CIpAddress::IpAddresses broadIp = CNetInterface::getAllIpv4Broadcast();
 
     std::cout << "Broadcast Address to send is: " << broadIp.at(0).toString() << std::endl;
@@ -24,39 +24,38 @@ int main(int argc, char *argv[])
     auto baseSocket = CBaseSocket::SoBroadcast(
                       CBaseSocket::SoReuseSocket(
                       CBaseSocket(ESocketMode::INET_DGRAM)));
-
     EtNet::CDgramClient dgramClient(std::move(baseSocket));
 
+    unsigned rcvCount {0};
     CDgramDataLink a = dgramClient.getLink(broadIp.at(0).toString(), PORT_NUM);
-
-    std::thread thd ([b = a]()
+    auto rcvFunc = [&a, &rcvCount]()
     {
-        while (true)
-        {
-            char buffer [128];
-            utils::span<char> rxSpan(buffer);
-            b.reciveFrom(rxSpan, [](SPeerAddr peer, utils::span<char> rx) {
-                std::cout << "RCV from " << peer.Ip.toString() << std::endl;
-                std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
-                return true;
-            });
+        char buffer [128];
+        utils::span<char> rxSpan(buffer);
+        CDgramDataLink::ERet ret = a.reciveFrom(rxSpan, [&rcvCount](SPeerAddr peer, utils::span<char> rx) {
+            std::cout << "RCV from " << peer.Ip.toString() << std::endl;
+            std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
+            rcvCount++;
+            return true;
+        });
+
+        if (CDgramDataLink::ERet::UNBLOCK == ret) {
+            return true;
         }
-    });
+
+        if(rcvCount==2) {
+            a.unblockRecive();
+        }
+        std::cout << "Called " << rcvCount << std::endl;
+        return false;
+    };
+    utils::CThreadLoop rcvLoop (rcvFunc, "RX_Worker");
+    rcvLoop.start(std::chrono::milliseconds::zero());
 
     for (int i = 0 ; i < 2; i++)
     {
         std::string test = std::string("Hallo") + std::to_string(i);
         a.send(utils::span<char>(test));
-        // a.reciveFrom(rxSpan, [](SPeerAddr peer, utils::span<char> rx) {
-        //     std::cout << "RCV from " << peer.Ip.toString() << std::endl;
-        //     std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
-        //     return true;
-        // });
-        // a.reciveFrom(rxSpan, [](SPeerAddr peer, utils::span<char> rx) {
-        //     std::cout << "RCV from " << peer.Ip.toString() << std::endl;
-        //     std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
-        //     return true;
-        // });
     }
-    thd.join();
+    rcvLoop.waitUntilFinished();
 }

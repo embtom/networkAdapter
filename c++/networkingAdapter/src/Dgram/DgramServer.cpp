@@ -41,7 +41,6 @@
 #include <fdSet.h>
 #include <BaseSocket.hpp>
 
-
 namespace EtNet
 {
 
@@ -53,13 +52,11 @@ class CDgramServerPrivate
 public:
     CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int port);
     ~CDgramServerPrivate();
-    void incomingConnectionCb(int fd) noexcept;
     CDgramDataLink waitForConnection();
 
 private:
     utils::CFdSet       m_FdSet;
     CBaseSocket         m_baseSocket;
-    std::promise<int>   m_connectionPromise;
 };
 
 }
@@ -107,30 +104,22 @@ CDgramServerPrivate::CDgramServerPrivate(CBaseSocket&& rBaseSocket, unsigned int
             break;
         }
     }
-
-    m_FdSet.AddFd(m_baseSocket.getFd(), [this] (int fd) {incomingConnectionCb(fd);});
 }
 
 CDgramServerPrivate::~CDgramServerPrivate()
 {
-    m_FdSet.RemoveFd(m_baseSocket.getFd());
     m_FdSet.UnBlock();
-}
-
-void CDgramServerPrivate::incomingConnectionCb(int fd) noexcept
-{
-    m_connectionPromise.set_value(fd);
 }
 
 CDgramDataLink CDgramServerPrivate::waitForConnection()
 {
-    m_connectionPromise = std::promise<int>{};
+    m_FdSet.AddFd(m_baseSocket.getFd());
     if (utils::CFdSetRetval::UNBLOCK == m_FdSet.Select()) {
+        m_FdSet.RemoveFd(m_baseSocket.getFd());
         return CDgramDataLink(-1);
     }
-
-    int fd =  m_connectionPromise.get_future().get();
-    return CDgramDataLink(fd);
+    m_FdSet.RemoveFd(m_baseSocket.getFd());
+    return CDgramDataLink(m_baseSocket.getFd());
 }
 
 //*****************************************************************************

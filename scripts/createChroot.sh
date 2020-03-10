@@ -6,7 +6,7 @@
 # 2. Create chroot build environment
 #   sudo pbuilder create --debootstrapopts --variant=buildd --othermirror "deb [trusted=yes] http://tomhp/reprepo bionic main"
 # 3. pdebuild without root
-#   sudo visudo    
+#   sudo visudo
 #   thomas ALL=(root) SETENV: NOPASSWD: /usr/sbin/pbuilder
 
 #Creation of the chroot "/var/cache/pbuilder/base.tgz"

@@ -29,9 +29,10 @@
 //******************************************************************************
 // Header
 
+#include <stdint.h>
 #include <cstddef>
 #include <functional>
-#include <stdint.h>
+#include <memory>
 #include <span.h>
 
 namespace EtNet
@@ -39,6 +40,7 @@ namespace EtNet
 
 constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
 
+class CStreamDataLinkPrivate;
 //*****************************************************************************
 //! \brief CStreamDataLink
 //!
@@ -48,8 +50,8 @@ public:
     using CallbackReceive = std::function<bool (utils::span<char> rx)>;
 
     CStreamDataLink() noexcept                                 = default;
-    CStreamDataLink(CStreamDataLink const&)                    = delete;
-    CStreamDataLink& operator=(CStreamDataLink const&)         = delete;
+    CStreamDataLink(CStreamDataLink const&)                    = default;
+    CStreamDataLink& operator=(CStreamDataLink const&)         = default;
     virtual ~CStreamDataLink() noexcept;
 
     CStreamDataLink(int socketFd) noexcept;
@@ -58,8 +60,10 @@ public:
 
     void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
     void send(const utils::span<char>& rTxSpan);
+
 private:
-    int m_socketFd {-1};
+    std::shared_ptr<CStreamDataLinkPrivate> m_pPrivate;
+   // int m_socketFd {-1};
 };
 
 }

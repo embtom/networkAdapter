@@ -55,21 +55,29 @@ class CDgramDataLinkPrivate;
 class CDgramDataLink
 {
 public:
+    enum class ERet
+    {
+        OK,
+        UNBLOCK
+    };
+
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
 
-    CDgramDataLink() noexcept                         = delete;
-    CDgramDataLink(CDgramDataLink const&);
-    CDgramDataLink& operator=(CDgramDataLink const&);
-    virtual ~CDgramDataLink() noexcept;
+    CDgramDataLink() noexcept                                = delete;
+    CDgramDataLink(CDgramDataLink const&)                    = delete;
+    CDgramDataLink& operator=(CDgramDataLink const&)         = delete;
 
-    CDgramDataLink(int socketFd) noexcept;
-    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr) noexcept;
+    CDgramDataLink(int socketFd);
+    CDgramDataLink(int socketFd, const SPeerAddr &rPeerAddr);
     CDgramDataLink(CDgramDataLink &&rhs) noexcept;
     CDgramDataLink& operator=(CDgramDataLink&& rhs) noexcept;
+    virtual ~CDgramDataLink() noexcept;
 
     void send(const utils::span<char>& rSpanTx);
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
-    void reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const;
+
+    bool unblockRecive() noexcept;
+    ERet reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const;
 
 private:
     std::unique_ptr<CDgramDataLinkPrivate> m_pPrivate;
