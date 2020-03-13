@@ -11,7 +11,7 @@ using namespace EtNet;
 
 TEST(DataLink, MoveKonstruktor)
 {
-    auto [a] = std::tuple(CStreamDataLink(3));
+ //   auto [a] = std::tuple(CStreamDataLink(3));
 }
 
 int main(int argc, char **argv)

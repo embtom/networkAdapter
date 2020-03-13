@@ -47,6 +47,12 @@ class CStreamDataLinkPrivate;
 class CStreamDataLink
 {
 public:
+    enum class ERet
+    {
+        OK,
+        UNBLOCK
+    };
+
     using CallbackReceive = std::function<bool (utils::span<char> rx)>;
 
     CStreamDataLink() noexcept                                 = default;
@@ -58,12 +64,13 @@ public:
     CStreamDataLink(CStreamDataLink &&rhs) noexcept;
     CStreamDataLink& operator=(CStreamDataLink&& rhs) noexcept;
 
-    void recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
     void send(const utils::span<char>& rTxSpan);
+
+    bool unblockRecive() noexcept;
+    CStreamDataLink::ERet recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
 
 private:
     std::shared_ptr<CStreamDataLinkPrivate> m_pPrivate;
-   // int m_socketFd {-1};
 };
 
 }

@@ -33,57 +33,64 @@
 #include <errno.h>
 #include <string.h>
 
+#include <fdSet.h>
 #include <error_msg.hpp>
 #include <Stream/StreamDataLink.hpp>
 
 namespace EtNet
 {
-    struct CStreamDataLinkPrivate : public std::enable_shared_from_this<CStreamDataLinkPrivate>
+    class CStreamDataLinkPrivate : public std::enable_shared_from_this<CStreamDataLinkPrivate>
     {
+    public:
         CStreamDataLinkPrivate() noexcept = default;
-        CStreamDataLinkPrivate(int socketFd) noexcept :
-            m_socketFd(socketFd)
-        { }
-        ~CStreamDataLinkPrivate() noexcept
-        {
-            if (m_socketFd > 0) {
-                close (m_socketFd);
-                m_socketFd=-1;
-            }
-        }
-        int m_socketFd {-1};
-    };
+        CStreamDataLinkPrivate(int socketFd) noexcept;
+        ~CStreamDataLinkPrivate() noexcept;
+        void send(const utils::span<char>& rTxSpan);
 
+        bool unblockRecive() noexcept;
+        CStreamDataLink::ERet recive(utils::span<char>& rRxSpan, CStreamDataLink::CallbackReceive scanForEnd);
+
+    private:
+        void reciveImpl(utils::span<char>& rRxSpan, CStreamDataLink::CallbackReceive scanForEnd);
+
+        utils::CFdSet   m_FdSet;
+        int             m_socketFd {-1};
+    };
 }
 
 using namespace EtNet;
 
 //*****************************************************************************
-// Method definitions "CStreamDataLink"
+// Method definitions "CStreamDataLinkPrivate"
 
-CStreamDataLink::CStreamDataLink(int socketFd) noexcept :
-    m_pPrivate(std::make_shared<CStreamDataLinkPrivate>(socketFd))
-{ }
-
-CStreamDataLink::~CStreamDataLink() noexcept = default;
-
-CStreamDataLink::CStreamDataLink(CStreamDataLink &&rhs) noexcept :
-    m_pPrivate(std::move(rhs.m_pPrivate))
-{ }
-
-CStreamDataLink& CStreamDataLink::operator=(CStreamDataLink&& rhs) noexcept
+CStreamDataLinkPrivate::CStreamDataLinkPrivate(int socketFd) noexcept :
+    m_socketFd(socketFd)
 {
-    m_pPrivate = std::move(rhs.m_pPrivate);
-    return *this;
+    m_FdSet.AddFd(socketFd);
 }
 
-void CStreamDataLink::send(const utils::span<char>& rTxSpan)
+CStreamDataLinkPrivate::~CStreamDataLinkPrivate() noexcept
+{
+    if (m_socketFd <= 0) {
+        return;
+    }
+    unblockRecive();
+    try {
+        m_FdSet.RemoveFd(m_socketFd);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << '\n';
+    }
+    close (m_socketFd);
+}
+
+void CStreamDataLinkPrivate::send(const utils::span<char>& rTxSpan)
 {
     std::size_t dataWritten = 0;
 
     while(dataWritten < rTxSpan.size_bytes())
     {
-        std::size_t put = write(m_pPrivate->m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
+        std::size_t put = write(m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -127,9 +134,35 @@ void CStreamDataLink::send(const utils::span<char>& rTxSpan)
     return;
 }
 
-void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
+bool CStreamDataLinkPrivate::unblockRecive() noexcept
 {
-    if (m_pPrivate->m_socketFd == 0)
+    try {
+        m_FdSet.UnBlock();
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+CStreamDataLink::ERet CStreamDataLinkPrivate::recive(utils::span<char>& rSpanRx, CStreamDataLink::CallbackReceive scanForEnd)
+{
+    utils::CFdSetRetval ret = m_FdSet.Select([this, &rSpanRx, &scanForEnd](int fd) {
+        reciveImpl(rSpanRx, scanForEnd);
+        m_FdSet.UnBlock();
+    });
+
+    switch(ret)
+    {
+        case utils::CFdSetRetval::UNBLOCK:  return CStreamDataLink::ERet::UNBLOCK;
+        case utils::CFdSetRetval::OK :      return CStreamDataLink::ERet::OK;
+    }
+}
+
+void CStreamDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CStreamDataLink::CallbackReceive scanForEnd)
+{
+    if (m_socketFd == 0)
     {
         throw std::logic_error(utils::buildErrorMessage("DataSocket::", __func__, ": accept called on a bad socket object (this object was moved)"));
     }
@@ -140,7 +173,7 @@ void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanFor
     while(dataRead < rRxSpan.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = read(m_pPrivate->m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
+        std::size_t get = read(m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -196,7 +229,41 @@ void CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanFor
             break;
         }
     }
-
     rRxSpan = utils::span<char>(readBuffer, dataRead);
-    //return dataRead;
 }
+
+//*****************************************************************************
+// Method definitions "CStreamDataLink"
+
+CStreamDataLink::CStreamDataLink(int socketFd) noexcept :
+    m_pPrivate(std::make_shared<CStreamDataLinkPrivate>(socketFd))
+{ }
+
+CStreamDataLink::~CStreamDataLink() noexcept = default;
+
+CStreamDataLink::CStreamDataLink(CStreamDataLink &&rhs) noexcept :
+    m_pPrivate(std::move(rhs.m_pPrivate))
+{ }
+
+CStreamDataLink& CStreamDataLink::operator=(CStreamDataLink&& rhs) noexcept
+{
+    m_pPrivate = std::move(rhs.m_pPrivate);
+    return *this;
+}
+
+void CStreamDataLink::send(const utils::span<char>& rTxSpan)
+{
+    m_pPrivate->send(rTxSpan);
+}
+
+bool CStreamDataLink::unblockRecive() noexcept
+{
+    return m_pPrivate->unblockRecive();
+}
+
+CStreamDataLink::ERet CStreamDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
+{
+    return m_pPrivate->recive(rRxSpan, scanForEnd);
+}
+
+

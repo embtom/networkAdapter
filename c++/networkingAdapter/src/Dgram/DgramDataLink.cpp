@@ -45,29 +45,9 @@ class CDgramDataLinkPrivate
 {
 public:
     CDgramDataLinkPrivate() noexcept = default;
-    CDgramDataLinkPrivate(int socketFd) :
-        m_socketFd(socketFd),
-        m_peerAdr({CIpAddress(), 0})
-    {
-        m_FdSet.AddFd(socketFd);
-    }
-
-    CDgramDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept :
-        m_socketFd(socketFd),
-        m_peerAdr(peerAdr)
-    {
-        m_FdSet.AddFd(socketFd);
-    }
-    ~CDgramDataLinkPrivate() noexcept
-    {
-        unblockRecive();
-        try {
-            m_FdSet.RemoveFd(m_socketFd);
-        }
-        catch(const std::exception& e){
-            std::cerr << e.what() << '\n';
-        }
-    }
+    CDgramDataLinkPrivate(int socketFd);
+    CDgramDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept;
+    ~CDgramDataLinkPrivate() noexcept;
 
     void send(const utils::span<char>& rSpanTx);
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
@@ -89,6 +69,31 @@ using namespace EtNet;
 
 //*****************************************************************************
 // Method definitions "CDgramDataLinkPrivate"
+CDgramDataLinkPrivate::CDgramDataLinkPrivate(int socketFd) :
+    m_socketFd(socketFd),
+    m_peerAdr({CIpAddress(), 0})
+{
+    m_FdSet.AddFd(socketFd);
+}
+
+CDgramDataLinkPrivate::CDgramDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept :
+    m_socketFd(socketFd),
+    m_peerAdr(peerAdr)
+{
+    m_FdSet.AddFd(socketFd);
+}
+
+CDgramDataLinkPrivate::~CDgramDataLinkPrivate() noexcept
+{
+    unblockRecive();
+    try {
+        m_FdSet.RemoveFd(m_socketFd);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+    }
+}
+
 void CDgramDataLinkPrivate::send(const utils::span<char>& rSpanTx)
 {
     sendTo(m_peerAdr, rSpanTx);
@@ -174,8 +179,10 @@ bool CDgramDataLinkPrivate::unblockRecive() noexcept
         m_FdSet.UnBlock();
     }
     catch(const std::exception& e) {
-        std::cerr << e.what() << '\n';
+        std::cerr << e.what() << std::endl;
+        return false;
     }
+    return true;
 }
 
 CDgramDataLink::ERet CDgramDataLinkPrivate::reciveFrom(utils::span<char>& rSpanRx, CDgramDataLink::CallbackReciveFrom scanForEnd) const
