@@ -189,7 +189,6 @@ CDgramDataLink::ERet CDgramDataLinkPrivate::reciveFrom(utils::span<char>& rSpanR
 {
     utils::CFdSetRetval ret = m_FdSet.Select([this, &rSpanRx, &scanForEnd](int fd) {
         reciveFromImpl(rSpanRx, scanForEnd);
-        m_FdSet.UnBlock();
     });
 
     switch(ret)

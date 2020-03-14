@@ -40,12 +40,10 @@ int main(int argc, char *argv[])
         });
 
         if (CDgramDataLink::ERet::UNBLOCK == ret) {
+            std::cout << "finish" << std::endl;
             return true;
         }
 
-        if(rcvCount==2) {
-            a.unblockRecive();
-        }
         std::cout << "Called " << rcvCount << std::endl;
         return false;
     };
@@ -57,5 +55,8 @@ int main(int argc, char *argv[])
         std::string test = std::string("Hallo") + std::to_string(i);
         a.send(utils::span<char>(test));
     }
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    a.unblockRecive();
     rcvLoop.waitUntilFinished();
 }

@@ -150,7 +150,6 @@ CStreamDataLink::ERet CStreamDataLinkPrivate::recive(utils::span<char>& rSpanRx,
 {
     utils::CFdSetRetval ret = m_FdSet.Select([this, &rSpanRx, &scanForEnd](int fd) {
         reciveImpl(rSpanRx, scanForEnd);
-        m_FdSet.UnBlock();
     });
 
     switch(ret)
