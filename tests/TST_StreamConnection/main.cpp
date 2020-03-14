@@ -4,8 +4,8 @@
 #include <tuple>
 #include <thread>
 #include <BaseSocket.hpp>
-#include <Stream/StreamClient.hpp>
-#include <Stream/StreamServer.hpp>
+#include <Tcp/TcpClient.hpp>
+#include <Tcp/TcpServer.hpp>
 
 
 #define ANSI_TXT_GRN                "\033[0;32m"
@@ -26,8 +26,8 @@ protected:
         m_Client(std::move(CBaseSocket::SoReuseSocket(CBaseSocket(EtNet::ESocketMode::INET_STREAM))))
     { }
 
-    CStreamServer m_Server;
-    CStreamClient m_Client;
+    CTcpServer m_Server;
+    CTcpClient m_Client;
 };
 
 TEST_F(CStreamComTest, simple)
@@ -37,7 +37,7 @@ TEST_F(CStreamComTest, simple)
         char rcvData[40] = {0};
         utils::span<char> rcvSpan (rcvData);
 
-        CStreamDataLink a;
+        CTcpDataLink a;
         CIpAddress b;
         //auto [a, b] = m_Server.waitForConnection();
         std::tie(a, b) = m_Server.waitForConnection();
@@ -50,7 +50,7 @@ TEST_F(CStreamComTest, simple)
         });
     });
 
-    auto [a] = m_Client.connect(std::string("localhost"),50003);
+    auto a = m_Client.connect(std::string("localhost"),50003);
     std::string dataToSend ("hallo litte stream test");
     char rcvData[40];
     utils::span<char> rxSpan (rcvData);

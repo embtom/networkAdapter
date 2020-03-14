@@ -3,7 +3,7 @@
 #include <cstring>
 #include <tuple>
 #include <algorithm>
-#include <Stream/StreamDataLink.hpp>
+#include <Tcp/TcpDataLink.hpp>
 
 #define GTEST_BOX                   "[     cout ] "
 
@@ -11,7 +11,7 @@ using namespace EtNet;
 
 TEST(DataLink, MoveKonstruktor)
 {
- //   auto [a] = std::tuple(CStreamDataLink(3));
+ //   auto [a] = std::tuple(CTcpDataLink(3));
 }
 
 int main(int argc, char **argv)

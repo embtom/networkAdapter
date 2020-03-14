@@ -58,6 +58,7 @@ public:
 
     static CBaseSocket&& SoReuseSocket(CBaseSocket &&rBaseSocket);
     static CBaseSocket&& SoBroadcast(CBaseSocket &&rBaseSocket);
+
 private:
     int         m_socketFd{-1};
 };

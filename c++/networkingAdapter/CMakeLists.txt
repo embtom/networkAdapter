@@ -6,12 +6,12 @@ set(SOURCES
     "src/BaseSocket.cpp"
     "src/Lookup/HostLookup.cpp"
     "src/Lookup/InterfacesLookup.cpp"
-    "src/Stream/StreamDataLink.cpp"
-    "src/Stream/StreamServer.cpp"
-    "src/Stream/StreamClient.cpp"
-    "src/Dgram/DgramClient.cpp"
-    "src/Dgram/DgramDataLink.cpp"
-    "src/Dgram/DgramServer.cpp"
+    "src/Tcp/TcpDataLink.cpp"
+    "src/Tcp/TcpServer.cpp"
+    "src/Tcp/TcpClient.cpp"
+    "src/Udp/UdpClient.cpp"
+    "src/Udp/UdpDataLink.cpp"
+    "src/Udp/UdpServer.cpp"
 )
 
 set(HEADERS
@@ -19,12 +19,12 @@ set(HEADERS
     "include/BaseSocket.hpp"
     "include/Lookup/HostLookup.hpp"
     "include/Lookup/InterfacesLookup.hpp"
-    "include/Stream/StreamDataLink.hpp"
-    "include/Stream/StreamServer.hpp"
-    "include/Stream/StreamClient.hpp"
-    "include/Dgram/DgramClient.hpp"
-    "include/Dgram/DgramDataLink.hpp"
-    "include/Dgram/DgramServer.hpp"
+    "include/Tcp/TcpDataLink.hpp"
+    "include/Tcp/TcpServer.hpp"
+    "include/Tcp/TcpClient.hpp"
+    "include/Udp/UdpClient.hpp"
+    "include/Udp/UdpDataLink.hpp"
+    "include/Udp/UdpServer.hpp"
 )
 
 ######################################################

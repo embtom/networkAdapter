@@ -23,58 +23,57 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _NETORDER_H_
-#define _NETORDER_H_
+#ifndef _TCPDATALINK_H_
+#define _TCPDATALINK_H_
 
 //******************************************************************************
 // Header
 
-#include <string>
-#include <type_traits>
-#include <array>
-#include "detail/EndianConverter.h"
+#include <stdint.h>
+#include <cstddef>
+#include <functional>
+#include <memory>
+#include <span.h>
 
-namespace EtEndian
+namespace EtNet
 {
 
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
+constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
+
+class CTcpDataLinkPrivate;
 
 //*****************************************************************************
-//! \brief CNetOrder
+//! \brief CTcpDataLink
 //!
-
-template<typename T>
-class CNetOrder
+class CTcpDataLink
 {
 public:
-    CNetOrder()                            = delete;
-    CNetOrder(const CNetOrder&)            = default;
-    CNetOrder& operator=(const CNetOrder&) = delete;
-
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
-    CNetOrder(U &&obj) noexcept :
-        m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
+    enum class ERet
     {
-        doForAllMembers<T>(m_converterFunc);
-    }
+        OK,
+        UNBLOCK
+    };
 
-    const T& HostOrder() const noexcept
-    {
-        return m_converterFunc.value();
-    }
+    using CallbackReceive = std::function<bool (utils::span<char> rx)>;
 
-    const T& NetworkOrder() const noexcept
-    {
-        return m_converterFunc.converted();
-    }
+    CTcpDataLink() noexcept                              = default;
+    CTcpDataLink(CTcpDataLink const&)                    = default;
+    CTcpDataLink& operator=(CTcpDataLink const&)         = default;
+    virtual ~CTcpDataLink() noexcept;
+
+    CTcpDataLink(int socketFd) noexcept;
+    CTcpDataLink(CTcpDataLink &&rhs) noexcept;
+    CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
+
+    void send(const utils::span<char>& rTxSpan);
+
+    bool unblockRecive() noexcept;
+    CTcpDataLink::ERet recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+
 private:
-    ConverterFunc<T> m_converterFunc;
+    std::shared_ptr<CTcpDataLinkPrivate> m_pPrivate;
 };
 
-//https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
-template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
 }
 
-#endif //_NETORDER_H_
+#endif // _TCPDATALINK_H_

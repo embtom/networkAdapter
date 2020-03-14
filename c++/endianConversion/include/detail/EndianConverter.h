@@ -26,6 +26,9 @@
 #ifndef _ENDIANCONVERTER_H_
 #define _ENDIANCONVERTER_H_
 
+//******************************************************************************
+// Header
+
 #include <string>
 #include <type_traits>
 #include <array>
@@ -43,6 +46,9 @@ enum class EConvertMode
     HOST_ORDER
 };
 
+//*****************************************************************************
+//! \brief ConverterFunc
+//!
 template<typename T>
 class ConverterFunc
 {

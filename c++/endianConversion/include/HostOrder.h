@@ -26,6 +26,9 @@
 #ifndef _HOSTORDER_H_
 #define _HOSTORDER_H_
 
+//******************************************************************************
+// Header
+
 #include <string>
 #include <type_traits>
 #include <array>
@@ -37,12 +40,18 @@ namespace EtEndian
 template <typename T>
 using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
 
-
+//*****************************************************************************
+//! \brief CHostOrder
+//!
 template<typename T>
 class CHostOrder
 {
 public:
     using class_type = T;
+
+    CHostOrder()                              = delete;
+    CHostOrder(const CHostOrder&)             = default;
+    CHostOrder& operator=(const CHostOrder &) = delete;
 
     template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CHostOrder>::value, int> = 0>
     CHostOrder(U &&obj) noexcept :
@@ -50,10 +59,6 @@ public:
     {
         doForAllMembers<T>(m_converterFunc);
     }
-
-    CHostOrder()                              = delete;
-    CHostOrder(const CHostOrder&)             = default;
-    CHostOrder& operator=(const CHostOrder &) = delete;
 
     const T& HostOrder() const noexcept
     {
@@ -73,6 +78,5 @@ template<class U>
 CHostOrder(U) -> CHostOrder<removeConstReference_t<U>>;
 
 }
-
 
 #endif //_HOSTORDER_H_

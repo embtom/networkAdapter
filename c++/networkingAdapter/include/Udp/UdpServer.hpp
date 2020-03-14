@@ -23,58 +23,44 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _NETORDER_H_
-#define _NETORDER_H_
+#ifndef _UDPSERVER_H_
+#define _UDPSERVER_H_
 
 //******************************************************************************
 // Header
 
-#include <string>
-#include <type_traits>
-#include <array>
-#include "detail/EndianConverter.h"
+#include <tuple>
+#include <memory>
+#include <IpAddress.hpp>
+#include <Udp/UdpDataLink.hpp>
 
-namespace EtEndian
+namespace EtNet
 {
 
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
+class CBaseSocket;
+class CUdpServerPrivate;
 
 //*****************************************************************************
-//! \brief CNetOrder
+//! \brief CUdpServer
 //!
-
-template<typename T>
-class CNetOrder
+class CUdpServer
 {
 public:
-    CNetOrder()                            = delete;
-    CNetOrder(const CNetOrder&)            = default;
-    CNetOrder& operator=(const CNetOrder&) = delete;
+    CUdpServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
-    CNetOrder(U &&obj) noexcept :
-        m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
-    {
-        doForAllMembers<T>(m_converterFunc);
-    }
+    CUdpServer(const CUdpServer&)                 = delete;
+    CUdpServer& operator= (const CUdpServer&)     = delete;
+    CUdpServer(CUdpServer&&) noexcept             = default;
+    CUdpServer& operator= (CUdpServer&&) noexcept = default;
+    CUdpServer() noexcept                           = default;
+    ~CUdpServer() noexcept;
 
-    const T& HostOrder() const noexcept
-    {
-        return m_converterFunc.value();
-    }
+    CUdpDataLink waitForConnection();
 
-    const T& NetworkOrder() const noexcept
-    {
-        return m_converterFunc.converted();
-    }
 private:
-    ConverterFunc<T> m_converterFunc;
+    std::unique_ptr<CUdpServerPrivate> m_pPrivate;
 };
 
-//https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
-template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
-}
+} // EtNet
 
-#endif //_NETORDER_H_
+#endif // _UDPSERVER_H_

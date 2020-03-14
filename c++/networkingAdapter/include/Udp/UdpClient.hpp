@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2019 Thomas Willetal 
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -23,58 +23,43 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _NETORDER_H_
-#define _NETORDER_H_
+#ifndef _UDPCLIENT_H_
+#define _UDPCLIENT_H_
 
 //******************************************************************************
 // Header
 
+#include <tuple>
 #include <string>
-#include <type_traits>
-#include <array>
-#include "detail/EndianConverter.h"
+#include <memory>
+#include <Udp/UdpDataLink.hpp>
 
-namespace EtEndian
+namespace EtNet
 {
 
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
+class CBaseSocket;
+class CUdpClientPrivate;
 
 //*****************************************************************************
-//! \brief CNetOrder
+//! \brief CUdpClient
 //!
-
-template<typename T>
-class CNetOrder
+class CUdpClient
 {
 public:
-    CNetOrder()                            = delete;
-    CNetOrder(const CNetOrder&)            = default;
-    CNetOrder& operator=(const CNetOrder&) = delete;
+    CUdpClient() noexcept                           = default;
+    CUdpClient(CUdpClient&&) noexcept             = default;
+    CUdpClient& operator= (CUdpClient&&) noexcept = default;
+    CUdpClient(const CUdpClient&)                 = delete;
+    CUdpClient& operator= (const CUdpClient&)     = delete;
 
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
-    CNetOrder(U &&obj) noexcept :
-        m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
-    {
-        doForAllMembers<T>(m_converterFunc);
-    }
+    CUdpClient(CBaseSocket &&rBaseSocket);
+    virtual ~CUdpClient() noexcept;
 
-    const T& HostOrder() const noexcept
-    {
-        return m_converterFunc.value();
-    }
+    CUdpDataLink getLink(const std::string& rHost, unsigned int port);
 
-    const T& NetworkOrder() const noexcept
-    {
-        return m_converterFunc.converted();
-    }
 private:
-    ConverterFunc<T> m_converterFunc;
+    std::unique_ptr<CUdpClientPrivate> m_pPrivate;
 };
 
-//https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
-template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
-}
-
-#endif //_NETORDER_H_
+} // EtNet
+#endif // _UDPCLIENT_H_

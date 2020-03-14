@@ -26,6 +26,9 @@
 #ifndef _NETCONVERT_H_
 #define _NETCONVERT_H_
 
+//******************************************************************************
+// Header
+
 #include <endian.h>   // __BYTE_ORDER __LITTLE_ENDIAN
 #include <type_traits>
 #include <byteswap.h>
@@ -33,6 +36,9 @@
 namespace EtEndian
 {
 
+//*****************************************************************************
+//! \brief host_to_network
+//!
 
 template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                      (sizeof(T) == 2), int> = 0>
@@ -73,6 +79,10 @@ constexpr T host_to_network (T value) noexcept
 {
     static_assert(std::is_arithmetic<T>::value, "No arithmetic type");
 }
+
+//*****************************************************************************
+//! \brief network_to_host
+//!
 
 template <typename T>
 constexpr T network_to_host (T value) noexcept
