@@ -1,5 +1,6 @@
 ######################################################
-#Sources and Headers to build
+# Sources
+
 set(HEADERS
     "include/NetOrder.h"
     "include/HostOrder.h"
@@ -14,7 +15,7 @@ set(HEADERS
 )
 
 ######################################################
-#Build target
+# Build target
 
 add_library(endianConversion INTERFACE)
 
@@ -24,7 +25,8 @@ target_include_directories(endianConversion INTERFACE
 )
 
 ######################################################
-#Install rules
+# Install rules
+
 install(TARGETS endianConversion EXPORT endianConversion-config
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
 )

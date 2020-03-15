@@ -1,2 +1,2 @@
-add_subdirectory(TcpClient)
-add_subdirectory(TcpServer)
+add_subdirectory(EXA_TcpClient)
+add_subdirectory(EXA_TcpServer)

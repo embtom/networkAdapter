@@ -12,4 +12,4 @@
 #Creation of the chroot "/var/cache/pbuilder/base.tgz"
 sudo pbuilder create --debootstrapopts --variant=buildd \
 --othermirror "deb [trusted=yes] http://tomhp/reprepo bionic main" \
---extrapackages "utilscpp-dev libgtest-dev"
+--extrapackages "utilscpp-dev libgtest-dev" "libdocopt-dev" "libdocopt0"

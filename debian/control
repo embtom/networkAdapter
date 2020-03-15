@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Thomas Willetal <t.willetal@gmail.com>
 Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4),
-               utilscpp-dev, libgtest-dev
+               utilscpp-dev, libgtest-dev, libdocopt-dev
 Standards-Version: 4.3.0
 
 Package: networkingadapter
@@ -12,6 +12,13 @@ Section: libs
 Depends: ${shlibs:Depends},
          ${misc:Depends},
 Description: Development headers of the emtom
+             networkingadapter
+
+Package: networkingadapter-examples
+Architecture: any
+Section: libs
+Depends: networkingadapter, libdocopt0
+Description: Example applications of the emtom
              networkingadapter
 
 Package: networkingadapter-dev

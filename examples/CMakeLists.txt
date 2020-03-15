@@ -1,3 +1,5 @@
+find_package(docopt REQUIRED)
+
 add_subdirectory(EXA_Udp)
 add_subdirectory(EXA_UdpBroadcast)
 add_subdirectory(EXA_InterfaceLookup)

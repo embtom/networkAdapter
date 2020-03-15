@@ -72,7 +72,7 @@ public:
 
 private:
     CNetInterface(unsigned int index, std::string&& name );
-    std::unique_ptr<CNetInterfacePrivat> m_private;
+    std::unique_ptr<CNetInterfacePrivat> m_pPrivate;
 };
 
 } //EtNet

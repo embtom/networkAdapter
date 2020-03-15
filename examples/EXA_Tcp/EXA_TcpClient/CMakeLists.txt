@@ -1,24 +1,27 @@
 
 #######################################################################################
-#Build Settings
+#Settings
 
-set (SOURCES UdpServer.cpp)
+set (SOURCES TcpClient.cpp)
 
 #######################################################################################
-#Build target settings
+#Build target
 
-add_executable(EXA_UdpServer ${SOURCES})
-set_target_properties(EXA_UdpServer PROPERTIES
+add_executable(EXA_TcpClient ${SOURCES})
+set_target_properties(EXA_TcpClient PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
     CXX_STANDARD   ${CMAKE_CXX_STANDARD}
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(EXA_UdpServer networkingAdapter)
+target_link_libraries(EXA_TcpClient
+    networkingAdapter
+    docopt
+)
 
 #######################################################################################
 #Install rules
 
-install(TARGETS EXA_UdpServer
+install(TARGETS EXA_TcpClient
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

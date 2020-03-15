@@ -1,9 +1,10 @@
 
+find_package(GTest REQUIRED)
 
 add_subdirectory(TST_baseSocket)
 add_subdirectory(TST_Common)
-add_subdirectory(TST_DgramConnection)
+add_subdirectory(TST_UdpConnection)
 add_subdirectory(TST_UdpDataLink)
 add_subdirectory(TST_EndianConversion)
-add_subdirectory(TST_StreamConnection)
+add_subdirectory(TST_TcpConnection)
 add_subdirectory(TST_IpAddress)

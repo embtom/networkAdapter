@@ -1,6 +1,7 @@
 
 ######################################################
-#Sources and Headers to build
+# Sources
+
 set(SOURCES
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
@@ -28,7 +29,8 @@ set(HEADERS
 )
 
 ######################################################
-#Build target
+# Build target
+
 add_library(networkingAdapter SHARED
     ${SOURCES}
     ${HEADERS}
@@ -41,7 +43,7 @@ set_target_properties(networkingAdapter PROPERTIES
 )
 
 target_link_libraries(networkingAdapter PRIVATE
-    PUBLIC EMBTOM::utilsCpp
+    PUBLIC  EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 
@@ -56,7 +58,7 @@ set_target_properties(networkingAdapter PROPERTIES
 )
 
 ######################################################
-#Install rules
+# Install rules
 install(TARGETS networkingAdapter EXPORT networkingadapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"

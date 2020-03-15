@@ -134,41 +134,41 @@ void CNetInterfacePrivat::requestMtu() noexcept
 // Method definitions "CNetInterface"
 
 CNetInterface::CNetInterface(unsigned int index, std::string&& name) :
-    m_private(std::make_unique<CNetInterfacePrivat>(index,std::move(name)))
+    m_pPrivate(std::make_unique<CNetInterfacePrivat>(index,std::move(name)))
 { }
 
 CNetInterface::~CNetInterface() noexcept = default;
 
 unsigned CNetInterface::getIfIndex() const noexcept
 {
-    return m_private->m_index;
+    return m_pPrivate->m_index;
 }
 
 std::string CNetInterface::getName() const noexcept
 {
-    return m_private->m_name;
+    return m_pPrivate->m_name;
 }
 
 CIpAddress::IpAddresses CNetInterface::getAddresses() const noexcept
 {
-    return m_private->m_addressList;
+    return m_pPrivate->m_addressList;
 }
 
 CIpAddress::IpAddresses CNetInterface::getSubMask() const noexcept
 {
-    return m_private->m_maskList;
+    return m_pPrivate->m_maskList;
 }
 
 CIpAddress::IpAddresses CNetInterface::getBroadcast() const noexcept
 {
-    return m_private->m_broadcastList;
+    return m_pPrivate->m_broadcastList;
 }
 
 EIfState CNetInterface::getState() const noexcept
 {
-    if (m_private->m_running && m_private->m_up)
+    if (m_pPrivate->m_running && m_pPrivate->m_up)
         return EIfState::running;
-    else if (!m_private->m_running && m_private->m_up)
+    else if (!m_pPrivate->m_running && m_pPrivate->m_up)
         return EIfState::up;
     else
         return EIfState::down;
@@ -176,7 +176,7 @@ EIfState CNetInterface::getState() const noexcept
 
 unsigned CNetInterface::getMtu() const noexcept
 {
-    return m_private->m_mtu;
+    return m_pPrivate->m_mtu;
 }
 
 CNetInterface::IfMap CNetInterface::getStateMap(bool OnlyRunning) noexcept
@@ -264,11 +264,11 @@ CNetInterface::IfMap CNetInterface::getStateMap(bool OnlyRunning) noexcept
                 ((OnlyRunning && (ifa->ifa_flags & IFF_RUNNING)) || !OnlyRunning))
 
             {
-                ifIt->second.m_private->m_up = (ifa->ifa_flags && IFF_UP);
-                ifIt->second.m_private->m_up = (ifa->ifa_flags && IFF_RUNNING);
-                ifIt->second.m_private->addAddress(std::move(address));
-                ifIt->second.m_private->addMask(std::move(subnetMask));
-                ifIt->second.m_private->addBroadcast(std::move(broadcastAddress));
+                ifIt->second.m_pPrivate->m_up = (ifa->ifa_flags && IFF_UP);
+                ifIt->second.m_pPrivate->m_up = (ifa->ifa_flags && IFF_RUNNING);
+                ifIt->second.m_pPrivate->addAddress(std::move(address));
+                ifIt->second.m_pPrivate->addMask(std::move(subnetMask));
+                ifIt->second.m_pPrivate->addBroadcast(std::move(broadcastAddress));
             }
         }
 
