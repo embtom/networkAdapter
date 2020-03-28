@@ -57,6 +57,10 @@ set_target_properties(networkingAdapter PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+target_compile_definitions(networkingAdapter
+    PUBLIC NETWORKING_ADAPTER_VERSION="${PROJECT_VERSION}"
+)
+
 ######################################################
 # Install rules
 install(TARGETS networkingAdapter EXPORT networkingadapter-targets

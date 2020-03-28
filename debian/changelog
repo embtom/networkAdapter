@@ -4,7 +4,7 @@ networkingadapter (0.9.2) bionic; urgency=medium
   * Suitable for multithreading
   * Install examples at own debian package
 
--- Thomas Willetal <t.willetal@gmail.com>  Sun, 15 Mar 2020 20:15:00 +0200
+ -- Thomas Willetal <t.willetal@gmail.com>  Sun, 15 Mar 2020 20:15:00 +0200
 
 networkingadapter (0.9.1) bionic; urgency=medium
 

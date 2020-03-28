@@ -41,7 +41,7 @@ int main ()
         std::cout << "Ipv4 :" << a.toString() << std::endl;
     }
 
-    std::cout << "\n All local Ipv4 addresses:" << std::endl;
+    std::cout << "\n All local Ipv6 addresses:" << std::endl;
 
     for(auto& a : EtNet::CNetInterface::getAllIpv6Ip(false))
     {
