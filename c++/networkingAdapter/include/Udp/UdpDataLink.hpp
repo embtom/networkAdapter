@@ -63,10 +63,10 @@ public:
 
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
 
-    CUdpDataLink() noexcept                                = delete;
     CUdpDataLink(CUdpDataLink const&)                    = delete;
     CUdpDataLink& operator=(CUdpDataLink const&)         = delete;
 
+    CUdpDataLink() noexcept;
     CUdpDataLink(int socketFd);
     CUdpDataLink(int socketFd, const SPeerAddr &rPeerAddr);
     CUdpDataLink(CUdpDataLink &&rhs) noexcept;

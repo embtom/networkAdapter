@@ -299,6 +299,8 @@ void CUdpDataLinkPrivate::reciveFromImpl(utils::span<char>& rSpanRx, CUdpDataLin
 //*****************************************************************************
 // Method definitions "CUdpDataLink"
 
+CUdpDataLink::CUdpDataLink() noexcept = default;
+
 CUdpDataLink::CUdpDataLink(int socketFd) :
     m_pPrivate(std::make_unique<CUdpDataLinkPrivate>(socketFd))
 { }

@@ -14,7 +14,10 @@ set_target_properties(EXA_UdpClient PROPERTIES
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(EXA_UdpClient networkingAdapter)
+target_link_libraries(EXA_UdpClient 
+    networkingAdapter
+    docopt
+)
 
 #######################################################################################
 #Install rules

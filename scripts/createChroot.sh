@@ -10,6 +10,14 @@
 #   thomas ALL=(root) SETENV: NOPASSWD: /usr/sbin/pbuilder
 
 #Creation of the chroot "/var/cache/pbuilder/base.tgz"
+
+source ./scripts/common.sh
+
 sudo pbuilder create --debootstrapopts --variant=buildd \
+--distribution "bionic" \
+--architecture "amd64" \
+--basetgz ${BASETGZ} \
 --othermirror "deb [trusted=yes] http://tomhp/reprepo bionic main" \
---extrapackages "utilscpp-dev libgtest-dev" "libdocopt-dev" "libdocopt0"
+--extrapackages "utilscpp-dev \
+                 libgtest-dev \
+                 libdocopt-dev"
