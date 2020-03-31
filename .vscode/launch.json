@@ -22,6 +22,25 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "EXA_TcpClient",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/GCC for x86_64-linux-gnu 7.4.0_Debug/examples/EXA_Tcp/EXA_TcpClient/EXA_TcpClient_g",
+            "args": ["-c", "localhost"],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

@@ -40,6 +40,7 @@ namespace EtNet
 
 constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
 
+class CBaseSocket;
 class CTcpDataLinkPrivate;
 
 //*****************************************************************************
@@ -62,6 +63,7 @@ public:
     virtual ~CTcpDataLink() noexcept;
 
     CTcpDataLink(int socketFd) noexcept;
+    CTcpDataLink(CBaseSocket&& rBaseSocket) noexcept;
     CTcpDataLink(CTcpDataLink &&rhs) noexcept;
     CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
 

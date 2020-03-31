@@ -45,6 +45,10 @@ CBaseSocket& CBaseSocket::operator=(CBaseSocket&& rhs) noexcept
     return *this;
 }
 
+CBaseSocket::CBaseSocket(int socketFd) noexcept :
+    m_socketFd(socketFd)
+{ }
+
 CBaseSocket::CBaseSocket(ESocketMode opMode)
 {
     int ret;
@@ -86,10 +90,15 @@ CBaseSocket::CBaseSocket(ESocketMode opMode)
 
 CBaseSocket::~CBaseSocket() noexcept
 {
-    if (m_socketFd > 0) {
+    if (isValid()) {
         ::close(m_socketFd);
         m_socketFd=-1;
     }
+}
+
+bool CBaseSocket::isValid() const noexcept
+{
+    return (m_socketFd > 0) ? true : false;
 }
 
 int CBaseSocket::getFd() const noexcept

@@ -121,7 +121,7 @@ CTcpDataLink CTcpClientPrivate::connect(const std::string& rHost, unsigned int p
         throw std::logic_error(utils::buildErrorMessage("ConnectSocket::", __func__, " : No valid Ip to connect"));
     }
 
-    return CTcpDataLink(m_baseSocket.getFd());
+    return CTcpDataLink(std::move(m_baseSocket));
 }
 
 //*****************************************************************************

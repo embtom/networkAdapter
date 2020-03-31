@@ -47,12 +47,14 @@ public:
     CBaseSocket() noexcept                     = default;
     CBaseSocket(CBaseSocket const&)            = delete;
     CBaseSocket& operator=(CBaseSocket const&) = delete;
-    virtual ~CBaseSocket() noexcept;
 
+    CBaseSocket(int socketFd) noexcept;
     CBaseSocket(ESocketMode opMode);
     CBaseSocket(CBaseSocket &&rhs) noexcept;
     CBaseSocket& operator=(CBaseSocket&& rhs) noexcept;
+    virtual ~CBaseSocket() noexcept;
 
+    bool isValid() const noexcept;
     int getFd() const noexcept;
     int getDomain() const noexcept;
 

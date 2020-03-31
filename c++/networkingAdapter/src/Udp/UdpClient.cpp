@@ -26,8 +26,6 @@
 //******************************************************************************
 // Header
 
-#include <Udp/UdpClient.hpp>
-
 #include <iostream>
 #include <stdexcept>
 #include <algorithm>
@@ -38,6 +36,7 @@
 #include <netinet/in.h>
 
 #include <error_msg.hpp>
+#include <Udp/UdpClient.hpp>
 #include <Lookup/HostLookup.hpp>
 #include <IpAddress.hpp>
 #include <BaseSocket.hpp>

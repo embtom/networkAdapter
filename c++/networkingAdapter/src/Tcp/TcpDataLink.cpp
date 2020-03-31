@@ -33,8 +33,12 @@
 #include <errno.h>
 #include <string.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 #include <fdSet.h>
 #include <error_msg.hpp>
+#include <BaseSocket.hpp>
 #include <Tcp/TcpDataLink.hpp>
 
 namespace EtNet
@@ -44,6 +48,7 @@ namespace EtNet
     public:
         CTcpDataLinkPrivate() noexcept = default;
         CTcpDataLinkPrivate(int socketFd) noexcept;
+        CTcpDataLinkPrivate(CBaseSocket&& rBaseSocket) noexcept;
         ~CTcpDataLinkPrivate() noexcept;
         void send(const utils::span<char>& rTxSpan);
 
@@ -54,7 +59,8 @@ namespace EtNet
         void reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
 
         utils::CFdSet   m_FdSet;
-        int             m_socketFd {-1};
+      //  int             m_socketFd {-1};
+        CBaseSocket     m_baseSocket;
     };
 }
 
@@ -64,24 +70,31 @@ using namespace EtNet;
 // Method definitions "CTcpDataLinkPrivate"
 
 CTcpDataLinkPrivate::CTcpDataLinkPrivate(int socketFd) noexcept :
-    m_socketFd(socketFd)
+    m_baseSocket(socketFd)
 {
     m_FdSet.AddFd(socketFd);
 }
 
+CTcpDataLinkPrivate::CTcpDataLinkPrivate(CBaseSocket&& rBaseSocket) noexcept :
+    m_baseSocket(std::move(rBaseSocket))
+{
+    m_FdSet.AddFd(m_baseSocket.getFd());
+}
+
+
 CTcpDataLinkPrivate::~CTcpDataLinkPrivate() noexcept
 {
-    if (m_socketFd <= 0) {
+    if (!m_baseSocket.isValid()) {
         return;
     }
+
     unblockRecive();
     try {
-        m_FdSet.RemoveFd(m_socketFd);
+        m_FdSet.RemoveFd(m_baseSocket.getFd());
     }
     catch(const std::exception& e){
         std::cerr << e.what() << '\n';
     }
-    close (m_socketFd);
 }
 
 void CTcpDataLinkPrivate::send(const utils::span<char>& rTxSpan)
@@ -90,7 +103,7 @@ void CTcpDataLinkPrivate::send(const utils::span<char>& rTxSpan)
 
     while(dataWritten < rTxSpan.size_bytes())
     {
-        std::size_t put = write(m_socketFd, rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten);
+        std::size_t put = ::send(m_baseSocket.getFd(), rTxSpan.data() + dataWritten, rTxSpan.size_bytes() - dataWritten, 0);
         if (put == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -161,7 +174,7 @@ CTcpDataLink::ERet CTcpDataLinkPrivate::recive(utils::span<char>& rSpanRx, CTcpD
 
 void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd)
 {
-    if (m_socketFd == 0)
+    if (m_baseSocket.getFd() == 0)
     {
         throw std::logic_error(utils::buildErrorMessage("DataSocket::", __func__, ": accept called on a bad socket object (this object was moved)"));
     }
@@ -172,7 +185,7 @@ void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::C
     while(dataRead < rRxSpan.size_bytes())
     {
         // The inner loop handles interactions with the socket.
-        std::size_t get = read(m_socketFd, readBuffer + dataRead, rRxSpan.size_bytes() - dataRead);
+        std::size_t get = recv(m_baseSocket.getFd(), readBuffer + dataRead, rRxSpan.size_bytes() - dataRead, 0);
         if (get == static_cast<std::size_t>(-1))
         {
             switch(errno)
@@ -206,6 +219,8 @@ void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::C
                 case ECONNRESET:[[fallthrough]];
                 case ENOTCONN:
                 {
+                    std::cout << "ENOTCONN"<< std::endl;    
+
                     // Connection broken.
                     // Return the data we have available and exit
                     // as if the connection was closed correctly.
@@ -236,6 +251,10 @@ void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::C
 
 CTcpDataLink::CTcpDataLink(int socketFd) noexcept :
     m_pPrivate(std::make_shared<CTcpDataLinkPrivate>(socketFd))
+{ }
+
+CTcpDataLink::CTcpDataLink(CBaseSocket&& rBaseSocket) noexcept :
+    m_pPrivate(std::make_shared<CTcpDataLinkPrivate>(std::move(rBaseSocket)))
 { }
 
 CTcpDataLink::~CTcpDataLink() noexcept = default;

@@ -1,3 +1,30 @@
+/*
+ * This file is part of the EMBTOM project
+ * Copyright (c) 2018-2019 Thomas Willetal
+ * (https://github.com/embtom)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+//******************************************************************************
+// Headers
 
 #include <iostream>
 #include <algorithm>
@@ -6,9 +33,16 @@
 #include <map>
 #include <docopt.h>
 #include <span.h>
+#include <threadLoop.h>
 #include <BaseSocket.hpp>
 #include <Tcp/TcpClient.hpp>
 #include <Tcp/TcpDataLink.hpp>
+
+using namespace EtNet;
+
+//*****************************************************************************
+//! \brief EXA_TcpClient
+//!
 
 int main(int argc, char *argv[])
 {
@@ -33,8 +67,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
-    EtNet::CTcpClient TcpClient(std::move(baseSocket));
+    auto baseSocket = CBaseSocket(ESocketMode::INET_STREAM);
+    CTcpClient TcpClient(std::move(baseSocket));
 
     std::string hostName(args["<hostname>"].asString());
     std::cout << "try to connect to: " << hostName << std::endl;
@@ -48,12 +82,36 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    char buffer [128];
-    utils::span<char> rxSpan(buffer);
-    std::string test ("Hallo");
-    a.send(utils::span<char>(test));
-    a.recive(rxSpan, [] (utils::span<char> rx) {
-         std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;;
-         return true;
-    });
+    unsigned rcvCount {0};
+    auto rcvFunc = [&a, &rcvCount]()
+    {
+        char buffer [128];
+        utils::span<char> rxSpan(buffer);
+        CTcpDataLink::ERet ret = a.recive(rxSpan, [&rcvCount] (utils::span<char> rx) {
+            std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
+            rcvCount++;
+            return true;
+        });
+
+        if (CTcpDataLink::ERet::UNBLOCK == ret) {
+            std::cout << "finish" << std::endl;
+            return true;
+        }
+
+        std::cout << "Called " << rcvCount << std::endl;
+        return false;
+    };
+
+    utils::CThreadLoop rcvLoop (rcvFunc, "RX_Worker");
+    rcvLoop.start(std::chrono::milliseconds::zero());
+
+    for (int i = 0; i < 10; i++) {
+        std::string toSend = std::string("Hallo") + std::to_string(i);
+        a.send(utils::span<char>(toSend));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    a.unblockRecive();
+    rcvLoop.waitUntilFinished();
 }

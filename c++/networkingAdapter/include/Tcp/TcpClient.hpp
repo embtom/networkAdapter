@@ -46,7 +46,7 @@ class CTcpClientPrivate;
 class CTcpClient
 {
 public:
-    CTcpClient() noexcept                            = default;
+    CTcpClient() noexcept                         = default;
     CTcpClient(const CTcpClient&)                 = delete;
     CTcpClient& operator= (const CTcpClient&)     = delete;
     CTcpClient(CTcpClient&&) noexcept             = default;

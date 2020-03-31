@@ -48,7 +48,7 @@ class CTcpServerPrivate;
 class CTcpServer
 {
 public:
-    CTcpServer() noexcept                            = default;
+    CTcpServer() noexcept                         = default;
     CTcpServer(const CTcpServer&)                 = delete;
     CTcpServer& operator= (const CTcpServer&)     = delete;
     CTcpServer(CTcpServer&&) noexcept             = default;
