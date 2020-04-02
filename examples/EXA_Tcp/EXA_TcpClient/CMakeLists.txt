@@ -15,6 +15,7 @@ set_target_properties(EXA_TcpClient PROPERTIES
 )
 
 target_link_libraries(EXA_TcpClient
+    endianConversion
     networkingAdapter
     Threads::Threads
     docopt

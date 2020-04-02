@@ -41,6 +41,13 @@ namespace EtEndian
 //!
 
 template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
+                                     (sizeof(T) == 1), int> = 0>
+constexpr T host_to_network (T value) noexcept
+{
+    return value;
+}
+
+template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                      (sizeof(T) == 2), int> = 0>
 constexpr T host_to_network (T value) noexcept
 {

@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Thomas Willetal <t.willetal@gmail.com>
 Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4),
-               utilscpp-dev, libgtest-dev, libdocopt-dev
+               utilscpp-dev (>= 1.2.3), libgtest-dev, libdocopt-dev
 Standards-Version: 4.3.0
 
 Package: networkingadapter

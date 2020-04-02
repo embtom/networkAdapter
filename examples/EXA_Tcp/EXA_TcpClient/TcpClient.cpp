@@ -31,6 +31,7 @@
 #include <array>
 #include <string>
 #include <map>
+#include <NetOrder.h>
 #include <docopt.h>
 #include <span.h>
 #include <threadLoop.h>
@@ -43,6 +44,28 @@ using namespace EtNet;
 //*****************************************************************************
 //! \brief EXA_TcpClient
 //!
+
+struct dataTx
+{
+    std::string info;
+    uint32_t data1;
+    uint16_t data2;
+};
+
+
+template <>
+inline auto EtEndian::registerMembers<dataTx>()
+{
+   return members(
+      member("info",   &dataTx::info),
+      member("data1",   &dataTx::data1),
+      member("data2",   &dataTx::data2)
+
+   );
+}
+
+using namespace EtEndian;
+
 
 int main(int argc, char *argv[])
 {
@@ -105,9 +128,19 @@ int main(int argc, char *argv[])
     utils::CThreadLoop rcvLoop (rcvFunc, "RX_Worker");
     rcvLoop.start(std::chrono::milliseconds::zero());
 
-    for (int i = 0; i < 10; i++) {
-        std::string toSend = std::string("Hallo") + std::to_string(i);
-        a.send(utils::span<char>(toSend));
+
+    dataTx tx {"Hallo", 0 ,0};
+
+    std::string toSend = std::string("Hallo");
+    for (int i = 0; i < 10; i++) 
+    {
+        tx.data1 = 0xffaa0000 + i;
+        tx.data2 = 0xAA00 + i;
+        dataTx netOrderTx = CNetOrder(tx).NetworkOrder();
+
+        utils::span<dataTx> bla (dataTx);
+
+       // a.send(utils::span<char>(netOrderTx));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 

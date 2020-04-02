@@ -114,6 +114,50 @@ public:
 
     }
 
+    template<typename Member, std::enable_if_t<std::is_array_v<EtEndian::get_member_type<Member>>, int> = 0>
+    void operator() (const Member& member)
+    {
+        // const char* name = member.getName();
+        using array_t = EtEndian::get_member_type<Member>;
+        using array_element_t = std::decay_t<decltype(std::declval<array_t>()[0])>;
+
+        static_assert(std::is_arithmetic<array_element_t>::value, "No arithmetic type");
+
+        constexpr std::size_t N = detail::array_count<detail::remove_cvref_t<array_t>>::value;
+
+        const array_t& sourceArray= member.getConstRef(m_initialObj);
+        array_t& destArray= member.getRef(m_convertedObj);
+
+        switch (m_ConvertMode)
+        {
+            case EConvertMode::NET_ORDER:
+            {
+                for(int i = 0; i < N; i++) {
+                    destArray[i] = host_to_network(sourceArray[i]);
+                }
+                break;
+            }
+            case EConvertMode::HOST_ORDER:
+            {
+                for(int i = 0; i < N; i++) {
+                    destArray[i] = network_to_host(sourceArray[i]);
+                }
+                break;
+            }
+        }
+    }
+
+
+    template<typename Member, std::enable_if_t< std::is_same<EtEndian::get_member_type<Member>, std::string>::value, int> = 0>
+    void operator()(const Member& member) noexcept
+    {
+        const std::string& sourceString = member.getConstRef(m_initialObj);
+        std::string& destString = member.getRef(m_convertedObj);
+        //No endian converson necessary because std::string is a byte array
+        destString = std::string(sourceString);
+        //destString.swap(sourceString);
+    }
+
     const T& value() const noexcept
     {
         return m_initialObj;
