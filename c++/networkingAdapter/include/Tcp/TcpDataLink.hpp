@@ -38,7 +38,7 @@
 namespace EtNet
 {
 
-constexpr auto defaultOneRead = [](utils::span<char> rx){ return true; };
+constexpr auto defaultOneRead = [](utils::span<uint8_t> rx){ return true; };
 
 class CBaseSocket;
 class CTcpDataLinkPrivate;
@@ -55,7 +55,7 @@ public:
         UNBLOCK
     };
 
-    using CallbackReceive = std::function<bool (utils::span<char> rx)>;
+    using CallbackReceive = std::function<bool (utils::span<uint8_t> rx)>;
 
     CTcpDataLink() noexcept                              = default;
     CTcpDataLink(CTcpDataLink const&)                    = default;
@@ -67,10 +67,10 @@ public:
     CTcpDataLink(CTcpDataLink &&rhs) noexcept;
     CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
 
-    void send(const utils::span<char>& rTxSpan);
+    void send(const utils::span<uint8_t>& rTxSpan);
 
     bool unblockRecive() noexcept;
-    CTcpDataLink::ERet recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
 
 private:
     std::shared_ptr<CTcpDataLinkPrivate> m_pPrivate;

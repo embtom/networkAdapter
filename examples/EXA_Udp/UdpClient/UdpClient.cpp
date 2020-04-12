@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    char buffer [128];
-    utils::span<char> rxSpan(buffer);
+    uint8_t buffer [128];
+    utils::span<uint8_t> rxSpan(buffer);
 
     /* Create a datagram socket; send to an address in the IPv6 domain */
     auto baseSocket = EtNet::CBaseSocket(EtNet::CBaseSocket::SoReuseSocket(EtNet::ESocketMode::INET_DGRAM));
@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
     for (int j = 0; j < 2; j++) {
 
         std::string test = std::string("Hallo") + std::to_string(j);
-        d.send(utils::span<char>(test));
+        d.send(utils::span(test).as_byte());
 
-        d.reciveFrom(rxSpan, [](EtNet::SPeerAddr ClientAddr, utils::span<char> rx) {
+        d.reciveFrom(rxSpan, [](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx) {
             std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
             return true;
         });

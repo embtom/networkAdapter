@@ -42,8 +42,8 @@ using namespace EtNet;
 
 int main(int argc, char *argv[])
 {
-    char buffer [128];
-    utils::span<char> rxSpan(buffer);
+    uint8_t buffer [128];
+    utils::span<uint8_t> rxSpan(buffer);
 
     CIpAddress::IpAddresses broadIp = CNetInterface::getAllIpv4Broadcast();
 
@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     CUdpDataLink a = UdpClient.getLink(broadIp.at(0).toString(), PORT_NUM);
     auto rcvFunc = [&a, &rcvCount]()
     {
-        char buffer [128];
-        utils::span<char> rxSpan(buffer);
-        CUdpDataLink::ERet ret = a.reciveFrom(rxSpan, [&rcvCount](SPeerAddr peer, utils::span<char> rx) {
+        uint8_t buffer [128];
+        utils::span<uint8_t> rxSpan(buffer);
+        CUdpDataLink::ERet ret = a.reciveFrom(rxSpan, [&rcvCount](SPeerAddr peer, utils::span<uint8_t> rx) {
             std::cout << "RCV from " << peer.Ip.toString() << std::endl;
             std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
             rcvCount++;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0 ; i < 2; i++) {
         std::string test = std::string("Hallo") + std::to_string(i);
-        a.send(utils::span<char>(test));
+        a.send(utils::span(test).as_byte());
     }
 
     std::this_thread::sleep_for(std::chrono::seconds(3));

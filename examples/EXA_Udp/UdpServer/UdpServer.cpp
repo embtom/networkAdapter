@@ -45,11 +45,11 @@ int main()
 
     while (true)
     {
-        char buffer [128] = {0};
-        utils::span<char> rxtxSpan (buffer);
+        uint8_t buffer [128] = {0};
+        utils::span<uint8_t> rxtxSpan (buffer);
 
         EtNet::CUdpDataLink a = UdpServer.waitForConnection();
-        a.reciveFrom(rxtxSpan,[&a, &UdpServer](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
+        a.reciveFrom(rxtxSpan,[&a, &UdpServer](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)
         {
             std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
 

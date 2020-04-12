@@ -61,7 +61,7 @@ public:
         UNBLOCK
     };
 
-    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<char> rx)>;
+    using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)>;
 
     CUdpDataLink(CUdpDataLink const&)                    = delete;
     CUdpDataLink& operator=(CUdpDataLink const&)         = delete;
@@ -73,11 +73,11 @@ public:
     CUdpDataLink& operator=(CUdpDataLink&& rhs) noexcept;
     virtual ~CUdpDataLink() noexcept;
 
-    void send(const utils::span<char>& rSpanTx);
-    void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
+    void send(const utils::span<uint8_t>& rSpanTx);
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx);
 
     bool unblockRecive() noexcept;
-    ERet reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const;
+    ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd) const;
 
 private:
     std::unique_ptr<CUdpDataLinkPrivate> m_pPrivate;

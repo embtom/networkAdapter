@@ -49,14 +49,14 @@ public:
     CUdpDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept;
     ~CUdpDataLinkPrivate() noexcept;
 
-    void send(const utils::span<char>& rSpanTx);
-    void sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx);
+    void send(const utils::span<uint8_t>& rSpanTx);
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx);
 
     bool unblockRecive() noexcept;
-    CUdpDataLink::ERet reciveFrom(utils::span<char>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const;
+    CUdpDataLink::ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const;
 
 private:
-    void reciveFromImpl(utils::span<char>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const;
+    void reciveFromImpl(utils::span<uint8_t>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const;
 
     utils::CFdSet   m_FdSet;
     int             m_socketFd  {-1};
@@ -94,12 +94,12 @@ CUdpDataLinkPrivate::~CUdpDataLinkPrivate() noexcept
     }
 }
 
-void CUdpDataLinkPrivate::send(const utils::span<char>& rSpanTx)
+void CUdpDataLinkPrivate::send(const utils::span<uint8_t>& rSpanTx)
 {
     sendTo(m_peerAdr, rSpanTx);
 }
 
-void CUdpDataLinkPrivate::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
+void CUdpDataLinkPrivate::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx)
 {
     sockaddr_in clAddr{};
     sockaddr_in6 clAddr6{};
@@ -185,7 +185,7 @@ bool CUdpDataLinkPrivate::unblockRecive() noexcept
     return true;
 }
 
-CUdpDataLink::ERet CUdpDataLinkPrivate::reciveFrom(utils::span<char>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const
+CUdpDataLink::ERet CUdpDataLinkPrivate::reciveFrom(utils::span<uint8_t>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const
 {
     utils::CFdSetRetval ret = m_FdSet.Select([this, &rSpanRx, &scanForEnd](int fd) {
         reciveFromImpl(rSpanRx, scanForEnd);
@@ -198,7 +198,7 @@ CUdpDataLink::ERet CUdpDataLinkPrivate::reciveFrom(utils::span<char>& rSpanRx, C
     }
 }
 
-void CUdpDataLinkPrivate::reciveFromImpl(utils::span<char>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const
+void CUdpDataLinkPrivate::reciveFromImpl(utils::span<uint8_t>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const
 {
     union e
     {
@@ -235,7 +235,7 @@ void CUdpDataLinkPrivate::reciveFromImpl(utils::span<char>& rSpanRx, CUdpDataLin
             }
         }
     };
-    char* readBuffer = rSpanRx.data();
+    uint8_t* readBuffer = rSpanRx.data();
     std::size_t dataRead  = 0;
 
     while(dataRead < rSpanRx.size_bytes())
@@ -289,11 +289,11 @@ void CUdpDataLinkPrivate::reciveFromImpl(utils::span<char>& rSpanRx, CUdpDataLin
         dataRead += get;
 
         toCIpAddress(peerAdr);
-        if (scanForEnd(peerAddress, utils::span<char>(readBuffer, dataRead))) {
+        if (scanForEnd(peerAddress, utils::span<uint8_t>(readBuffer, dataRead))) {
             break;
         }
     }
-    rSpanRx = utils::span<char>(readBuffer, dataRead);
+    rSpanRx = utils::span<uint8_t>(readBuffer, dataRead);
 }
 
 //*****************************************************************************
@@ -321,12 +321,12 @@ CUdpDataLink& CUdpDataLink::operator=(CUdpDataLink&& rhs) noexcept
 
 CUdpDataLink::~CUdpDataLink() noexcept = default;
 
-void CUdpDataLink::send(const utils::span<char>& rSpanTx)
+void CUdpDataLink::send(const utils::span<uint8_t>& rSpanTx)
 {
     m_pPrivate->send(rSpanTx);
 }
 
-void CUdpDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<char>& rSpanTx)
+void CUdpDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx)
 {
     m_pPrivate->sendTo(rClientAddr, rSpanTx);
 }
@@ -336,7 +336,7 @@ bool CUdpDataLink::unblockRecive() noexcept
     return m_pPrivate->unblockRecive();
 }
 
-CUdpDataLink::ERet CUdpDataLink::reciveFrom(utils::span<char>& rSpanRx, CallbackReciveFrom scanForEnd) const
+CUdpDataLink::ERet CUdpDataLink::reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd) const
 {
     return m_pPrivate->reciveFrom(rSpanRx, scanForEnd);
 }

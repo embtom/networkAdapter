@@ -50,13 +50,13 @@ namespace EtNet
         CTcpDataLinkPrivate(int socketFd) noexcept;
         CTcpDataLinkPrivate(CBaseSocket&& rBaseSocket) noexcept;
         ~CTcpDataLinkPrivate() noexcept;
-        void send(const utils::span<char>& rTxSpan);
+        void send(const utils::span<uint8_t>& rTxSpan);
 
         bool unblockRecive() noexcept;
-        CTcpDataLink::ERet recive(utils::span<char>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
+        CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
 
     private:
-        void reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
+        void reciveImpl(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
 
         utils::CFdSet   m_FdSet;
       //  int             m_socketFd {-1};
@@ -97,7 +97,7 @@ CTcpDataLinkPrivate::~CTcpDataLinkPrivate() noexcept
     }
 }
 
-void CTcpDataLinkPrivate::send(const utils::span<char>& rTxSpan)
+void CTcpDataLinkPrivate::send(const utils::span<uint8_t>& rTxSpan)
 {
     std::size_t dataWritten = 0;
 
@@ -159,7 +159,7 @@ bool CTcpDataLinkPrivate::unblockRecive() noexcept
     return true;
 }
 
-CTcpDataLink::ERet CTcpDataLinkPrivate::recive(utils::span<char>& rSpanRx, CTcpDataLink::CallbackReceive scanForEnd)
+CTcpDataLink::ERet CTcpDataLinkPrivate::recive(utils::span<uint8_t>& rSpanRx, CTcpDataLink::CallbackReceive scanForEnd)
 {
     utils::CFdSetRetval ret = m_FdSet.Select([this, &rSpanRx, &scanForEnd](int fd) {
         reciveImpl(rSpanRx, scanForEnd);
@@ -172,7 +172,7 @@ CTcpDataLink::ERet CTcpDataLinkPrivate::recive(utils::span<char>& rSpanRx, CTcpD
     }
 }
 
-void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd)
+void CTcpDataLinkPrivate::reciveImpl(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd)
 {
     if (m_baseSocket.getFd() == 0)
     {
@@ -180,7 +180,7 @@ void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::C
     }
 
     std::size_t dataRead  = 0;
-    char* readBuffer = rRxSpan.data();
+    uint8_t* readBuffer = rRxSpan.data();
 
     while(dataRead < rRxSpan.size_bytes())
     {
@@ -238,12 +238,12 @@ void CTcpDataLinkPrivate::reciveImpl(utils::span<char>& rRxSpan, CTcpDataLink::C
             break;
         }
         dataRead += get;
-        if (scanForEnd(utils::span<char>(readBuffer, dataRead)))
+        if (scanForEnd(utils::span<uint8_t>(readBuffer, dataRead)))
         {
             break;
         }
     }
-    rRxSpan = utils::span<char>(readBuffer, dataRead);
+    rRxSpan = utils::span<uint8_t>(readBuffer, dataRead);
 }
 
 //*****************************************************************************
@@ -269,7 +269,7 @@ CTcpDataLink& CTcpDataLink::operator=(CTcpDataLink&& rhs) noexcept
     return *this;
 }
 
-void CTcpDataLink::send(const utils::span<char>& rTxSpan)
+void CTcpDataLink::send(const utils::span<uint8_t>& rTxSpan)
 {
     m_pPrivate->send(rTxSpan);
 }
@@ -279,7 +279,7 @@ bool CTcpDataLink::unblockRecive() noexcept
     return m_pPrivate->unblockRecive();
 }
 
-CTcpDataLink::ERet CTcpDataLink::recive(utils::span<char>& rRxSpan, CallbackReceive scanForEnd)
+CTcpDataLink::ERet CTcpDataLink::recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd)
 {
     return m_pPrivate->recive(rRxSpan, scanForEnd);
 }

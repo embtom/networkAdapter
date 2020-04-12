@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
     unsigned rcvCount {0};
     auto rcvFunc = [&a, &rcvCount]()
     {
-        char buffer [128];
-        utils::span<char> rxSpan(buffer);
-        CTcpDataLink::ERet ret = a.recive(rxSpan, [&rcvCount] (utils::span<char> rx) {
+        uint8_t buffer [128];
+        utils::span<uint8_t> rxSpan(buffer);
+        CTcpDataLink::ERet ret = a.recive(rxSpan, [&rcvCount] (utils::span<uint8_t> rx) {
             std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
             rcvCount++;
             return true;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     dataTx tx {"Hallo", 0 ,0};
 
     std::string toSend = std::string("Hallo");
-    for (int i = 0; i < 10; i++) 
+    for (int i = 0; i < 10; i++)
     {
         tx.data1 = 0xffaa0000 + i;
         tx.data2 = 0xAA00 + i;

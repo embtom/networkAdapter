@@ -34,15 +34,15 @@ TEST_F(CStreamComTest, simple)
 {
     std::thread t([this]()
     {
-        char rcvData[40] = {0};
-        utils::span<char> rcvSpan (rcvData);
+        uint8_t rcvData[40] = {0};
+        utils::span<uint8_t> rcvSpan (rcvData);
 
         CTcpDataLink a;
         CIpAddress b;
         //auto [a, b] = m_Server.waitForConnection();
         std::tie(a, b) = m_Server.waitForConnection();
         std::cout << GTEST_BOX << "Server connectd from: " << b.toString() << std::endl;
-        a.recive(rcvSpan, [&a, &rcvData](utils::span<char> rx)
+        a.recive(rcvSpan, [&a, &rcvData](utils::span<uint8_t> rx)
         {
             std::cout << GTEST_BOX << "Rcv from: " << rx.size() << std::endl;
             a.send(rx);
@@ -52,11 +52,11 @@ TEST_F(CStreamComTest, simple)
 
     auto a = m_Client.connect(std::string("localhost"),50003);
     std::string dataToSend ("hallo litte stream test");
-    char rcvData[40];
-    utils::span<char> rxSpan (rcvData);
-    a.send(utils::span<char>(dataToSend));
+    uint8_t rcvData[40];
+    utils::span<uint8_t> rxSpan (rcvData);
+    a.send(utils::span(dataToSend).as_byte());
     a.recive(rxSpan);
-    std::string dataRcv(rcvData);
+    std::string dataRcv((char*)rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);

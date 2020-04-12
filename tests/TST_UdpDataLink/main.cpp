@@ -34,12 +34,12 @@ TEST_F(CDgramComTest, simple)
 {
     std::thread t([this]()
     {
-        char rcvData[40] = {0};
+        uint8_t rcvData[40] = {0};
 
         CUdpDataLink a = m_Server.waitForConnection();
-        utils::span<char> rxtxData(rcvData);
+        utils::span<uint8_t> rxtxData(rcvData);
 
-        a.reciveFrom(rxtxData, [&a, &rcvData](EtNet::SPeerAddr ClientAddr, utils::span<char> rx)
+        a.reciveFrom(rxtxData, [&a, &rcvData](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)
         {
             std::cout << GTEST_BOX << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
             a.sendTo(ClientAddr, rx);
@@ -49,14 +49,14 @@ TEST_F(CDgramComTest, simple)
 
     auto a = m_Client.getLink(std::string("localhost"),50002);
     std::string dataToSend ("hallo litte dgram test");
-    char rcvData[40];
-    utils::span<char> rxSpan (rcvData);
-    a.send(utils::span<char>(dataToSend));
-    a.reciveFrom(rxSpan, [] (EtNet::SPeerAddr ClientAddr, utils::span<char> rx) 
+    uint8_t rcvData[40];
+    utils::span<uint8_t> rxSpan (rcvData);
+    a.send(utils::span(dataToSend).as_byte());
+    a.reciveFrom(rxSpan, [] (EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx) 
     {
         return true;
     });
-    std::string dataRcv(rcvData);
+    std::string dataRcv((char*)rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;
 
     EXPECT_EQ(dataRcv, dataToSend);

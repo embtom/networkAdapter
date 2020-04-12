@@ -48,12 +48,12 @@ int main(int argc, char *argv[])
 
     while(true)
     {
-        char buffer [128];
-        utils::span<char> rxSpan(buffer);
-        a.recive(rxSpan, [&a](utils::span<char> rx) {
+        uint8_t buffer [128];
+        utils::span<uint8_t> rxSpan(buffer);
+        a.recive(rxSpan, [&a](utils::span<uint8_t> rx) {
             std::cout << "Rcv Len:" << rx.size() << std::endl;;
 
-            for (char& elem : rx) {
+            for (uint8_t& elem : rx) {
                 elem = toupper(elem);
             }
 
