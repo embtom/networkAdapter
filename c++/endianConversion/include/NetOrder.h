@@ -32,13 +32,11 @@
 #include <string>
 #include <type_traits>
 #include <array>
-#include "detail/EndianConverter.h"
+#include <EndianConverter.h>
+#include <templateHelpers.h>
 
 namespace EtEndian
 {
-
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
 
 //*****************************************************************************
 //! \brief CNetOrder
@@ -52,7 +50,7 @@ public:
     CNetOrder(const CNetOrder&)            = default;
     CNetOrder& operator=(const CNetOrder&) = delete;
 
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
+    template<typename U, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<U>, CNetOrder>, int> = 0>
     CNetOrder(U &&obj) noexcept :
         m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
     {
@@ -74,7 +72,7 @@ private:
 
 //https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
 template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
+CNetOrder(U) -> CNetOrder<utils::remove_cvref_t<U>>;
 }
 
 #endif //_NETORDER_H_

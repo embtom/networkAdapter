@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
+#include <templateHelpers.h>
 #include <detail/EndianConvert.h>
 #include <detail/EndianMembers.h>
 #include <detail/EndianMeta.h>
@@ -212,13 +213,13 @@ struct dataTx
 {
    bool operator==(const dataTx& rhs) const
    {
-      for (int i = 0; i < EtEndian::detail::array_count_v<decltype(info)>; i++) {
+      for (int i = 0; i < utils::array_count_v<decltype(info)>; i++) {
          if (rhs.info[i] != info[i]) {
             return false;
          }
       }
 
-      for (int i = 0; i < EtEndian::detail::array_count_v<decltype(data0)>; i++) {
+      for (int i = 0; i < utils::array_count_v<decltype(data0)>; i++) {
          if (rhs.data0[i] != data0[i]) {
             return false;
          }
@@ -299,7 +300,7 @@ TEST(NetOrder, ConvertToNetwithSpan)
    EXPECT_EQ(std::strcmp(tx.info,rTxHostOrder.info),0);
    EXPECT_EQ(std::strcmp(rTxNetOrder.info, rTxHostOrder.info),0);
 
-   for(int itr=0; itr < EtEndian::detail::array_count_v<decltype(rTxHostOrder.data0)>; itr++) {
+   for(int itr=0; itr < utils::array_count_v<decltype(rTxHostOrder.data0)>; itr++) {
       EXPECT_EQ(tx.data0[itr], rTxHostOrder.data0[itr]);
       EXPECT_EQ(rTxHostOrder.data0[itr], EtTest::swapEndian(rTxNetOrder.data0[itr]));
    }

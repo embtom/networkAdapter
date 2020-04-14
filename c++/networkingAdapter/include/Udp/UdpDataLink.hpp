@@ -73,8 +73,8 @@ public:
     CUdpDataLink& operator=(CUdpDataLink&& rhs) noexcept;
     virtual ~CUdpDataLink() noexcept;
 
-    void send(const utils::span<uint8_t>& rSpanTx);
-    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx);
+    void send(const utils::span<uint8_t>& rSpanTx) const;
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const;
 
     bool unblockRecive() noexcept;
     ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd) const;

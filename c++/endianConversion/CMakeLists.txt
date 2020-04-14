@@ -10,24 +10,24 @@ set(HEADERS
     "include/detail/EndianMeta.h"
     "include/detail/EndianMeta.inl"
     "include/detail/MetaHolder.h"
-    "include/detail/template_helpers.h"
-    "include/detail/template_helpers.inl"
 )
 
 ######################################################
 # Build target
 
 add_library(endianConversion INTERFACE)
+add_library(EMBTOM::endianConversion ALIAS endianConversion)
 
 target_include_directories(endianConversion INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/detail>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion>
 )
 
 ######################################################
 # Install rules
 
-install(TARGETS endianConversion EXPORT endianConversion-config
+install(TARGETS endianConversion EXPORT endianConversion-targets
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
 )
 
@@ -35,8 +35,12 @@ install(FILES ${HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
 )
 
-install(EXPORT endianConversion-config
+install(EXPORT endianConversion-targets
     NAMESPACE
         EMBTOM::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianConversion"
+)
+
+install(FILES "cmake/endianConversion-config.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianConversion"
 )

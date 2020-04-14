@@ -46,11 +46,11 @@ namespace EtNet
     class CTcpDataLinkPrivate : public std::enable_shared_from_this<CTcpDataLinkPrivate>
     {
     public:
-        CTcpDataLinkPrivate() noexcept = default;
+        CTcpDataLinkPrivate() = default;
         CTcpDataLinkPrivate(int socketFd) noexcept;
         CTcpDataLinkPrivate(CBaseSocket&& rBaseSocket) noexcept;
         ~CTcpDataLinkPrivate() noexcept;
-        void send(const utils::span<uint8_t>& rTxSpan);
+        void send(const utils::span<uint8_t>& rTxSpan) const;
 
         bool unblockRecive() noexcept;
         CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
@@ -59,7 +59,6 @@ namespace EtNet
         void reciveImpl(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
 
         utils::CFdSet   m_FdSet;
-      //  int             m_socketFd {-1};
         CBaseSocket     m_baseSocket;
     };
 }
@@ -97,7 +96,7 @@ CTcpDataLinkPrivate::~CTcpDataLinkPrivate() noexcept
     }
 }
 
-void CTcpDataLinkPrivate::send(const utils::span<uint8_t>& rTxSpan)
+void CTcpDataLinkPrivate::send(const utils::span<uint8_t>& rTxSpan) const
 {
     std::size_t dataWritten = 0;
 
@@ -269,7 +268,7 @@ CTcpDataLink& CTcpDataLink::operator=(CTcpDataLink&& rhs) noexcept
     return *this;
 }
 
-void CTcpDataLink::send(const utils::span<uint8_t>& rTxSpan)
+void CTcpDataLink::send(const utils::span<uint8_t>& rTxSpan) const
 {
     m_pPrivate->send(rTxSpan);
 }
@@ -283,5 +282,11 @@ CTcpDataLink::ERet CTcpDataLink::recive(utils::span<uint8_t>& rRxSpan, CallbackR
 {
     return m_pPrivate->recive(rRxSpan, scanForEnd);
 }
+
+CTcpDataLink::ERet CTcpDataLink::recive(utils::span<uint8_t>&& rRxSpan, CallbackReceive scanForEnd)
+{
+    return m_pPrivate->recive(rRxSpan, scanForEnd);
+}
+
 
 

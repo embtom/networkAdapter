@@ -3,7 +3,7 @@
 
 #include <cstring>
 #include <type_traits>
-#include <detail/template_helpers.h>
+#include <templateHelpers.h>
 
 
 namespace EtEndian
@@ -80,10 +80,10 @@ public:
     //the remove_cvref_t(std::remove_reference_t) is necessary, to remove the reference type of the array, passed as universal reference.
     // for e.g (is_array<V> is false because it is reference to a array),
     //         (is_array<remove_cvref_t<V>> is true because the reference type of the array is removed)
-    template <typename V, typename std::enable_if_t<std::is_same_v<detail::remove_cvref_t<V>, member_type>, int> = 0>
+    template <typename V, typename std::enable_if_t<std::is_same_v<utils::remove_cvref_t<V>, member_type>, int> = 0>
     void set(Class& obj, V&& value) const
     {
-        constexpr int size = detail::array_count<detail::remove_cvref_t<V>>::value;
+        constexpr int size = utils::array_count<utils::remove_cvref_t<V>>::value;
         std::memcpy(obj.*m_ptr, &value, size);
     }
 

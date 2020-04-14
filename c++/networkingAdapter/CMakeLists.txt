@@ -42,7 +42,8 @@ set_target_properties(networkingAdapter PROPERTIES
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(networkingAdapter PRIVATE
+target_link_libraries(networkingAdapter
+    PUBLIC  EMBTOM::endianConversion
     PUBLIC  EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
@@ -63,7 +64,7 @@ target_compile_definitions(networkingAdapter
 
 ######################################################
 # Install rules
-install(TARGETS networkingAdapter EXPORT networkingadapter-targets
+install(TARGETS networkingAdapter EXPORT networkingAdapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
@@ -72,12 +73,12 @@ install(FILES ${HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
 
-install(EXPORT networkingadapter-targets
+install(EXPORT networkingAdapter-targets
     NAMESPACE
         EMBTOM::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )
 
-install(FILES "cmake/networkingadapter-config.cmake"
+install(FILES "cmake/networkingAdapter-config.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )

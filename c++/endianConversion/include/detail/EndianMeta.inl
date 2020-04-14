@@ -1,9 +1,9 @@
 #include <cassert>
 #include <tuple>
 #include <cstring>
+#include <templateHelpers.h>
 
 #include "EndianMembers.h"
-#include "template_helpers.h"
 #include "MetaHolder.h"
 
 namespace EtEndian
@@ -78,7 +78,7 @@ constexpr bool isRegistered()
 template <typename Class, typename F, typename>
 void doForAllMembers(F&& f)
 {
-    detail::for_tuple(std::forward<F>(f), getMembers<Class>());
+    utils::for_tuple(std::forward<F>(f), getMembers<Class>());
 }
 
 } //EtEndian

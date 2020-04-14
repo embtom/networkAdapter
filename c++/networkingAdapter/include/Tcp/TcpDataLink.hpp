@@ -34,6 +34,7 @@
 #include <functional>
 #include <memory>
 #include <span.h>
+#include <templateHelpers.h>
 
 namespace EtNet
 {
@@ -67,11 +68,24 @@ public:
     CTcpDataLink(CTcpDataLink &&rhs) noexcept;
     CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
 
-    void send(const utils::span<uint8_t>& rTxSpan);
+    void send(const utils::span<uint8_t>& rTxSpan) const;
+
+    template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
+    void send(const utils::span<T>& rTxSpan) const {
+        send(rTxSpan.as_byte());
+    }
+
+    CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    CTcpDataLink::ERet recive(utils::span<uint8_t>&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+
+    template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
+    CTcpDataLink::ERet recive(utils::span<T>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead) {
+        constexpr bool ok = utils::is_span_v<utils::span<T>>;
+        constexpr bool ok2 = std::is_trivially_copyable_v<T>;
+        return recive(rRxSpan.as_byte(), scanForEnd);
+    }
 
     bool unblockRecive() noexcept;
-    CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
-
 private:
     std::shared_ptr<CTcpDataLinkPrivate> m_pPrivate;
 };

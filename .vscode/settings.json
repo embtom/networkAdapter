@@ -8,7 +8,7 @@
         "-DNETWORKINGADAPTER_BUILD_TEST=ON",
         "-DNETWORKINGADAPTER_BUILD_EXAMPLES=ON"
     ],
-    "cmakeExplorer.buildDir": "build/GCC for x86_64-linux-gnu 7.4.0_Debug",
+    "cmakeExplorer.buildDir": "build/GCC for x86_64-linux-gnu 7.5.0_${buildType}",
     "editor.rename.enablePreview": false,
     "workbench.editor.enablePreview": false,
 }

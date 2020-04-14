@@ -44,13 +44,13 @@ namespace EtNet
 class CUdpDataLinkPrivate
 {
 public:
-    CUdpDataLinkPrivate() noexcept = default;
+    CUdpDataLinkPrivate() = default;
     CUdpDataLinkPrivate(int socketFd);
     CUdpDataLinkPrivate(int socketFd, const SPeerAddr& peerAdr) noexcept;
     ~CUdpDataLinkPrivate() noexcept;
 
-    void send(const utils::span<uint8_t>& rSpanTx);
-    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx);
+    void send(const utils::span<uint8_t>& rSpanTx) const;
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const;
 
     bool unblockRecive() noexcept;
     CUdpDataLink::ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CUdpDataLink::CallbackReciveFrom scanForEnd) const;
@@ -94,12 +94,12 @@ CUdpDataLinkPrivate::~CUdpDataLinkPrivate() noexcept
     }
 }
 
-void CUdpDataLinkPrivate::send(const utils::span<uint8_t>& rSpanTx)
+void CUdpDataLinkPrivate::send(const utils::span<uint8_t>& rSpanTx) const
 {
     sendTo(m_peerAdr, rSpanTx);
 }
 
-void CUdpDataLinkPrivate::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx)
+void CUdpDataLinkPrivate::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const
 {
     sockaddr_in clAddr{};
     sockaddr_in6 clAddr6{};
@@ -321,12 +321,12 @@ CUdpDataLink& CUdpDataLink::operator=(CUdpDataLink&& rhs) noexcept
 
 CUdpDataLink::~CUdpDataLink() noexcept = default;
 
-void CUdpDataLink::send(const utils::span<uint8_t>& rSpanTx)
+void CUdpDataLink::send(const utils::span<uint8_t>& rSpanTx) const
 {
     m_pPrivate->send(rSpanTx);
 }
 
-void CUdpDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx)
+void CUdpDataLink::sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const
 {
     m_pPrivate->sendTo(rClientAddr, rSpanTx);
 }

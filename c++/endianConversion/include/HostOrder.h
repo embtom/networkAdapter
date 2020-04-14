@@ -32,13 +32,11 @@
 #include <string>
 #include <type_traits>
 #include <array>
-#include "detail/EndianConverter.h"
+#include <EndianConverter.h>
+#include <templateHelpers.h>
 
 namespace EtEndian
 {
-
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
 
 //*****************************************************************************
 //! \brief CHostOrder
@@ -53,7 +51,7 @@ public:
     CHostOrder(const CHostOrder&)             = default;
     CHostOrder& operator=(const CHostOrder &) = delete;
 
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CHostOrder>::value, int> = 0>
+    template<typename U, std::enable_if_t<!std::is_same<utils::remove_cvref_t<U>, CHostOrder>::value, int> = 0>
     CHostOrder(U &&obj) noexcept :
         m_converterFunc(EConvertMode::HOST_ORDER, std::forward<U>(obj))
     {
@@ -75,7 +73,7 @@ private:
 
 //https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
 template<class U>
-CHostOrder(U) -> CHostOrder<removeConstReference_t<U>>;
+CHostOrder(U) -> CHostOrder<utils::remove_cvref_t<U>>;
 
 }
 

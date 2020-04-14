@@ -32,10 +32,10 @@
 #include <string>
 #include <type_traits>
 #include <array>
-#include "EndianMeta.h"
-#include "EndianMembers.h"
-#include "EndianConvert.h"
-#include "template_helpers.h"
+#include <templateHelpers.h>
+#include <EndianMeta.h>
+#include <EndianMembers.h>
+#include <EndianConvert.h>
 
 namespace EtEndian
 {
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    template<typename Member, std::enable_if_t<detail::is_array<EtEndian::get_member_type<Member>>::value, int> = 0>
+    template<typename Member, std::enable_if_t<utils::is_array<EtEndian::get_member_type<Member>>::value, int> = 0>
     void operator()(const Member& member) noexcept
     {
         using array_t = EtEndian::get_member_type<Member>;
@@ -123,7 +123,7 @@ public:
 
         static_assert(std::is_arithmetic<array_element_t>::value, "No arithmetic type");
 
-        constexpr std::size_t N = detail::array_count<detail::remove_cvref_t<array_t>>::value;
+        constexpr std::size_t N = utils::array_count<utils::remove_cvref_t<array_t>>::value;
 
         const array_t& sourceArray= member.getConstRef(m_initialObj);
         array_t& destArray= member.getRef(m_convertedObj);
