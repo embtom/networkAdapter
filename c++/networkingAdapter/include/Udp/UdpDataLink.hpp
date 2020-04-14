@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -34,7 +34,9 @@
 #include <functional>
 #include <memory>
 #include <span.h>
-#include <BaseSocket.hpp>
+#include <templateHelpers.h>
+#include <NetAdapter.hpp>
+
 #include <IpAddress.hpp>
 
 namespace EtNet
@@ -46,7 +48,7 @@ struct SPeerAddr
     unsigned int Port {0};
 };
 
-constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, std::size_t rcvCount){ return false; };
+constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, utils::span<uint8_t> rx){ return false; };
 
 class CUdpDataLinkPrivate;
 //*****************************************************************************
@@ -63,21 +65,40 @@ public:
 
     using CallbackReciveFrom = std::function<bool (EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)>;
 
+    CUdpDataLink() noexcept;
     CUdpDataLink(CUdpDataLink const&)                    = delete;
     CUdpDataLink& operator=(CUdpDataLink const&)         = delete;
+    virtual ~CUdpDataLink() noexcept;
 
-    CUdpDataLink() noexcept;
     CUdpDataLink(int socketFd);
     CUdpDataLink(int socketFd, const SPeerAddr &rPeerAddr);
     CUdpDataLink(CUdpDataLink &&rhs) noexcept;
     CUdpDataLink& operator=(CUdpDataLink&& rhs) noexcept;
-    virtual ~CUdpDataLink() noexcept;
 
     void send(const utils::span<uint8_t>& rSpanTx) const;
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const;
 
+    template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
+    void send(const utils::span<T>& rTxSpan) const {
+        send(rTxSpan.as_byte());
+    }
+
+    template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<T>& rTxSpan) const {
+        sendTo(rClientAddr, rTxSpan.as_byte());
+    }
+
+    ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd = defaultReciveFrom) const;
+    ERet reciveFrom(utils::span<uint8_t>&& rSpanRx, CallbackReciveFrom scanForEnd = defaultReciveFrom) const;
+
+    template<typename T, std::enable_if_t<
+            utils::is_span_v<utils::remove_cvref_t<T>> &&
+            !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
+    ERet reciveFrom(T&& rRxSpan, CallbackReciveFrom scanForEnd = defaultReciveFrom) {
+        return reciveFrom(rRxSpan.as_byte(), scanForEnd);
+    }
+
     bool unblockRecive() noexcept;
-    ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd) const;
 
 private:
     std::unique_ptr<CUdpDataLinkPrivate> m_pPrivate;

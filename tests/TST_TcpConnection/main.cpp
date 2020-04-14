@@ -19,38 +19,33 @@
 
 using namespace EtNet;
 
-    struct STestData
+struct STestData
+{
+    STestData() noexcept = default;
+    explicit STestData(std::string _name, uint32_t _data0, uint16_t _data1, uint8_t _data2) noexcept :
+        data0(_data0), data1(_data1), data2(_data2)  {
+        std::memcpy(name, _name.c_str(), utils::array_count_v<decltype(name)>);
+    }
+    bool operator==(const STestData& rhs) const
     {
-        STestData() noexcept = default;
-        explicit STestData(std::string _name, uint32_t _data0, uint16_t _data1, uint8_t _data2) noexcept :
-            data0(_data0), data1(_data1), data2(_data2)  {
-            std::memcpy(name, _name.c_str(), utils::array_count_v<decltype(name)>);
-        }
-
-        bool operator==(const STestData& rhs) const
+        for (int i = 0; i < utils::array_count_v<decltype(name)>; i++) 
         {
-            for (int i = 0; i < utils::array_count_v<decltype(name)>; i++) 
-            {
-                if(rhs.name[i] != name[i]) {
-                    return false;
-                }
+            if(rhs.name[i] != name[i]) {
+                return false;
             }
-
-            if ((data0 == rhs.data0) &&
-                (data1 == rhs.data1) &&
-                (data2 == rhs.data2)) {
-                return true;
-            }
-            return false;
         }
-
-        char     name[10] {0};
-        uint32_t data0 {0};
-        uint16_t data1 {0};
-        uint8_t  data2 {0};
-    };
-
-
+        if ((data0 == rhs.data0) &&
+            (data1 == rhs.data1) &&
+            (data2 == rhs.data2)) {
+            return true;
+        }
+        return false;
+    }
+    char     name[10] {0};
+    uint32_t data0 {0};
+    uint16_t data1 {0};
+    uint8_t  data2 {0};
+};
 
 class CTcpComTest : public  ::testing::Test
 {
@@ -124,15 +119,11 @@ TEST_F(CTcpComTest, ComplexData)
     auto a = m_Client.connect(std::string("localhost"),50003);
 
     a.send(utils::span(dataTransmit));
-
-    utils::span rxSpan (dataRecive);
-    a.recive(rxSpan);
+    a.recive(utils::span(dataRecive));
 
     EXPECT_EQ(dataTransmit, dataRecive);
-
     t.join();
 }
-
 
 int main(int argc, char **argv)
 {

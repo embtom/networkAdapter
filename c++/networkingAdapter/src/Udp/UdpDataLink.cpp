@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -337,6 +337,11 @@ bool CUdpDataLink::unblockRecive() noexcept
 }
 
 CUdpDataLink::ERet CUdpDataLink::reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd) const
+{
+    return m_pPrivate->reciveFrom(rSpanRx, scanForEnd);
+}
+
+CUdpDataLink::ERet CUdpDataLink::reciveFrom(utils::span<uint8_t>&& rSpanRx, CallbackReciveFrom scanForEnd) const
 {
     return m_pPrivate->reciveFrom(rSpanRx, scanForEnd);
 }

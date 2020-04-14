@@ -16,8 +16,9 @@ set(SOURCES
 )
 
 set(HEADERS
-    "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
+    "include/IpAddress.hpp"
+    "include/NetAdapter.hpp"
     "include/Lookup/HostLookup.hpp"
     "include/Lookup/InterfacesLookup.hpp"
     "include/Tcp/TcpDataLink.hpp"

@@ -23,44 +23,28 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _UDPSERVER_H_
-#define _UDPSERVER_H_
+#ifndef _NETADAPTER_H_
+#define _NETADAPTER_H_
 
-//******************************************************************************
-// Header
-
-#include <tuple>
-#include <memory>
-#include <IpAddress.hpp>
-#include <Udp/UdpDataLink.hpp>
+#include <type_traits>
+#include <templateHelpers.h>
 
 namespace EtNet
 {
 
-class CBaseSocket;
-class CUdpServerPrivate;
+template<typename T>
+struct is_span_uint8_t :  std::false_type{};
 
-//*****************************************************************************
-//! \brief CUdpServer
-//!
-class CUdpServer
+template<typename T>
+struct is_span_uint8_t<utils::span<T>> // : std::true_type {};
 {
-public:
-    CUdpServer(CBaseSocket&& rBaseSocket, unsigned int port);
-
-    CUdpServer(const CUdpServer&)                 = delete;
-    CUdpServer& operator= (const CUdpServer&)     = delete;
-    CUdpServer(CUdpServer&&) noexcept             = default;
-    CUdpServer& operator= (CUdpServer&&) noexcept = default;
-    CUdpServer() noexcept                           = default;
-    ~CUdpServer() noexcept;
-
-    CUdpDataLink waitForConnection();
-
-private:
-    std::unique_ptr<CUdpServerPrivate> m_pPrivate;
+    static constexpr bool value = std::is_same_v<T,uint8_t>;
 };
 
-} // EtNet
+template <typename T>
+inline constexpr bool is_span_uint8_t_v = is_span_uint8_t<T>::value;
 
-#endif // _UDPSERVER_H_
+}
+
+
+#endif // _NETADAPTER_H_

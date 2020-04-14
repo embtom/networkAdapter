@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -37,6 +37,7 @@
 #include <arpa/inet.h>
 
 #include <span.h>
+#include <BaseSocket.hpp>
 #include <Lookup/InterfacesLookup.hpp>
 #include <Lookup/HostLookup.hpp>
 #include <Udp/UdpServer.hpp>

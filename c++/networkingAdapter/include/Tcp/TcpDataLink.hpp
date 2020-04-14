@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -35,6 +35,7 @@
 #include <memory>
 #include <span.h>
 #include <templateHelpers.h>
+#include <NetAdapter.hpp>
 
 namespace EtNet
 {
@@ -75,13 +76,13 @@ public:
         send(rTxSpan.as_byte());
     }
 
-    CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
-    CTcpDataLink::ERet recive(utils::span<uint8_t>&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
+    ERet recive(utils::span<uint8_t>&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
 
-    template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
-    CTcpDataLink::ERet recive(utils::span<T>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead) {
-        constexpr bool ok = utils::is_span_v<utils::span<T>>;
-        constexpr bool ok2 = std::is_trivially_copyable_v<T>;
+    template<typename T, std::enable_if_t<
+            utils::is_span_v<utils::remove_cvref_t<T>> &&
+            !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
+    ERet recive(T&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead) {
         return recive(rRxSpan.as_byte(), scanForEnd);
     }
 
