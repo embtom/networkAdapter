@@ -1,0 +1,2 @@
+add_subdirectory(EXA_TcpClient)
+add_subdirectory(EXA_TcpServer)

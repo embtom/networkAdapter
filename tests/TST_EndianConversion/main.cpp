@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 #include <iostream>
+#include <templateHelpers.h>
 #include <detail/EndianConvert.h>
 #include <detail/EndianMembers.h>
 #include <detail/EndianMeta.h>
 #include <NetOrder.h>
 #include <HostOrder.h>
-
+#include <span.h>
 
 #include "SwapEndian.h"
 
@@ -205,8 +206,121 @@ TEST(NetOrder, ConvertToNet)
       EXPECT_EQ(TestHostOrder,TestHostOrder3);
       EXPECT_EQ(TestNetOrder,TestNetOrder3);
    }
+}
 
 
+struct dataTx
+{
+   bool operator==(const dataTx& rhs) const
+   {
+      for (int i = 0; i < utils::array_count_v<decltype(info)>; i++) {
+         if (rhs.info[i] != info[i]) {
+            return false;
+         }
+      }
+
+      for (int i = 0; i < utils::array_count_v<decltype(data0)>; i++) {
+         if (rhs.data0[i] != data0[i]) {
+            return false;
+         }
+      }
+
+      if ((rhs.data1 == data1) &&
+          (rhs.data2 == data2))
+      {
+         return true;
+      }
+      return false;
+   }
+
+    char info[10];
+    uint16_t data0[4];
+    uint32_t data1;
+    uint16_t data2;
+};
+
+
+template <>
+inline auto EtEndian::registerMembers<dataTx>()
+{
+   return members(
+      member("info",   &dataTx::info),
+      member("data0",  &dataTx::data0),
+      member("data1",  &dataTx::data1),
+      member("data2",  &dataTx::data2)
+   );
+}
+
+TEST(NetOrder, MemberReflection)
+{
+   dataTx tx {"Hallo",
+              {0x0102, 0x0203, 0xA1A2, 0xA2A3},
+              0xAABBCC44,
+              0x1122};
+
+   //info
+   auto x = EtEndian::member("info",  &dataTx::info);
+   EXPECT_EQ(x.getName(), "info");
+   const EtEndian::get_member_type<decltype(x)> &rInfo = x.get(tx);
+   EXPECT_EQ(tx.info, rInfo);
+
+   EtEndian::get_member_type<decltype(x)> newInfo = "NewStr"; 
+   x.set(tx, newInfo);
+   EXPECT_EQ(strcmp(tx.info, newInfo),0);
+
+   //data1
+   auto y = EtEndian::member("data1", &dataTx::data1);
+   EXPECT_EQ(y.getName(), "data1");
+   const EtEndian::get_member_type<decltype(y)> &rData1 = y.get(tx);
+   EXPECT_EQ(tx.data1, rData1);
+   y.set(tx, uint32_t{0xBBFFAACC});
+   EXPECT_EQ(tx.data1, uint32_t{0xBBFFAACC});
+
+   //data2
+   auto z = EtEndian::member("data2", &dataTx::data2);
+   EXPECT_EQ(z.getName(), "data2");
+   const EtEndian::get_member_type<decltype(z)> &rData2 = z.get(tx);
+   EXPECT_EQ(tx.data2, rData2);
+   z.set(tx, uint32_t{0xBBFF});
+   EXPECT_EQ(tx.data2, uint32_t{0xBBFF});
+}
+
+TEST(NetOrder, ConvertToNetwithSpan)
+{
+   dataTx tx {"Hallo",
+           {0x0102, 0x0203, 0xA1A2, 0xA2A3},
+           0xAABBCC44,
+           0x1122};
+
+
+   EtEndian::CNetOrder txNetOrder(tx);
+   const dataTx& rTxNetOrder = txNetOrder.NetworkOrder();
+   const dataTx& rTxHostOrder = txNetOrder.HostOrder();
+
+   EXPECT_EQ(std::strcmp(tx.info,rTxHostOrder.info),0);
+   EXPECT_EQ(std::strcmp(rTxNetOrder.info, rTxHostOrder.info),0);
+
+   for(int itr=0; itr < utils::array_count_v<decltype(rTxHostOrder.data0)>; itr++) {
+      EXPECT_EQ(tx.data0[itr], rTxHostOrder.data0[itr]);
+      EXPECT_EQ(rTxHostOrder.data0[itr], EtTest::swapEndian(rTxNetOrder.data0[itr]));
+   }
+
+   EXPECT_EQ(tx.data1, rTxHostOrder.data1);
+   EXPECT_EQ(rTxHostOrder.data1, EtTest::swapEndian(rTxNetOrder.data1));
+   EXPECT_EQ(tx.data2, rTxHostOrder.data2);
+   EXPECT_EQ(rTxHostOrder.data2, EtTest::swapEndian(rTxNetOrder.data2));
+
+   //utils::span spanNetData (rTxNetOrder);
+   utils::span txRawSpan = utils::span(rTxNetOrder).as_byte();
+
+   // //Simulate Rx Path
+   dataTx Rx {0};
+   //utils::span spanNetRx (netRx);
+   utils::span rxRawSpan = utils::span(Rx).as_byte();
+   std::memcpy(rxRawSpan.data(), txRawSpan.data(), txRawSpan.size());
+
+   const dataTx &rx = EtEndian::CHostOrder(Rx).HostOrder();
+   EXPECT_EQ(rx,tx);
 }
 
 

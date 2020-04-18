@@ -1,6 +1,4 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
@@ -17,7 +15,15 @@
             "command": "${workspaceFolder}/scripts/createChroot.sh",
             "problemMatcher": [
                 "$gcc"
-           ]
+            ]
+        },
+        {
+            "label": "start EXA_HostName_g",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/GCC for x86_64-linux-gnu 7.4.0_Debug/examples/EXA_HostName/EXA_HostName_g",
+            "args": [
+                "--host", "localhost"
+            ]
         }
     ]
 }

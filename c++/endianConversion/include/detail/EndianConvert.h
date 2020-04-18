@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -26,6 +26,9 @@
 #ifndef _NETCONVERT_H_
 #define _NETCONVERT_H_
 
+//******************************************************************************
+// Header
+
 #include <endian.h>   // __BYTE_ORDER __LITTLE_ENDIAN
 #include <type_traits>
 #include <byteswap.h>
@@ -33,6 +36,16 @@
 namespace EtEndian
 {
 
+//*****************************************************************************
+//! \brief host_to_network
+//!
+
+template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
+                                     (sizeof(T) == 1), int> = 0>
+constexpr T host_to_network (T value) noexcept
+{
+    return value;
+}
 
 template<typename T, std::enable_if_t<std::is_arithmetic<T>::value &&
                                      (sizeof(T) == 2), int> = 0>
@@ -73,6 +86,10 @@ constexpr T host_to_network (T value) noexcept
 {
     static_assert(std::is_arithmetic<T>::value, "No arithmetic type");
 }
+
+//*****************************************************************************
+//! \brief network_to_host
+//!
 
 template <typename T>
 constexpr T network_to_host (T value) noexcept

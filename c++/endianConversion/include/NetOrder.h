@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -26,32 +26,36 @@
 #ifndef _NETORDER_H_
 #define _NETORDER_H_
 
+//******************************************************************************
+// Header
+
 #include <string>
 #include <type_traits>
 #include <array>
-#include "detail/EndianConverter.h"
+#include <EndianConverter.h>
+#include <templateHelpers.h>
 
 namespace EtEndian
 {
 
-template <typename T>
-using removeConstReference_t = std::remove_const_t<std::remove_reference_t<T>>;
-
+//*****************************************************************************
+//! \brief CNetOrder
+//!
 
 template<typename T>
 class CNetOrder
 {
 public:
-    template<typename U, std::enable_if_t<!std::is_same<removeConstReference_t<U>, CNetOrder>::value, int> = 0>
+    CNetOrder()                            = delete;
+    CNetOrder(const CNetOrder&)            = default;
+    CNetOrder& operator=(const CNetOrder&) = delete;
+
+    template<typename U, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<U>, CNetOrder>, int> = 0>
     CNetOrder(U &&obj) noexcept :
         m_converterFunc(EConvertMode::NET_ORDER, std::forward<U>(obj))
     {
         doForAllMembers<T>(m_converterFunc);
     }
-
-    CNetOrder()                            = delete;
-    CNetOrder(const CNetOrder&)            = default;
-    CNetOrder& operator=(const CNetOrder&) = delete;
 
     const T& HostOrder() const noexcept
     {
@@ -68,8 +72,24 @@ private:
 
 //https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
 template<class U>
-CNetOrder(U) -> CNetOrder<removeConstReference_t<U>>;
-}
+CNetOrder(U) -> CNetOrder<utils::remove_cvref_t<U>>;
 
+//*****************************************************************************
+//! \brief type trait to check if CHostOrder
+//!
+
+template<typename T>
+struct is_net_order :  std::false_type{};
+
+template<typename T>
+struct is_net_order<CNetOrder<T>>
+{
+    static constexpr bool value = std::is_trivially_copyable_v<T>;
+};
+
+template <typename T>
+inline constexpr bool is_net_order_v = is_net_order<T>::value;
+
+}
 
 #endif //_NETORDER_H_

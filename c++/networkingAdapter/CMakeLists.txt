@@ -1,34 +1,37 @@
 
 ######################################################
-#Sources and Headers to build
+# Sources
+
 set(SOURCES
     "src/IpAddress.cpp"
     "src/BaseSocket.cpp"
     "src/Lookup/HostLookup.cpp"
     "src/Lookup/InterfacesLookup.cpp"
-    "src/Stream/StreamDataLink.cpp"
-    "src/Stream/StreamServer.cpp"
-    "src/Stream/StreamClient.cpp"
-    "src/Dgram/DgramClient.cpp"
-    "src/Dgram/DgramDataLink.cpp"
-    "src/Dgram/DgramServer.cpp"
+    "src/Tcp/TcpDataLink.cpp"
+    "src/Tcp/TcpServer.cpp"
+    "src/Tcp/TcpClient.cpp"
+    "src/Udp/UdpClient.cpp"
+    "src/Udp/UdpDataLink.cpp"
+    "src/Udp/UdpServer.cpp"
 )
 
 set(HEADERS
-    "include/IpAddress.hpp"
     "include/BaseSocket.hpp"
+    "include/IpAddress.hpp"
+    "include/NetAdapter.hpp"
     "include/Lookup/HostLookup.hpp"
     "include/Lookup/InterfacesLookup.hpp"
-    "include/Stream/StreamDataLink.hpp"
-    "include/Stream/StreamServer.hpp"
-    "include/Stream/StreamClient.hpp"
-    "include/Dgram/DgramClient.hpp"
-    "include/Dgram/DgramDataLink.hpp"
-    "include/Dgram/DgramServer.hpp"
+    "include/Tcp/TcpDataLink.hpp"
+    "include/Tcp/TcpServer.hpp"
+    "include/Tcp/TcpClient.hpp"
+    "include/Udp/UdpClient.hpp"
+    "include/Udp/UdpDataLink.hpp"
+    "include/Udp/UdpServer.hpp"
 )
 
 ######################################################
-#Build target
+# Build target
+
 add_library(networkingAdapter SHARED
     ${SOURCES}
     ${HEADERS}
@@ -40,8 +43,9 @@ set_target_properties(networkingAdapter PROPERTIES
     CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(networkingAdapter PRIVATE
-    PUBLIC EMBTOM::utilsCpp
+target_link_libraries(networkingAdapter
+    PUBLIC  EMBTOM::endianConversion
+    PUBLIC  EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 
@@ -55,9 +59,13 @@ set_target_properties(networkingAdapter PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+target_compile_definitions(networkingAdapter
+    PUBLIC NETWORKING_ADAPTER_VERSION="${PROJECT_VERSION}"
+)
+
 ######################################################
-#Install rules
-install(TARGETS networkingAdapter EXPORT networkingadapter-targets
+# Install rules
+install(TARGETS networkingAdapter EXPORT networkingAdapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
@@ -66,12 +74,12 @@ install(FILES ${HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
 )
 
-install(EXPORT networkingadapter-targets
+install(EXPORT networkingAdapter-targets
     NAMESPACE
         EMBTOM::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )
 
-install(FILES "cmake/networkingadapter-config.cmake"
+install(FILES "cmake/networkingAdapter-config.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
 )

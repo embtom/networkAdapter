@@ -1,2 +1,0 @@
-add_subdirectory(dgramClient)
-add_subdirectory(dgramServer)

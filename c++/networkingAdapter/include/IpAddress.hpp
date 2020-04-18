@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -93,8 +93,8 @@ public:
 
     bool operator== (const CIpAddress& rhs) const noexcept;
     bool operator!= (const CIpAddress& rhs) const noexcept;
-private:
 
+private:
     static size_t charCount(const std::string& rIpStr, char toCount) noexcept;
     mutable std::variant<std::monostate, in6_addr, in_addr> m_address;
 };

@@ -1,6 +1,6 @@
 /*
  * This file is part of the EMBTOM project
- * Copyright (c) 2018-2019 Thomas Willetal
+ * Copyright (c) 2018-2020 Thomas Willetal
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -47,17 +47,20 @@ public:
     CBaseSocket() noexcept                     = default;
     CBaseSocket(CBaseSocket const&)            = delete;
     CBaseSocket& operator=(CBaseSocket const&) = delete;
-    virtual ~CBaseSocket() noexcept;
 
+    CBaseSocket(int socketFd) noexcept;
     CBaseSocket(ESocketMode opMode);
     CBaseSocket(CBaseSocket &&rhs) noexcept;
     CBaseSocket& operator=(CBaseSocket&& rhs) noexcept;
+    virtual ~CBaseSocket() noexcept;
 
+    bool isValid() const noexcept;
     int getFd() const noexcept;
     int getDomain() const noexcept;
 
     static CBaseSocket&& SoReuseSocket(CBaseSocket &&rBaseSocket);
     static CBaseSocket&& SoBroadcast(CBaseSocket &&rBaseSocket);
+
 private:
     int         m_socketFd{-1};
 };
