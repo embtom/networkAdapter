@@ -46,6 +46,17 @@ struct STestData
     uint8_t  data2 {0};
 };
 
+template <>
+inline auto EtEndian::registerMembers<STestData>()
+{
+   return members(
+      member("name",   &STestData::name),
+      member("data0",  &STestData::data0),
+      member("data1",  &STestData::data1),
+      member("data2",   &STestData::data2)
+   );
+}
+
 class CDgramComTest : public  ::testing::Test
 {
 protected:
@@ -113,6 +124,34 @@ TEST_F(CDgramComTest, ComplexData)
 
     a.send(utils::span(dataTransmit));
     a.reciveFrom(utils::span(dataRecive));
+
+    EXPECT_EQ(dataTransmit, dataRecive);
+    t.join();
+}
+
+TEST_F(CDgramComTest, ComplexDataEndian)
+{
+    std::thread t([this]()
+    {
+        uint8_t rcvData[sizeof(STestData)] = {0};
+
+        CUdpDataLink a = m_Server.waitForConnection();
+        a.reciveFrom(utils::span<uint8_t>(rcvData), [&a, &rcvData](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)
+        {
+            std::cout << GTEST_BOX << "Rcv from: " << ClientAddr.Ip.toString() << " " << rcvData << std::endl;
+            a.sendTo(ClientAddr, rx);
+            return true;
+        });
+    });
+
+    auto a = m_Client.getLink(std::string("localhost"),50002);
+
+    STestData dataTransmit ("EndianConv", 0xFFBBCCDD, 0xAAEE, 0x88);
+    a.send(EtEndian::CNetOrder(dataTransmit));
+
+    EtEndian::CHostOrder<STestData> rx;
+    a.reciveFrom(rx);
+    const STestData& dataRecive = rx.HostOrder();
 
     EXPECT_EQ(dataTransmit, dataRecive);
     t.join();

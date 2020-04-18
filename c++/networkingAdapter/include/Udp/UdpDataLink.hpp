@@ -35,6 +35,8 @@
 #include <memory>
 #include <span.h>
 #include <templateHelpers.h>
+#include <HostOrder.h>
+#include <NetOrder.h>
 #include <NetAdapter.hpp>
 
 #include <IpAddress.hpp>
@@ -75,17 +77,32 @@ public:
     CUdpDataLink(CUdpDataLink &&rhs) noexcept;
     CUdpDataLink& operator=(CUdpDataLink&& rhs) noexcept;
 
-    void send(const utils::span<uint8_t>& rSpanTx) const;
-    void sendTo(const SPeerAddr& rClientAddr, const utils::span<uint8_t>& rSpanTx) const;
+    void send(const utils::span<const uint8_t>& rSpanTx) const;
 
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void send(const utils::span<T>& rTxSpan) const {
         send(rTxSpan.as_byte());
     }
 
+    template<typename T>
+    void send(const EtEndian::CNetOrder<T>& rTx)
+    {
+        utils::span<std::add_const_t<std::remove_reference_t<T>>> txSpan (rTx.NetworkOrder());
+        send(txSpan.as_byte());
+    }
+
+    void sendTo(const SPeerAddr& rClientAddr, const utils::span<const uint8_t>& rSpanTx) const;
+
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<T>& rTxSpan) const {
         sendTo(rClientAddr, rTxSpan.as_byte());
+    }
+
+    template<typename T>
+    void sendTo(const SPeerAddr& rClientAddr, const EtEndian::CNetOrder<T>& rTx)
+    {
+        utils::span<std::add_const_t<std::remove_reference_t<T>>> txSpan (rTx.NetworkOrder());
+        sendTo(rClientAddr, txSpan.as_byte());
     }
 
     ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd = defaultReciveFrom) const;
@@ -96,6 +113,14 @@ public:
             !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
     ERet reciveFrom(T&& rRxSpan, CallbackReciveFrom scanForEnd = defaultReciveFrom) {
         return reciveFrom(rRxSpan.as_byte(), scanForEnd);
+    }
+
+    template<typename T, std::enable_if_t<EtEndian::is_host_order_v<utils::remove_cvref_t<T>>, int> = 0>
+    ERet reciveFrom(T&& rRx, CallbackReciveFrom scanForEnd = defaultReciveFrom)
+    {
+        using orderType = typename utils::remove_cvref_t<T>::class_type;
+        utils::span<orderType> rxSpan(rRx.object());
+        return reciveFrom(rxSpan);
     }
 
     bool unblockRecive() noexcept;

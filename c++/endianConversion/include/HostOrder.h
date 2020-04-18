@@ -47,19 +47,26 @@ class CHostOrder
 public:
     using class_type = T;
 
-    CHostOrder()                              = delete;
     CHostOrder(const CHostOrder&)             = default;
     CHostOrder& operator=(const CHostOrder &) = delete;
 
     template<typename U, std::enable_if_t<!std::is_same<utils::remove_cvref_t<U>, CHostOrder>::value, int> = 0>
     CHostOrder(U &&obj) noexcept :
+        m_doItOnce(false),
         m_converterFunc(EConvertMode::HOST_ORDER, std::forward<U>(obj))
-    {
-        doForAllMembers<T>(m_converterFunc);
-    }
+    {  }
 
-    const T& HostOrder() const noexcept
+    CHostOrder() noexcept :
+        m_doItOnce(false),
+        m_converterFunc(EConvertMode::HOST_ORDER)
+    {  }
+
+    const T& HostOrder() noexcept
     {
+        if (!m_doItOnce) {
+            doForAllMembers<class_type>(m_converterFunc);
+            m_doItOnce = true;
+        }
         return m_converterFunc.converted();
     }
 
@@ -67,13 +74,36 @@ public:
     {
         return m_converterFunc.value();
     }
+
+    T& object() noexcept
+    {
+        return m_converterFunc.object();
+    } 
 private:
+    bool m_doItOnce;
     ConverterFunc<T> m_converterFunc;
 };
 
 //https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
 template<class U>
 CHostOrder(U) -> CHostOrder<utils::remove_cvref_t<U>>;
+
+
+//*****************************************************************************
+//! \brief type trait to check if CHostOrder
+//!
+
+template<typename T>
+struct is_host_order :  std::false_type{};
+
+template<typename T>
+struct is_host_order<EtEndian::CHostOrder<T>> : std::true_type
+{
+//    static constexpr bool value = true; //std::is_trivially_copyable_v<T>;
+};
+
+template <typename T>
+inline constexpr bool is_host_order_v = is_host_order<T>::value;
 
 }
 

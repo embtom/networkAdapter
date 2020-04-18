@@ -35,7 +35,10 @@
 #include <memory>
 #include <span.h>
 #include <templateHelpers.h>
+#include <HostOrder.h>
+#include <NetOrder.h>
 #include <NetAdapter.hpp>
+
 
 namespace EtNet
 {
@@ -69,11 +72,18 @@ public:
     CTcpDataLink(CTcpDataLink &&rhs) noexcept;
     CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
 
-    void send(const utils::span<uint8_t>& rTxSpan) const;
+    void send(const utils::span<const uint8_t>& rTxSpan) const;
 
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void send(const utils::span<T>& rTxSpan) const {
         send(rTxSpan.as_byte());
+    }
+
+    template<typename T>
+    void send(const EtEndian::CNetOrder<T>& rTx)
+    {
+        utils::span<std::add_const_t<std::remove_reference_t<T>>> txSpan (rTx.NetworkOrder());
+        send(txSpan.as_byte());
     }
 
     ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
@@ -82,8 +92,17 @@ public:
     template<typename T, std::enable_if_t<
             utils::is_span_v<utils::remove_cvref_t<T>> &&
             !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
-    ERet recive(T&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead) {
+    ERet recive(T&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead)
+    {
         return recive(rRxSpan.as_byte(), scanForEnd);
+    }
+
+    template<typename T, std::enable_if_t<EtEndian::is_host_order_v<utils::remove_cvref_t<T>>, int> = 0>
+    ERet recive(T&& rRx, CallbackReceive scanForEnd = defaultOneRead)
+    {
+        using orderType = typename utils::remove_cvref_t<T>::class_type;
+        utils::span<orderType> rxSpan(rRx.object());
+        return recive(rxSpan);
     }
 
     bool unblockRecive() noexcept;

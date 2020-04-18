@@ -47,6 +47,18 @@ struct STestData
     uint8_t  data2 {0};
 };
 
+template <>
+inline auto EtEndian::registerMembers<STestData>()
+{
+   return members(
+      member("name",   &STestData::name),
+      member("data0",  &STestData::data0),
+      member("data1",  &STestData::data1),
+      member("data2",   &STestData::data2)
+   );
+}
+
+
 class CTcpComTest : public  ::testing::Test
 {
 protected:
@@ -124,6 +136,41 @@ TEST_F(CTcpComTest, ComplexData)
     EXPECT_EQ(dataTransmit, dataRecive);
     t.join();
 }
+
+TEST_F(CTcpComTest, ComplexDataEndian)
+{
+
+    std::thread t([this]()
+    {
+        uint8_t rcvData[sizeof(STestData)] = {0};
+        utils::span<uint8_t> rcvSpan (rcvData);
+
+        CTcpDataLink a;
+        CIpAddress b;
+
+        std::tie(a, b) = m_Server.waitForConnection();
+        std::cout << GTEST_BOX << "Server connectd from: " << b.toString() << std::endl;
+        a.recive(rcvSpan, [&a, &rcvData](utils::span<uint8_t> rx)
+        {
+            std::cout << GTEST_BOX << "Rcv from: " << rx.size() << std::endl;
+            a.send(rx);
+            return true;
+        });
+    });
+
+    auto a = m_Client.connect(std::string("localhost"),50003);
+
+    STestData dataTransmit ("hallo", 0xFFBBCCDD, 0xAAEE, 0x88);
+    a.send(EtEndian::CNetOrder(dataTransmit));
+
+    EtEndian::CHostOrder<STestData> rx;
+    a.recive(rx);
+    const STestData& dataRecive = rx.HostOrder();
+
+    EXPECT_EQ(dataTransmit, dataRecive);
+    t.join();
+}
+
 
 int main(int argc, char **argv)
 {

@@ -50,7 +50,7 @@ namespace EtNet
         CTcpDataLinkPrivate(int socketFd) noexcept;
         CTcpDataLinkPrivate(CBaseSocket&& rBaseSocket) noexcept;
         ~CTcpDataLinkPrivate() noexcept;
-        void send(const utils::span<uint8_t>& rTxSpan) const;
+        void send(const utils::span<const uint8_t>& rTxSpan) const;
 
         bool unblockRecive() noexcept;
         CTcpDataLink::ERet recive(utils::span<uint8_t>& rRxSpan, CTcpDataLink::CallbackReceive scanForEnd);
@@ -96,7 +96,7 @@ CTcpDataLinkPrivate::~CTcpDataLinkPrivate() noexcept
     }
 }
 
-void CTcpDataLinkPrivate::send(const utils::span<uint8_t>& rTxSpan) const
+void CTcpDataLinkPrivate::send(const utils::span<const uint8_t>& rTxSpan) const
 {
     std::size_t dataWritten = 0;
 
@@ -268,7 +268,7 @@ CTcpDataLink& CTcpDataLink::operator=(CTcpDataLink&& rhs) noexcept
     return *this;
 }
 
-void CTcpDataLink::send(const utils::span<uint8_t>& rTxSpan) const
+void CTcpDataLink::send(const utils::span<const uint8_t>& rTxSpan) const
 {
     m_pPrivate->send(rTxSpan);
 }

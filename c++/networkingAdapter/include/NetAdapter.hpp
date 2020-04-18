@@ -27,6 +27,7 @@
 #define _NETADAPTER_H_
 
 #include <type_traits>
+#include <HostOrder.h>
 #include <templateHelpers.h>
 
 namespace EtNet
@@ -43,6 +44,7 @@ struct is_span_uint8_t<utils::span<T>> // : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_span_uint8_t_v = is_span_uint8_t<T>::value;
+
 
 }
 

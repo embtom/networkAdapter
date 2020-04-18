@@ -60,6 +60,10 @@ public:
         m_initialObj(std::forward<U>(rObj))
     { };
 
+    ConverterFunc(EConvertMode mode) noexcept :
+        m_ConvertMode(mode)
+    { };
+
     ConverterFunc(const ConverterFunc&) = default;
 
     template<typename Member, std::enable_if_t<std::is_arithmetic<EtEndian::get_member_type<Member>>::value, int> = 0>
@@ -158,6 +162,11 @@ public:
         //destString.swap(sourceString);
     }
 
+    T& object() noexcept
+    {
+        return m_initialObj;
+    }
+
     const T& value() const noexcept
     {
         return m_initialObj;
@@ -170,8 +179,8 @@ public:
 
 private:
     const EConvertMode  m_ConvertMode;
-    const T             m_initialObj;
-    T                   m_convertedObj;
+    T   m_initialObj;
+    T   m_convertedObj;
 };
 
 }
