@@ -34,6 +34,9 @@ deploy_job:
     - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-examples
     - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkingadapter
     - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkingadapter*_amd64.changes
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - ./scripts/createTag.sh
   when: on_success
   only:
     - master
@@ -45,6 +48,8 @@ enable_merge:
   script:
     - ./scripts/createChroot.sh
     - ./scripts/buildPackage.sh
+    #- export CI_TAG=$(./scripts/createTag.sh)
+    #- git tag -a "${CI_TAG}" -m "gitlab release build ${CI_TAG}"
   artifacts:
     paths:
       - ./build_deb/
