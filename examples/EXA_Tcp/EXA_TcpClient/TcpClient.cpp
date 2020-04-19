@@ -27,45 +27,29 @@
 // Headers
 
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <array>
 #include <string>
 #include <map>
 #include <NetOrder.h>
+#include <HostOrder.h>
 #include <docopt.h>
 #include <span.h>
 #include <threadLoop.h>
 #include <BaseSocket.hpp>
 #include <Tcp/TcpClient.hpp>
 #include <Tcp/TcpDataLink.hpp>
+#include <ComProto.hpp>
+
+constexpr int PORT_NUM = 5001;
 
 using namespace EtNet;
+using namespace EtEndian;
 
 //*****************************************************************************
 //! \brief EXA_TcpClient
 //!
-
-struct dataTx
-{
-    std::string info;
-    uint32_t data1;
-    uint16_t data2;
-};
-
-
-template <>
-inline auto EtEndian::registerMembers<dataTx>()
-{
-   return members(
-      member("info",   &dataTx::info),
-      member("data1",   &dataTx::data1),
-      member("data2",   &dataTx::data2)
-
-   );
-}
-
-using namespace EtEndian;
-
 
 int main(int argc, char *argv[])
 {
@@ -90,6 +74,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    ////////////////////////////////
+    // Connect Server
     auto baseSocket = CBaseSocket(ESocketMode::INET_STREAM);
     CTcpClient TcpClient(std::move(baseSocket));
 
@@ -98,53 +84,59 @@ int main(int argc, char *argv[])
 
     EtNet::CTcpDataLink a;
     try {
-        a = TcpClient.connect(hostName, 5001);
+        a = TcpClient.connect(hostName, PORT_NUM);
     }
     catch(const std::exception& e) {
         std::cout << "Failed to establish connection: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
+    ////////////////////////////////
+    // Rcv Loop
     unsigned rcvCount {0};
     auto rcvFunc = [&a, &rcvCount]()
     {
-        uint8_t buffer [128];
-        utils::span<uint8_t> rxSpan(buffer);
-        CTcpDataLink::ERet ret = a.recive(rxSpan, [&rcvCount] (utils::span<uint8_t> rx) {
-            std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
-            rcvCount++;
-            return true;
-        });
-
-        if (CTcpDataLink::ERet::UNBLOCK == ret) {
+        EtEndian::CHostOrder<ComProto> rx;
+        if(CTcpDataLink::ERet::UNBLOCK == a.recive(rx))
+        {
             std::cout << "finish" << std::endl;
             return true;
         }
 
-        std::cout << "Called " << rcvCount << std::endl;
+        const ComProto& rxData = rx.HostOrder();
+
+        EtEndian::doForAllMembers<ComProto>(
+            [&rxData](const auto& member)
+        {
+            using MemberT = EtEndian::get_member_type<decltype(member)>;
+            std::cout << std::hex << " " << std::left
+                      << std::setw(20) << member.getName()
+                      << std::setw(20) << member.getConstRef(rxData)
+                      << std::endl;
+        });
+        std::cout << "----" << std::endl;
         return false;
     };
 
     utils::CThreadLoop rcvLoop (rcvFunc, "RX_Worker");
     rcvLoop.start(std::chrono::milliseconds::zero());
 
-
-    dataTx tx {"Hallo", 0 ,0};
-
-    std::string toSend = std::string("Hallo");
+    ////////////////////////////////
+    // Tx
+    ComProto tx {"Hallo", 0 ,0, 0};
     for (int i = 0; i < 10; i++)
     {
         tx.data1 = 0xffaa0000 + i;
         tx.data2 = 0xAA00 + i;
-        dataTx netOrderTx = CNetOrder(tx).NetworkOrder();
-
-        utils::span<dataTx> bla (dataTx);
-
-       // a.send(utils::span<char>(netOrderTx));
+        a.send(CNetOrder(tx));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    tx.disconnect = 1;
+    a.send(CNetOrder(tx));
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
     a.unblockRecive();
     rcvLoop.waitUntilFinished();
+
+    return EXIT_SUCCESS;
 }

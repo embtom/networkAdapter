@@ -102,7 +102,7 @@ public:
     {
         using orderType = typename utils::remove_cvref_t<T>::class_type;
         utils::span<orderType> rxSpan(rRx.object());
-        return recive(rxSpan);
+        return recive(rxSpan, scanForEnd);
     }
 
     bool unblockRecive() noexcept;

@@ -27,16 +27,24 @@
 // Headers
 
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <array>
 #include <string>
 #include <map>
+#include <NetOrder.h>
+#include <HostOrder.h>
 #include <docopt.h>
+#include <span.h>
+#include <threadLoop.h>
 #include <BaseSocket.hpp>
 #include <Udp/UdpClient.hpp>
+#include <ComProto.hpp>
 
-#define PORT_NUM 50002
-#define BUF_SIZE 100
+constexpr int PORT_NUM = 50002;
+
+using namespace EtNet;
+using namespace EtEndian;
 
 //*****************************************************************************
 //! \brief EXA_UdpClient
@@ -65,36 +73,69 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    uint8_t buffer [128];
-    utils::span<uint8_t> rxSpan(buffer);
-
-    /* Create a datagram socket; send to an address in the IPv6 domain */
-    auto baseSocket = EtNet::CBaseSocket(EtNet::CBaseSocket::SoReuseSocket(EtNet::ESocketMode::INET_DGRAM));
-    EtNet::CUdpClient abc (std::move(baseSocket));
+    ////////////////////////////////
+    // Connect Server
+    auto baseSocket = CBaseSocket(CBaseSocket::SoReuseSocket(ESocketMode::INET_DGRAM));
+    CUdpClient UdpClient (std::move(baseSocket));
 
     std::string hostName(args["<hostname>"].asString());
     std::cout << "try to connect to: " << hostName << std::endl;
 
-    EtNet::CUdpDataLink d;
+    CUdpDataLink DataLink;
     try {
-        d = abc.getLink(hostName, PORT_NUM);
+        DataLink = UdpClient.getLink(hostName, PORT_NUM);
     }
     catch(const std::exception& e) {
         std::cout << "Failed to establish connection: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
-    /* Send messages to server; echo responses on stdout */
-    for (int j = 0; j < 2; j++) {
-
-        std::string test = std::string("Hallo") + std::to_string(j);
-        d.send(utils::span(test).as_byte());
-
-        d.reciveFrom(rxSpan, [](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx) {
-            std::cout << "Rcv Len: " << rx.data() << " Size: " << rx.size() << std::endl;
+    ////////////////////////////////
+    // Rcv Loop
+    unsigned rcvCount {0};
+    auto rcvFunc = [&DataLink, &rcvCount]()
+    {
+        EtEndian::CHostOrder<ComProto> rx;
+        if(CUdpDataLink::ERet::UNBLOCK == DataLink.reciveFrom(rx))
+        {
+            std::cout << "finish" << std::endl;
             return true;
+        }
+
+        const ComProto& rxData = rx.HostOrder();
+
+        EtEndian::doForAllMembers<ComProto>(
+            [&rxData](const auto& member)
+        {
+            using MemberT = EtEndian::get_member_type<decltype(member)>;
+            std::cout << std::hex << " " << std::left
+                      << std::setw(20) << member.getName()
+                      << std::setw(20) << member.getConstRef(rxData)
+                      << std::endl;
         });
+        std::cout << "----" << std::endl;
+        return false;
+    };
+
+    utils::CThreadLoop rcvLoop (rcvFunc, "RX_Worker");
+    rcvLoop.start(std::chrono::milliseconds::zero());
+
+    ////////////////////////////////
+    // Tx
+    ComProto tx {"Hallo", 0 ,0, 0};
+    for (int i = 0; i < 10; i++)
+    {
+        tx.data1 = 0xffaa0000 + i;
+        tx.data2 = 0xAA00 + i;
+        DataLink.send(CNetOrder(tx));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+
+    tx.disconnect = 1;
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    DataLink.unblockRecive();
+    rcvLoop.waitUntilFinished();
 
     return EXIT_SUCCESS;
 }

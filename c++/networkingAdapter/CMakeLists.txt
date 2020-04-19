@@ -36,12 +36,7 @@ add_library(networkingAdapter SHARED
     ${SOURCES}
     ${HEADERS}
 )
-
-set_target_properties(networkingAdapter PROPERTIES
-    DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
-    CXX_STANDARD   ${CMAKE_CXX_STANDARD}
-    CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
-)
+add_library(EMBTOM::networkingAdapter ALIAS networkingAdapter)
 
 target_link_libraries(networkingAdapter
     PUBLIC  EMBTOM::endianConversion

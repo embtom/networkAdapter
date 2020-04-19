@@ -10,11 +10,13 @@ set (SOURCES TcpServer.cpp)
 add_executable(EXA_TcpServer ${SOURCES})
 set_target_properties(EXA_TcpServer PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
-    CXX_STANDARD   ${CMAKE_CXX_STANDARD}
-    CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(EXA_TcpServer PRIVATE networkingAdapter)
+target_link_libraries(EXA_TcpServer
+    EMBTOM::endianConversion
+    EMBTOM::networkingAdapter
+    ComProto
+)
 
 #######################################################################################
 #Install rules

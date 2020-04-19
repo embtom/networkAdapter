@@ -10,11 +10,13 @@ set (SOURCES UdpServer.cpp)
 add_executable(EXA_UdpServer ${SOURCES})
 set_target_properties(EXA_UdpServer PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
-    CXX_STANDARD   ${CMAKE_CXX_STANDARD}
-    CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
-target_link_libraries(EXA_UdpServer networkingAdapter)
+target_link_libraries(EXA_UdpServer
+    EMBTOM::endianConversion
+    EMBTOM::networkingAdapter
+    ComProto
+)
 
 #######################################################################################
 #Install rules

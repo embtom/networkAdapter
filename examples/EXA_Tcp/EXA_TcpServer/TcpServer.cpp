@@ -4,7 +4,7 @@
  * (https://github.com/embtom)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
+ * DataLink copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
  * distribute, sublicense, and/or sell copies of the Software, and to
@@ -27,39 +27,67 @@
 // Headers
 
 #include <iostream>
+#include <iomanip>
 #include <array>
 #include <span.h>
 #include <BaseSocket.hpp>
 #include <Tcp/TcpServer.hpp>
 #include <Tcp/TcpDataLink.hpp>
+#include <ComProto.hpp>
+
+constexpr int PORT_NUM = 5001;
+
+using namespace EtNet;
 
 //*****************************************************************************
 //! \brief EXA_TcpServer
 //!
-
 int main(int argc, char *argv[])
 {
-    auto baseSocket = EtNet::CBaseSocket(EtNet::ESocketMode::INET_STREAM);
-    EtNet::CTcpServer CTcpServer(std::move(baseSocket), 5001);
+    auto baseSocket = CBaseSocket(ESocketMode::INET_STREAM);
+    CTcpServer CTcpServer(std::move(baseSocket), PORT_NUM);
 
-    EtNet::CTcpDataLink a;
-    EtNet::CIpAddress b;
-    std::tie(a,b) = CTcpServer.waitForConnection();
+    CTcpDataLink DataLink;
+    CIpAddress peerIp;
 
-    while(true)
+    while (true)
     {
-        uint8_t buffer [128];
-        utils::span<uint8_t> rxSpan(buffer);
-        a.recive(rxSpan, [&a](utils::span<uint8_t> rx) {
-            std::cout << "Rcv Len:" << rx.size() << std::endl;;
+        std::cout<< "Wait for connection" << std::endl;
+        std::tie(DataLink,peerIp) = CTcpServer.waitForConnection();
+        std::cout << "Connected by: " << peerIp.toString() << std::endl;
 
-            for (uint8_t& elem : rx) {
-                elem = toupper(elem);
+        bool serverActive = true;
+        while(serverActive)
+        {
+            EtEndian::CHostOrder<ComProto> rx;
+            DataLink.recive(rx);
+            const ComProto& rxData = rx.HostOrder();
+
+            EtEndian::doForAllMembers<ComProto>(
+                [&rxData](const auto& member)
+            {
+                using MemberT = EtEndian::get_member_type<decltype(member)>;
+                std::cout << std::hex << " " << std::left
+                          << std::setw(20) << member.getName()
+                          << std::setw(20) << member.getConstRef(rxData)
+                          << std::endl;
+            });
+            std::cout << "----" << std::endl;
+
+            ComProto txData;
+            int i;
+            for(i = 0; i < strlen(rxData.info); i++) {
+                txData.info[i] = toupper(rxData.info[i]);
             }
-
-            a.send(rx);
-            return true;
-        });
+            memcpy(&txData.info[i],"Echo",4);
+            txData.data1 = rxData.data1;
+            txData.data2 = rxData.data2;
+            txData.disconnect = rxData.disconnect;
+            if(rxData.disconnect) {
+                std::cout << "Disconntected" << std::endl;
+                serverActive = false;
+            }
+            DataLink.send(EtEndian::CNetOrder(txData));
+        }
     }
-
 }
