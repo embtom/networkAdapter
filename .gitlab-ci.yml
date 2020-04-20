@@ -37,6 +37,7 @@ deploy_job:
     - cd .. 
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git remote set-url origin ssh://git@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - ./scripts/createTag.sh
   when: on_success
   only:
