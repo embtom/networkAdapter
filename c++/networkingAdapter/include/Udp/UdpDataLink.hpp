@@ -39,6 +39,8 @@
 #include <NetOrder.h>
 #include <NetAdapter.hpp>
 
+#include <iostream>
+
 #include <IpAddress.hpp>
 
 namespace EtNet
@@ -50,7 +52,11 @@ struct SPeerAddr
     unsigned int Port {0};
 };
 
-constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, utils::span<uint8_t> rx){ return false; };
+constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, utils::span<uint8_t> rx)
+{
+    std::cout << "DefaultRecive" << std::endl;
+    return false; 
+};
 
 class CUdpDataLinkPrivate;
 //*****************************************************************************
@@ -120,7 +126,7 @@ public:
     {
         using orderType = typename utils::remove_cvref_t<T>::class_type;
         utils::span<orderType> rxSpan(rRx.object());
-        return reciveFrom(rxSpan);
+        return reciveFrom(rxSpan, scanForEnd);
     }
 
     bool unblockRecive() noexcept;

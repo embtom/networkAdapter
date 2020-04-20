@@ -27,22 +27,17 @@
 // Headers
 
 #include <iostream>
-#include <thread>
-
-#include <stdio.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <arpa/inet.h>
-
+#include <iomanip>
+#include <array>
 #include <span.h>
 #include <BaseSocket.hpp>
+#include <Udp/UdpServer.hpp>
+#include <Udp/UdpDataLink.hpp>
+#include <ComProto.hpp>
 #include <Lookup/InterfacesLookup.hpp>
 #include <Lookup/HostLookup.hpp>
-#include <Udp/UdpServer.hpp>
 
-#define PORT_NUM 50002
+constexpr int PORT_NUM = 50002;
 
 using namespace EtNet;
 
@@ -58,21 +53,44 @@ int main()
 
     while (true)
     {
-        uint8_t buffer [128] = {0};
-        utils::span<uint8_t> rxtxSpan (buffer);
+        CUdpDataLink a = UdpServer.waitForConnection();
+        SPeerAddr activePeerAddr;
 
-        EtNet::CUdpDataLink a = UdpServer.waitForConnection();
-        a.reciveFrom(rxtxSpan,[&a](EtNet::SPeerAddr ClientAddr, utils::span<uint8_t> rx)
+        EtEndian::CHostOrder<ComProto> rx;
+        a.reciveFrom(rx, [&activePeerAddr] (SPeerAddr ClientAddr, utils::span<uint8_t> rx)
         {
-            EtNet::SPeerAddr peer {CIpAddress("192.168.1.255"), ClientAddr.Port};
-            std::cout << "Message form: " << ClientAddr.Ip.toString() << " with length: " << rx.size() << std::endl;
-            for(auto &elem : rx) {
-                elem = toupper(elem);
-            }
-            a.sendTo(ClientAddr, rx);
-            return true;
+            activePeerAddr = ClientAddr;
+            std::cout << "Connected from: " << ClientAddr.Ip.toString() << std::endl;
+            return false;
         });
 
+        const ComProto& rxData = rx.HostOrder();
+
+        EtEndian::doForAllMembers<ComProto>(
+            [&rxData](const auto& member)
+        {
+            using MemberT = EtEndian::get_member_type<decltype(member)>;
+            std::cout << std::hex << " " << std::left
+                      << std::setw(20) << member.getName()
+                      << std::setw(20) << member.getConstRef(rxData)
+                      << std::endl;
+        });
+        std::cout << "----" << std::endl;
+
+        ComProto txData;
+        int i;
+        for(i = 0; i < strlen(rxData.info); i++) {
+            txData.info[i] = toupper(rxData.info[i]);
+        }
+        memcpy(&txData.info[i],"Echo\0",5);
+        txData.data1 = rxData.data1;
+        txData.data2 = rxData.data2;
+        txData.disconnect = rxData.disconnect;
+        if(rxData.disconnect) {
+            std::cout << "Last Message from peer" << std::endl;
+        }
+
+        a.sendTo(activePeerAddr, EtEndian::CNetOrder(txData));
     }
 }
 

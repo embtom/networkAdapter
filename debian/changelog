@@ -1,3 +1,11 @@
+networkingadapter (0.9.3) bionic; urgency=medium
+
+  * Fix to pass CallbackReceive
+  * Add alias TARGET EMBTOM::networkingAdapter
+  * Rework Examples to endian converter interface
+
+ -- Thomas Willetal <t.willetal@gmail.com>  Sun, 19 Apr 2020 13:00:00 +0200
+
 networkingadapter (0.9.2) bionic; urgency=medium
 
   * Cleanup CMake files

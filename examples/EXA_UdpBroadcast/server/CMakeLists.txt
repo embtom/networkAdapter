@@ -10,12 +10,12 @@ set (SOURCES broadServer.cpp)
 add_executable(EXA_BroadServer ${SOURCES})
 set_target_properties(EXA_BroadServer PROPERTIES
     DEBUG_POSTFIX  ${CMAKE_DEBUG_POSTFIX}
-    CXX_STANDARD   ${CMAKE_CXX_STANDARD}
-    CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS}
 )
 
 target_link_libraries(EXA_BroadServer
-    networkingAdapter
+    EMBTOM::endianConversion
+    EMBTOM::networkingAdapter
+    ComProto
 )
 
 #######################################################################################
