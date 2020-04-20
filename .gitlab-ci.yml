@@ -34,6 +34,7 @@ deploy_job:
     - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-examples
     - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkingadapter
     - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkingadapter*_amd64.changes
+    - cd .. 
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - ./scripts/createTag.sh
