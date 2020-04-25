@@ -1,0 +1,7 @@
+Origin: network-adapter_lin_x64_builder
+Label: network-adapter_lin_x64_builder
+Codename: bionic
+Suite: stable
+Architectures: amd64 source
+Components: main
+Description: Embtom Repository Unstable

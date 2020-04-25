@@ -2,17 +2,49 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build debian package",
+            "label": "create build container with reprepo",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/buildPackage.sh",
+            "command": "${workspaceFolder}/scripts/010_create_build_container.sh",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "build chroot for debian package build",
+            "label": "setup reprepo build dependencies",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/createChroot.sh",
+            "command": "${workspaceFolder}/scripts/020_setup_build_dependencies.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "setup reprepo import dependencies",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/021_setup_import_dependencies.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build basetgz localhost mirror",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/200_create_basetgz_localhost.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build basetgz tomhp mirror",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/200_create_basetgz_tomhp.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build deb package",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/300_build_deb_package.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -20,7 +52,7 @@
         {
             "label": "start EXA_HostName_g",
             "type": "shell",
-            "command": "${workspaceFolder}/build/GCC for x86_64-linux-gnu 7.4.0_Debug/examples/EXA_HostName/EXA_HostName_g",
+            "command": "${workspaceFolder}/build/GCC for x86_64-linux-gnu 7.5.0_Debug/examples/EXA_HostName/EXA_HostName_g",
             "args": [
                 "--host", "localhost"
             ]

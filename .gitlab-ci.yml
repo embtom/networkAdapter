@@ -12,8 +12,8 @@ build_job:
   tags:
     - tomhp
   script:
-    - ./scripts/createChroot.sh
-    - ./scripts/buildPackage.sh
+    - ./scripts/210_create_basetgz_tomhp.sh
+    - ./scripts/300_build_deb_package.sh
   artifacts:
     paths:
       - ./build_deb/
@@ -34,11 +34,11 @@ deploy_job:
     - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-examples
     - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkingadapter
     - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkingadapter*_amd64.changes
-    - cd .. 
+    - cd ..
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git remote set-url origin ssh://git@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
-    - ./scripts/createTag.sh
+    - ./scripts/400_create_tag.sh
   when: on_success
   only:
     - master
@@ -48,10 +48,8 @@ enable_merge:
   tags:
     - tomhp
   script:
-    - ./scripts/createChroot.sh
-    - ./scripts/buildPackage.sh
-    #- export CI_TAG=$(./scripts/createTag.sh)
-    #- git tag -a "${CI_TAG}" -m "gitlab release build ${CI_TAG}"
+    - ./scripts/210_create_basetgz_tomhp.sh
+    - ./scripts/300_build_deb_package.sh
   artifacts:
     paths:
       - ./build_deb/
