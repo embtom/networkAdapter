@@ -13,8 +13,8 @@ set_target_properties(EXA_UdpClient PROPERTIES
 )
 
 target_link_libraries(EXA_UdpClient
-    EMBTOM::endianConversion
-    EMBTOM::networkingAdapter
+    EMBTOM::endianconversion
+    EMBTOM::networkadapter
     Threads::Threads
     docopt
     ComProto

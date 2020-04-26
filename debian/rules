@@ -10,4 +10,4 @@ override_dh_auto_configure:
 						 -DNETWORKINGADAPTER_BUILD_TEST=ON -DNETWORKINGADAPTER_BUILD_EXAMPLES=ON
 
 override_dh_strip:
-	dh_strip -p networkingadapter --dbg-package=networkingadapter-dbg
+	dh_strip -p networkadapter --dbg-package=networkadapter-dbg

@@ -15,7 +15,7 @@ set_target_properties(TST_IpAddress PROPERTIES
 )
 
 target_link_libraries(TST_IpAddress
-    networkingAdapter
+    networkadapter
     GTest::GTest
     GTest::Main
 )

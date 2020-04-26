@@ -1,4 +1,4 @@
-Source: networkingadapter
+Source: networkadapter
 Section: devel
 Priority: optional
 Maintainer: Thomas Willetal <t.willetal@gmail.com>
@@ -6,35 +6,35 @@ Build-Depends: cmake, debhelper (>= 11), gcc (>= 7.4),
                utilscpp-dev (>= 1.2.4), libgtest-dev, libdocopt-dev
 Standards-Version: 4.3.0
 
-Package: networkingadapter
+Package: networkadapter
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends},
          ${misc:Depends},
 Description: Development headers of the emtom
-             networkingadapter
+             networkadapter
 
-Package: networkingadapter-examples
+Package: networkadapter-examples
 Architecture: any
 Section: libs
-Depends: networkingadapter, libdocopt0
+Depends: networkadapter, libdocopt0
 Description: Example applications of the emtom
-             networkingadapter
+             networkadapter
 
-Package: networkingadapter-dev
+Package: networkadapter-dev
 Architecture: any
 Section: libdevel
-Depends: networkingadapter,
+Depends: networkadapter,
          ${misc:Depends}
 Description: Development headers of the embtom
-             networkingadapter [development]
+             networkadapter [development]
 
-Package: networkingadapter-dbg
+Package: networkadapter-dbg
 Architecture: any
 Section: debug
 Priority: extra
 Depends:
-    networkingadapter (= ${binary:Version}),
+    networkadapter (= ${binary:Version}),
     ${misc:Depends}
-Description: debugging symbols for networkingadapter
+Description: debugging symbols for networkadapter
 

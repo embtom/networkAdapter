@@ -13,8 +13,8 @@ set_target_properties(EXA_Broadclient PROPERTIES
 )
 
 target_link_libraries(EXA_Broadclient
-    EMBTOM::endianConversion
-    EMBTOM::networkingAdapter
+    EMBTOM::endianconversion
+    EMBTOM::networkadapter
     Threads::Threads
     ComProto
 )

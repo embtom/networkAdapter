@@ -15,7 +15,7 @@ set_target_properties(TST_UdpDataLink PROPERTIES
 )
 
 target_link_libraries(TST_UdpDataLink
-    networkingAdapter
+    networkadapter
     GTest::GTest
     GTest::Main
 )

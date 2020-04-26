@@ -28,12 +28,12 @@ deploy_job:
   script:
     - cd ./build_deb
     - cp * /media/volume1/ci_projects/snapshot/networkingAdapter
-    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-dev
-    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-dbg
-    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter
-    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkingadapter-examples
-    - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkingadapter
-    - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkingadapter*_amd64.changes
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkadapter-dev
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkadapter-dbg
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkadapter
+    - reprepro -b /media/volume1/reprepo/ -A amd64 remove bionic networkadapter-examples
+    - reprepro -b /media/volume1/reprepo/ -A source remove bionic networkadapter
+    - reprepro --ignore=wrongdistribution -b /media/volume1/reprepo/ -V include bionic networkadapter*_amd64.changes
     - cd ..
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
