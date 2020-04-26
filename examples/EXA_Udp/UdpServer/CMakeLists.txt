@@ -13,8 +13,8 @@ set_target_properties(EXA_UdpServer PROPERTIES
 )
 
 target_link_libraries(EXA_UdpServer
-    EMBTOM::endianConversion
-    EMBTOM::networkingAdapter
+    EMBTOM::endianconversion
+    EMBTOM::networkadapter
     ComProto
 )
 

@@ -13,7 +13,7 @@ set_target_properties(EXA_InterfaceLookup PROPERTIES
 )
 
 target_link_libraries(EXA_InterfaceLookup
-    EMBTOM::networkingAdapter
+    EMBTOM::networkadapter
 )
 
 #######################################################################################

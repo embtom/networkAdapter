@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: networkingadapter
-Source: https://github.com/embtom/networkingadapter
+Upstream-Name: networkadapter
+Source: https://github.com/embtom/networkadapter
 Files: *
 Copyright: 2020 embtom
 License: GPL-3.0+

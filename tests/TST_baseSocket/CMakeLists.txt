@@ -19,7 +19,7 @@ target_include_directories(TST_baseSocket
 )
 
 target_link_libraries(TST_baseSocket
-    networkingAdapter
+    networkadapter
     GTest::GTest
     GTest::Main
 )

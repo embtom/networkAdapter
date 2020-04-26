@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-project(networkingAdapter
+project(networkadapter
     LANGUAGES   CXX
-    VERSION     0.9.4
+    VERSION     0.9.5
 )
 
 ######################################################
@@ -21,8 +21,8 @@ set(CMAKE_CXX_EXTENSIONS yes)
 ######################################################
 # Options
 
-option (NETWORKINGADAPTER_BUILD_TEST "build tests of the networkingAdapter" ON)
-option (NETWORKINGADAPTER_BUILD_EXAMPLES "build examples of the networkingAdapter" ON)
+option (NETWORKINGADAPTER_BUILD_TEST "build tests of the networkadapter" ON)
+option (NETWORKINGADAPTER_BUILD_EXAMPLES "build examples of the networkadapter" ON)
 
 ######################################################
 # Subdirectoris
@@ -30,12 +30,12 @@ add_subdirectory(c++)
 
 include(CTest)
 if (${BUILD_TESTING} AND ${NETWORKINGADAPTER_BUILD_TEST})
-    message(STATUS "Build with networkingAdapter Unit Tests")
+    message(STATUS "Build with networkadapter Unit Tests")
     enable_testing()
     add_subdirectory(tests)
 endif()
 
 if (${NETWORKINGADAPTER_BUILD_EXAMPLES})
-    message(STATUS "Build with networkingAdapter Examples")
+    message(STATUS "Build with networkadapter Examples")
     add_subdirectory(examples)
 endif()

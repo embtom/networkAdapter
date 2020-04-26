@@ -15,32 +15,32 @@ set(HEADERS
 ######################################################
 # Build target
 
-add_library(endianConversion INTERFACE)
-add_library(EMBTOM::endianConversion ALIAS endianConversion)
+add_library(endianconversion INTERFACE)
+add_library(EMBTOM::endianconversion ALIAS endianconversion)
 
-target_include_directories(endianConversion INTERFACE
+target_include_directories(endianconversion INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/detail>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianconversion>
 )
 
 ######################################################
 # Install rules
 
-install(TARGETS endianConversion EXPORT endianConversion-targets
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
+install(TARGETS endianconversion EXPORT endianconversion-targets
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianconversion"
 )
 
 install(FILES ${HEADERS}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianConversion"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/endianconversion"
 )
 
-install(EXPORT endianConversion-targets
+install(EXPORT endianconversion-targets
     NAMESPACE
         EMBTOM::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianConversion"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianconversion"
 )
 
-install(FILES "cmake/endianConversion-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianConversion"
+install(FILES "cmake/endianconversion-config.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/endianconversion"
 )

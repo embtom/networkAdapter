@@ -32,49 +32,49 @@ set(HEADERS
 ######################################################
 # Build target
 
-add_library(networkingAdapter SHARED
+add_library(networkadapter SHARED
     ${SOURCES}
     ${HEADERS}
 )
-add_library(EMBTOM::networkingAdapter ALIAS networkingAdapter)
+add_library(EMBTOM::networkadapter ALIAS networkadapter)
 
-target_link_libraries(networkingAdapter
-    PUBLIC  EMBTOM::endianConversion
+target_link_libraries(networkadapter
+    PUBLIC  EMBTOM::endianconversion
     PUBLIC  EMBTOM::utilsCpp
     PRIVATE Threads::Threads
 )
 
-target_include_directories(networkingAdapter PUBLIC
+target_include_directories(networkadapter PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkadapter>
 )
 
-set_target_properties(networkingAdapter PROPERTIES
+set_target_properties(networkadapter PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-target_compile_definitions(networkingAdapter
+target_compile_definitions(networkadapter
     PUBLIC NETWORKING_ADAPTER_VERSION="${PROJECT_VERSION}"
 )
 
 ######################################################
 # Install rules
-install(TARGETS networkingAdapter EXPORT networkingAdapter-targets
+install(TARGETS networkadapter EXPORT networkadapter-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkadapter"
 )
 
 install(FILES ${HEADERS}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkingAdapter"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/embtom/networkadapter"
 )
 
-install(EXPORT networkingAdapter-targets
+install(EXPORT networkadapter-targets
     NAMESPACE
         EMBTOM::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkadapter"
 )
 
-install(FILES "cmake/networkingAdapter-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkingAdapter"
+install(FILES "cmake/networkadapter-config.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/networkadapter"
 )

@@ -1,3 +1,3 @@
 
-add_subdirectory(networkingAdapter)
+add_subdirectory(networkAdapter)
 add_subdirectory(endianConversion)

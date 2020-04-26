@@ -13,7 +13,7 @@ set_target_properties(EXA_HostName PROPERTIES
 )
 
 target_link_libraries(EXA_HostName
-    EMBTOM::networkingAdapter
+    EMBTOM::networkadapter
     docopt
 )
 

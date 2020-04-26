@@ -13,8 +13,8 @@ set_target_properties(EXA_TcpServer PROPERTIES
 )
 
 target_link_libraries(EXA_TcpServer
-    EMBTOM::endianConversion
-    EMBTOM::networkingAdapter
+    EMBTOM::endianconversion
+    EMBTOM::networkadapter
     ComProto
 )
 

@@ -6,5 +6,5 @@ target_include_directories (ComProto
 )
 
 target_link_libraries(ComProto INTERFACE
-    EMBTOM::endianConversion
+    EMBTOM::endianconversion
 )

@@ -16,8 +16,8 @@ set_target_properties(TST_TcpConnection PROPERTIES
 )
 
 target_link_libraries(TST_TcpConnection
-    networkingAdapter
-    EMBTOM::endianConversion
+    networkadapter
+    EMBTOM::endianconversion
     GTest::GTest
     GTest::Main
 )
