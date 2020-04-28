@@ -50,13 +50,18 @@ enum class EAddressFamily{
 
 //*****************************************************************************
 //! \brief CIpAddress
+//!This class is a representation of IP address, suitable IPv4 or the IPv6
+//!address.
 //!
+//!IPv6 addresses are supported only if the target platform supports IPv6.
 class CIpAddress
 {
 public:
     using IpAddresses = std::vector<CIpAddress>;
 
+    //!Creates a emty Ip
     constexpr CIpAddress() noexcept         = default;
+    
     CIpAddress(const CIpAddress&)            = default;
     CIpAddress& operator=(const CIpAddress&) = default;
     CIpAddress(CIpAddress&&)                 = default;
