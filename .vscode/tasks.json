@@ -4,7 +4,7 @@
         {
             "label": "create build container with reprepo",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/010_create_build_container.sh",
+            "command": "${workspaceFolder}/scripts/010_docker_create.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -12,7 +12,7 @@
         {
             "label": "setup reprepo build dependencies",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/020_setup_build_dependencies.sh",
+            "command": "${workspaceFolder}/scripts/020_docker_build_depend.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -20,7 +20,7 @@
         {
             "label": "setup reprepo import dependencies",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/021_setup_import_dependencies.sh",
+            "command": "${workspaceFolder}/scripts/021_docker_import_depend.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -28,7 +28,7 @@
         {
             "label": "build basetgz localhost mirror",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/200_create_basetgz_localhost.sh",
+            "command": "${workspaceFolder}/scripts/200_basetgz_create_localhost.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -36,7 +36,7 @@
         {
             "label": "build basetgz tomhp mirror",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/200_create_basetgz_tomhp.sh",
+            "command": "${workspaceFolder}/scripts/200_basetgz_create_tomhp.sh",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -44,7 +44,7 @@
         {
             "label": "build deb package",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/300_build_deb_package.sh",
+            "command": "${workspaceFolder}/scripts/300_build_package.sh",
             "problemMatcher": [
                 "$gcc"
             ]

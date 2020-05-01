@@ -50,7 +50,7 @@ class CTcpDataLinkPrivate;
 
 //*****************************************************************************
 //! \brief CTcpDataLink
-//!
+//! The TcpDataLink is communication layer used by TcpClient and TcpServer
 class CTcpDataLink
 {
 public:
@@ -65,20 +65,29 @@ public:
     CTcpDataLink() noexcept                              = default;
     CTcpDataLink(CTcpDataLink const&)                    = default;
     CTcpDataLink& operator=(CTcpDataLink const&)         = default;
-    virtual ~CTcpDataLink() noexcept;
-
-    CTcpDataLink(int socketFd) noexcept;
-    CTcpDataLink(CBaseSocket&& rBaseSocket) noexcept;
     CTcpDataLink(CTcpDataLink &&rhs) noexcept;
     CTcpDataLink& operator=(CTcpDataLink&& rhs) noexcept;
+    virtual ~CTcpDataLink() noexcept;
 
+    //! The TcpDataLink is instantiated either by TcpServer or TcpClient
+    CTcpDataLink(int socketFd) noexcept;
+    CTcpDataLink(CBaseSocket&& rBaseSocket) noexcept;
+
+    //! data to transmit is passed by a the non-owning span view of type "const uint8_t"
+    //! e.g uint8_t txData[5] = {0,1,2,3,4};
+    //! e.g send(utils::span(txData));
     void send(const utils::span<const uint8_t>& rTxSpan) const;
 
+    //! data to transmit is passed by a the non-owning span view of any type T.
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void send(const utils::span<T>& rTxSpan) const {
         send(rTxSpan.as_byte());
     }
 
+    //! data to transmit is passed ty NetOrder reflection helper. It converts the data to transmit
+    //! automatically into Network-byte-order (Big Endian).
+    //! For reflection of the passed type a registration of the members (EtEndian::registerMembers<T>)
+    //! is required. See at examples
     template<typename T>
     void send(const EtEndian::CNetOrder<T>& rTx)
     {
@@ -86,9 +95,13 @@ public:
         send(txSpan.as_byte());
     }
 
+    //! the recive buffer is passed by a the non-owning span view of type "uint8_t"
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     ERet recive(utils::span<uint8_t>& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
     ERet recive(utils::span<uint8_t>&& rRxSpan, CallbackReceive scanForEnd = defaultOneRead);
 
+    //! the recive buffer is passed by a the non-owning span view of any type T.
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     template<typename T, std::enable_if_t<
             utils::is_span_v<utils::remove_cvref_t<T>> &&
             !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
@@ -97,6 +110,11 @@ public:
         return recive(rRxSpan.as_byte(), scanForEnd);
     }
 
+    //! data buffer to recive is passed with the assistance of the HostOrder 
+    //! reflection helper. It converts the recived data to HostOrder again.
+    //! For reflection of the passed type a registration of the members (EtEndian::registerMembers<T>)
+    //! is required. See at examples
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     template<typename T, std::enable_if_t<EtEndian::is_host_order_v<utils::remove_cvref_t<T>>, int> = 0>
     ERet recive(T&& rRx, CallbackReceive scanForEnd = defaultOneRead)
     {
@@ -105,6 +123,7 @@ public:
         return recive(rxSpan, scanForEnd);
     }
 
+    //The recive methode is blocking if no data is available and can be unblocked.
     bool unblockRecive() noexcept;
 private:
     std::shared_ptr<CTcpDataLinkPrivate> m_pPrivate;

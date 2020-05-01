@@ -61,7 +61,7 @@ constexpr auto defaultReciveFrom = [](SPeerAddr ClientAddr, utils::span<uint8_t>
 class CUdpDataLinkPrivate;
 //*****************************************************************************
 //! \brief CUdpDataLink
-//!
+//! The UdpDataLink is communication layer used by UdpClient and UdpServer
 class CUdpDataLink
 {
 public:
@@ -76,20 +76,32 @@ public:
     CUdpDataLink() noexcept;
     CUdpDataLink(CUdpDataLink const&)                    = delete;
     CUdpDataLink& operator=(CUdpDataLink const&)         = delete;
-    virtual ~CUdpDataLink() noexcept;
-
-    CUdpDataLink(int socketFd);
-    CUdpDataLink(int socketFd, const SPeerAddr &rPeerAddr);
     CUdpDataLink(CUdpDataLink &&rhs) noexcept;
     CUdpDataLink& operator=(CUdpDataLink&& rhs) noexcept;
+    virtual ~CUdpDataLink() noexcept;
 
+    //! The UdpDataLink is instantiated either by UdpServer or UdpClient
+    CUdpDataLink(int socketFd);
+    CUdpDataLink(int socketFd, const SPeerAddr &rPeerAddr);
+
+    //! data to transmit is passed by a the non-owning span view of type "const uint8_t"
+    //! The peer adress to transmit is specified at constrution
+    //! e.g uint8_t txData[5] = {0,1,2,3,4};
+    //! e.g send(utils::span(txData));
     void send(const utils::span<const uint8_t>& rSpanTx) const;
 
+    //! data to transmit is passed by a the non-owning span view of any type T.
+    //! The peer adress to transmit is specified at constrution
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void send(const utils::span<T>& rTxSpan) const {
         send(rTxSpan.as_byte());
     }
 
+    //! data to transmit is passed ty NetOrder reflection helper. It converts the data to transmit
+    //! automatically into Network-byte-order (Big Endian).
+    //! The peer adress to transmit is specified at constrution
+    //! For reflection of the passed type a registration of the members (EtEndian::registerMembers<T>)
+    //! is required. See at examples
     template<typename T>
     void send(const EtEndian::CNetOrder<T>& rTx)
     {
@@ -97,13 +109,24 @@ public:
         send(txSpan.as_byte());
     }
 
+    //! data to transmit is passed by a the non-owning span view of type "const uint8_t"
+    //! The ClientAddr specifies the peer adress to transmit.
+    //! e.g uint8_t txData[5] = {0,1,2,3,4};
+    //! e.g send(utils::span(txData));
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<const uint8_t>& rSpanTx) const;
 
+    //! data to transmit is passed by a the non-owning span view of any type T.
+    //! The ClientAddr specifies the peer adress to transmit.
     template<typename T, std::enable_if_t<!std::is_same_v<utils::remove_cvref_t<T>,uint8_t>,int> = 0>
     void sendTo(const SPeerAddr& rClientAddr, const utils::span<T>& rTxSpan) const {
         sendTo(rClientAddr, rTxSpan.as_byte());
     }
 
+    //! data to transmit is passed ty NetOrder reflection helper. It converts the data to transmit
+    //! automatically into Network-byte-order (Big Endian).
+    //! The peer adress to transmit is specified at constrution
+    //! For reflection of the passed type a registration of the members (EtEndian::registerMembers<T>)
+    //! is required. See at examples
     template<typename T>
     void sendTo(const SPeerAddr& rClientAddr, const EtEndian::CNetOrder<T>& rTx)
     {
@@ -111,9 +134,13 @@ public:
         sendTo(rClientAddr, txSpan.as_byte());
     }
 
+    //! the recive buffer is passed by a the non-owning span view of type "uint8_t"
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     ERet reciveFrom(utils::span<uint8_t>& rSpanRx, CallbackReciveFrom scanForEnd = defaultReciveFrom) const;
     ERet reciveFrom(utils::span<uint8_t>&& rSpanRx, CallbackReciveFrom scanForEnd = defaultReciveFrom) const;
 
+    //! the recive buffer is passed by a the non-owning span view of any type T.
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     template<typename T, std::enable_if_t<
             utils::is_span_v<utils::remove_cvref_t<T>> &&
             !is_span_uint8_t_v<utils::remove_cvref_t<T>>, int> = 0>
@@ -121,6 +148,11 @@ public:
         return reciveFrom(rRxSpan.as_byte(), scanForEnd);
     }
 
+    //! data buffer to recive is passed with the assistance of the HostOrder 
+    //! reflection helper. It converts the recived data to HostOrder again.
+    //! For reflection of the passed type a registration of the members (EtEndian::registerMembers<T>)
+    //! is required. See at examples
+    //! The return value is Ret::UNBLOCK if "unblockRecive" is called
     template<typename T, std::enable_if_t<EtEndian::is_host_order_v<utils::remove_cvref_t<T>>, int> = 0>
     ERet reciveFrom(T&& rRx, CallbackReciveFrom scanForEnd = defaultReciveFrom)
     {
@@ -129,6 +161,7 @@ public:
         return reciveFrom(rxSpan, scanForEnd);
     }
 
+    //The recive methode is blocking if no data is available and can be unblocked.
     bool unblockRecive() noexcept;
 
 private:

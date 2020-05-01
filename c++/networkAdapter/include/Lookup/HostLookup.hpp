@@ -39,7 +39,7 @@ namespace EtNet
 
 //*****************************************************************************
 //! \brief CHostLookup
-//!
+//! Loopup of concerning IpAddress or HostName
 class CHostLookup
 {
 
@@ -53,12 +53,18 @@ public:
     CHostLookup& operator=(CHostLookup&&) noexcept      = default;
     virtual ~CHostLookup() noexcept;
 
+    //! Loopup of the concerning IpAddress
     CHostLookup(std::string&& rHostName);
     CHostLookup(const std::string& rHostName);
+
+    //! Loopup of the concerning HostName
     CHostLookup(CIpAddress&& rIpAddress);
     CHostLookup(const CIpAddress& rIpAddress);
 
+    //Get List of IpAddresses
     IpAddresses addresses() const noexcept;
+
+    //Get Hostname
     std::string hostname() const noexcept;
 
 private:

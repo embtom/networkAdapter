@@ -44,19 +44,24 @@ class CTcpServerPrivate;
 
 //*****************************************************************************
 //! \brief CTcpServer
-//!
+//! TcpServer for stream connection
 class CTcpServer
 {
 public:
     CTcpServer() noexcept                         = default;
+    //Copy of server is delected can only be moved
     CTcpServer(const CTcpServer&)                 = delete;
     CTcpServer& operator= (const CTcpServer&)     = delete;
     CTcpServer(CTcpServer&&) noexcept             = default;
     CTcpServer& operator= (CTcpServer&&) noexcept = default;
     virtual ~CTcpServer() noexcept;
 
+    //! Initialize TcpServer with a BaseSocket and port to listen
     CTcpServer(CBaseSocket&& rBaseSocket, unsigned int port);
 
+    //! wait for connecton, if the routine unblocks a client have connected
+    //! and returns the IpAddress of the Client and a TcpDataLink Object.
+    //! It is used to communicate the client
     std::tuple<CTcpDataLink, CIpAddress> waitForConnection();
 private:
     std::unique_ptr<CTcpServerPrivate> m_pPrivate;
