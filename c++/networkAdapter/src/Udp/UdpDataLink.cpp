@@ -195,6 +195,7 @@ CUdpDataLink::ERet CUdpDataLinkPrivate::reciveFrom(utils::span<uint8_t>& rSpanRx
     {
         case utils::CFdSetRetval::UNBLOCK:  return CUdpDataLink::ERet::UNBLOCK;
         case utils::CFdSetRetval::OK :      return CUdpDataLink::ERet::OK;
+        default:                            return CUdpDataLink::ERet::OK;
     }
 }
 

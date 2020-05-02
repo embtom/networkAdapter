@@ -168,6 +168,7 @@ CTcpDataLink::ERet CTcpDataLinkPrivate::recive(utils::span<uint8_t>& rSpanRx, CT
     {
         case utils::CFdSetRetval::UNBLOCK:  return CTcpDataLink::ERet::UNBLOCK;
         case utils::CFdSetRetval::OK :      return CTcpDataLink::ERet::OK;
+        default:                            return CTcpDataLink::ERet::OK;
     }
 }
 
