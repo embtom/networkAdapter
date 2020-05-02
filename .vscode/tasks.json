@@ -2,15 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "create build container with reprepo",
+            "label": "create_docker_builder",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/010_docker_create.sh",
+            "command": "${workspaceFolder}/scripts/010_docker_builder_create.sh",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "setup reprepo build dependencies",
+            "label": "docker_build_dependencies",
             "type": "shell",
             "command": "${workspaceFolder}/scripts/020_docker_build_depend.sh",
             "problemMatcher": [
@@ -18,33 +18,41 @@
             ]
         },
         {
-            "label": "setup reprepo import dependencies",
+            "label": "docker_build_netadapter",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/021_docker_import_depend.sh",
+            "command": "${workspaceFolder}/scripts/030_docker_build_netadapter.sh",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "build basetgz localhost mirror",
+            "label": "pbuilder_start_debmirror",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/200_basetgz_create_localhost.sh",
+            "command": "${workspaceFolder}/scripts/100_pbuilder_start_debmirror.sh",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "build basetgz tomhp mirror",
+            "label": "pbuilder_debmirror_localhost",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/200_basetgz_create_tomhp.sh",
+            "command": "${workspaceFolder}/scripts/200_pbuilder_debmirror_localhost.sh",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "build deb package",
+            "label": "pbuilder_debmirror_tomhp",
             "type": "shell",
-            "command": "${workspaceFolder}/scripts/300_build_package.sh",
+            "command": "${workspaceFolder}/scripts/210_pbuilder_debmirror_tomhp.sh",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "pbuilder_build_netadapter",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/300_pbuilder_build_netadapter.sh",
             "problemMatcher": [
                 "$gcc"
             ]

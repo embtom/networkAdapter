@@ -29,5 +29,3 @@ do
     reprepro -b /var/lib/reprepro -V include bionic $i
   fi
 done
-
-nginx

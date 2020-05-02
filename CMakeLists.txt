@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(networkadapter
     LANGUAGES   CXX
-    VERSION     0.9.5
+    VERSION     0.9.6
 )
 
 ######################################################

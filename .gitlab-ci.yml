@@ -12,8 +12,8 @@ build_job:
   tags:
     - tomhp
   script:
-    - ./scripts/210_create_basetgz_tomhp.sh
-    - ./scripts/300_build_deb_package.sh
+    - ./scripts/210_pbuilder_debmirror_tomhp.sh
+    - ./scripts/300_pbuilder_build_netadapter.sh
   artifacts:
     paths:
       - ./build_deb/
@@ -48,8 +48,8 @@ enable_merge:
   tags:
     - tomhp
   script:
-    - ./scripts/210_create_basetgz_tomhp.sh
-    - ./scripts/300_build_deb_package.sh
+    - ./scripts/210_pbuilder_debmirror_tomhp.sh
+    - ./scripts/300_pbuilder_build_netadapter.sh
   artifacts:
     paths:
       - ./build_deb/

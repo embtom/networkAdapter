@@ -48,3 +48,6 @@ ADD build_dependencies.sh /home/${USER}/build_dependencies.sh
 RUN sudo chmod +x /home/${USER}/build_dependencies.sh
 ADD import_dependencies.sh /home/${USER}/import_dependencies.sh
 RUN sudo chmod +x /home/${USER}/import_dependencies.sh
+ADD build_netadapter.sh /home/${USER}/build_netadapter.sh
+RUN sudo chmod +x /home/${USER}/build_netadapter.sh
+

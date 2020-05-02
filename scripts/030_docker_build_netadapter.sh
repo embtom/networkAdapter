@@ -11,10 +11,12 @@ cd ${CONTAINER_DIR}
 mkdir -p ${ARTIFACTS_SHARE_NAME}
 
 ARTIFACTS_SHARE=$(realpath ${ARTIFACTS_SHARE_NAME})
+TOPDIR_SHARE=$(realpath ${TOP_DIR})
 source $SCRIPTS_DIR/ContainerCommon.sh
+
 
 docker run  --privileged \
             --tty \
-            --mount type=bind,source=${ARTIFACTS_SHARE},target=/media/artifacts \
+            --mount type=bind,source=${TOPDIR_SHARE},target=/home/$USER/topdir \
             $COMMON \
-             /bin/bash -c "./build_dependencies.sh"
+            /bin/bash -c "./build_netadapter.sh"

@@ -11,23 +11,24 @@ Architecture: any
 Section: libs
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-Description: Development headers of the emtom
-             networkadapter
-
-Package: networkadapter-examples
-Architecture: any
-Section: libs
-Depends: networkadapter, libdocopt0
-Description: Example applications of the emtom
-             networkadapter
+Description: C++ 17 posix abstraction layer for UDP and TCP Sockets
+ This library provides simplified C++ posix sockets abstraction layer for
+ TCP and UDP communication. It also contains a handy c++ endian converter, based
+ on class member reflecion.
+ .
+ This package contains the networkadapter shared library.
 
 Package: networkadapter-dev
 Architecture: any
 Section: libdevel
 Depends: networkadapter,
          ${misc:Depends}
-Description: Development headers of the embtom
-             networkadapter [development]
+Description: C++ 17 posix abstraction layer for UDP and TCP Sockets
+ This library provides simplified C++ posix sockets abstraction layer for
+ TCP and UDP communication. It also contains a handy c++ endian converter, based
+ on class member reflecion.
+ .
+ This package contains the networkadapter development files.
 
 Package: networkadapter-dbg
 Architecture: any
@@ -36,5 +37,20 @@ Priority: extra
 Depends:
     networkadapter (= ${binary:Version}),
     ${misc:Depends}
-Description: debugging symbols for networkadapter
+Description: C++ 17 posix abstraction layer for UDP and TCP Sockets
+ This library provides simplified C++ posix sockets abstraction layer for
+ TCP and UDP communication. It also contains a handy c++ endian converter, based
+ on class member reflecion.
+ .
+ This package contains the networkadapter debugging symbols.
 
+Package: networkadapter-examples
+Architecture: any
+Section: libs
+Depends: networkadapter, libdocopt0
+Description: C++ 17 posix abstraction layer for UDP and TCP Sockets
+ This library provides simplified C++ posix sockets abstraction layer for
+ TCP and UDP communication. It also contains a handy c++ endian converter, based
+ on class member reflecion.
+ .
+ This package contains example applications.
