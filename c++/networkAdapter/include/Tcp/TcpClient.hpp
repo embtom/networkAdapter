@@ -42,7 +42,7 @@ class CTcpClientPrivate;
 
 //*****************************************************************************
 //! \brief CTcpClient
-//!
+//! TcpClient for stream connection
 class CTcpClient
 {
 public:
@@ -53,8 +53,11 @@ public:
     CTcpClient& operator= (CTcpClient&&) noexcept = default;
     virtual ~CTcpClient() noexcept;
 
+    //! Initialize TcpClient by a BaseSocket
     CTcpClient(CBaseSocket &&rBaseSocket);
 
+    //! Establish a connection to a TcpServer. The returned
+    //! TcpDataLink Object is used for communication
     CTcpDataLink connect(const std::string& rHost, unsigned int port);
 private:
     std::unique_ptr<CTcpClientPrivate> m_pPrivate;

@@ -40,7 +40,7 @@ enum class ESocketMode
 
 //*****************************************************************************
 //! \brief CBaseSocket
-//!
+//! It is encapsulation of the Posix Socket
 class CBaseSocket
 {
 public:
@@ -48,17 +48,29 @@ public:
     CBaseSocket(CBaseSocket const&)            = delete;
     CBaseSocket& operator=(CBaseSocket const&) = delete;
 
+    //! Storage a passed socket at the BaseSocket
     CBaseSocket(int socketFd) noexcept;
+
+    //! Create new socket depending on the operation mode
     CBaseSocket(ESocketMode opMode);
+
     CBaseSocket(CBaseSocket &&rhs) noexcept;
     CBaseSocket& operator=(CBaseSocket&& rhs) noexcept;
     virtual ~CBaseSocket() noexcept;
 
+    //! Check if socket is valid
     bool isValid() const noexcept;
+
+    //! get containing socket
     int getFd() const noexcept;
+
+    //! request socket domain, AF_INET or AF_INET6
     int getDomain() const noexcept;
 
+    //! apply socketopt SO_REUSEADDR at Basesocket
     static CBaseSocket&& SoReuseSocket(CBaseSocket &&rBaseSocket);
+
+    //! apply socketopt SO_BROADCAST at Basesocket
     static CBaseSocket&& SoBroadcast(CBaseSocket &&rBaseSocket);
 
 private:

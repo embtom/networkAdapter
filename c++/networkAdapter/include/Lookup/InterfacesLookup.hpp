@@ -43,12 +43,27 @@ namespace EtNet
 
 //*****************************************************************************
 //! \brief CNetInterface
-//!
+//! Loopup all available local Ipaddreses
 class CNetInterfacePrivat;
 class CNetInterface
 {
 public:
     using IfMap = std::map<unsigned int, CNetInterface>;
+
+    //! get a map of networkdevices and concerning network addresses
+    static IfMap getStateMap(bool bUpOnly) noexcept;
+
+    //! get all local Ipv4 addreses
+    static CIpAddress::IpAddresses getAllIpv4Ip(bool bWithLoopback) noexcept;
+
+     //! get all local Ipv4 addreses
+    static CIpAddress::IpAddresses getAllIpv6Ip(bool bWithLoopback) noexcept;
+
+     //! get all local Ipv4 submask addresses
+    static CIpAddress::IpAddresses getAllIpv4Submask() noexcept;
+
+    //! get all local Ipv4 broadcast addressess
+    static CIpAddress::IpAddresses getAllIpv4Broadcast() noexcept;
 
     CNetInterface(const CNetInterface&) noexcept            = delete;
     CNetInterface& operator=(const CNetInterface&) noexcept = delete;
@@ -64,11 +79,6 @@ public:
     EIfState getState() const noexcept;
     unsigned getMtu() const noexcept;
 
-    static IfMap getStateMap(bool bUpOnly) noexcept;
-    static CIpAddress::IpAddresses getAllIpv4Ip(bool bWithLoopback) noexcept;
-    static CIpAddress::IpAddresses getAllIpv6Ip(bool bWithLoopback) noexcept;
-    static CIpAddress::IpAddresses getAllIpv4Submask() noexcept;
-    static CIpAddress::IpAddresses getAllIpv4Broadcast() noexcept;
 
 private:
     CNetInterface(unsigned int index, std::string&& name );

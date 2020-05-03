@@ -95,7 +95,7 @@ TEST_F(CTcpComTest, RawData)
     std::string dataToSend ("hallo litte stream test");
     uint8_t rcvData[40];
     utils::span<uint8_t> rxSpan (rcvData);
-    a.send(utils::span(dataToSend).as_byte());
+    a.send(utils::span(dataToSend));
     a.recive(rxSpan);
     std::string dataRcv((char*)rcvData);
     std::cout << GTEST_BOX << "Rcv: " << dataRcv << std::endl;

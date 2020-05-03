@@ -15,9 +15,10 @@ mkdir -p ${ARTIFACTS_SHARE_NAME}
 ARTIFACTS_SHARE=$(realpath ${ARTIFACTS_SHARE_NAME})
 source $SCRIPTS_DIR/ContainerCommon.sh
 
-#--interactive
 
 docker run  --privileged \
             --tty \
+            --mount type=bind,source=${ARTIFACTS_SHARE},target=/media/artifacts \
+            -p 80:80 \
             $COMMON \
-             /bin/bash -c "./build_dependencies.sh"
+             /bin/bash -c "./import_dependencies.sh && nginx"

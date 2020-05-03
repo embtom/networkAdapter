@@ -42,7 +42,7 @@ class CUdpClientPrivate;
 
 //*****************************************************************************
 //! \brief CUdpClient
-//!
+//! TcpClient for dgram connection
 class CUdpClient
 {
 public:
@@ -51,10 +51,13 @@ public:
     CUdpClient& operator= (CUdpClient&&) noexcept = default;
     CUdpClient(const CUdpClient&)                 = delete;
     CUdpClient& operator= (const CUdpClient&)     = delete;
-
-    CUdpClient(CBaseSocket &&rBaseSocket);
     virtual ~CUdpClient() noexcept;
 
+    //! Initialize TcpClient by a BaseSocket
+    CUdpClient(CBaseSocket &&rBaseSocket);
+
+    //! Request a link to send Udp packets to a UdpServer
+    //! The returned UdpDataLink Object is used for communication
     CUdpDataLink getLink(const std::string& rHost, unsigned int port);
 
 private:

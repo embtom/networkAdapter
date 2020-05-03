@@ -1,3 +1,9 @@
+networkadapter (0.9.6) bionic; urgency=medium
+
+  * Networkadapter Dokumentation
+
+ -- Thomas Willetal <t.willetal@gmail.com>  Sat, 02 May 2020 13:00:00 +0200
+
 networkadapter (0.9.5) bionic; urgency=medium
 
   * No CamelCase at exportet targets

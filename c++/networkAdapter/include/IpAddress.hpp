@@ -50,19 +50,27 @@ enum class EAddressFamily{
 
 //*****************************************************************************
 //! \brief CIpAddress
+//!It is a representation of IP address, suitable IPv4 or the IPv6
+//!address.
 //!
+//!IPv6 addresses are supported only if the target platform supports IPv6.
 class CIpAddress
 {
 public:
     using IpAddresses = std::vector<CIpAddress>;
 
+    //!Creates a (zero) Ip adddress
     constexpr CIpAddress() noexcept         = default;
+
     CIpAddress(const CIpAddress&)            = default;
     CIpAddress& operator=(const CIpAddress&) = default;
     CIpAddress(CIpAddress&&)                 = default;
     CIpAddress& operator=(CIpAddress&&)      = default;
     virtual ~CIpAddress() noexcept           = default;
 
+    //! Creates an IPAddress from a native inet address type.
+    //! Depending on the passed address type (in_addr or in6_addr)
+    //! the containing address family is selected.
     template <typename T,
               typename std::enable_if_t<std::is_same<std::remove_reference_t<T>, in_addr>::value ||
                                         std::is_same<std::remove_reference_t<T>, in6_addr>::value, int> = 0>
@@ -70,25 +78,49 @@ public:
         m_address(std::forward<T>(rIpAddr))
     { }
 
+    //! Creates an IPAddress a string in representation format of dotted decimal
+	//! for IPv4 or hex string for IPv6
+    //! e.g. "x.x.x.x" for IPv4,
+    //! e.g. "x:x:x:x:x:x:x:x" for Ipv6
     CIpAddress(const std::string& rIpStr);
     CIpAddress(std::string&& rIpStr) :
         CIpAddress(rIpStr)
     { }
 
+    //! return the the contained ip address as string
     std::string toString() const noexcept;
+
+    //! return ture if containing address is Ipv4
     bool is_v4() const noexcept;
+
+    //! return ture if containing address is Ipv6
     bool is_v6() const noexcept;
+
+    //! return ture if containing address is loopback address
     bool is_loopback() const noexcept;
+
+    //! return ture if containing address is a broadcast address
     bool is_broadcast() const noexcept;
+
+    //! return ture if containing address is a submask
     bool is_submask() const noexcept;
 
+    //! return ture if the IpAddress is not initialized
     bool empty() const noexcept;
 
+    //! Request of containing address family
     EAddressFamily addressFamily() const noexcept;
 
+    //! returns the internal IPv4 address structure
+    //! otherwise nullptr will be returned
     const in_addr* to_v4() const noexcept;
+
+    //! returns the internal IPv6 address structure
+    //! otherwise nullptr will be returned
     const in6_addr* to_v6() const noexcept;
 
+    //! return of the boradcast address derived form the passed
+    //! Network SubMask
     CIpAddress broadcast(const CIpAddress& rSubmask) const noexcept;
 
     bool operator== (const CIpAddress& rhs) const noexcept;
